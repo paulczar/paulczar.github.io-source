@@ -1,0 +1,1601 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+      <title>Recent Content on Paul Czarkowski </title>
+      <generator uri="https://hugo.spf13.com">Hugo</generator>
+    <link>http://tech.paulcz.net/index.xml/</link>
+    <language>en-us</language>
+    
+    
+    <updated>Tue, 13 May 2014 00:00:00 UTC</updated>
+    
+    <item>
+      <title>EZBake - A new way to converge docker containers with chef</title>
+      <link>http://tech.paulcz.net/2014/05/ezbake-a-new-way-to-converge-docker-containers-with-chef/</link>
+      <pubDate>Tue, 13 May 2014 00:00:00 UTC</pubDate>
+      
+      <guid>http://tech.paulcz.net/2014/05/ezbake-a-new-way-to-converge-docker-containers-with-chef/</guid>
+      <description>&lt;p&gt;&lt;code&gt;EZ Bake&lt;/code&gt; came from an idea I had while watching the &lt;a href=&#34;https://twitter.com/hangops&#34;&gt;HangOps&lt;/a&gt; &lt;a href=&#34;https://www.youtube.com/watch?v=clLFKIeSADo&amp;amp;feature=youtu.be&#34;&gt;episode 2014-04-11&lt;/a&gt; in which they were talking about &lt;code&gt;Docker&lt;/code&gt; and Config Management being complementary rather than adversary.&lt;/p&gt;
+
+&lt;p&gt;I have expermented with using &lt;code&gt;Chef&lt;/code&gt; and &lt;code&gt;Docker&lt;/code&gt; together in the &lt;a href=&#34;/2013/09/creating-immutable-servers-with-chef-and-docker-dot-io.html&#34;&gt;past&lt;/a&gt; but wanted to tackle the problem from a slightly different angle.  I&amp;rsquo;ve recently been working on some PAAS stuff, both &lt;a href=&#34;http://deis.io&#34;&gt;Deis&lt;/a&gt; and &lt;a href=&#34;http://solum.io&#34;&gt;Solum&lt;/a&gt; these both utilize the tooling from &lt;a href=&#34;https://github.com/flynn/flynn&#34;&gt;Flynn&lt;/a&gt; which builds heroku style &lt;code&gt;buildpacks&lt;/code&gt; in &lt;code&gt;Docker&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;EZ Bake takes chef recipes designed for &lt;code&gt;chef-solo&lt;/code&gt; ( but could easily be extended to do the same for &lt;code&gt;chef-zero&lt;/code&gt;, or &lt;code&gt;chef-client&lt;/code&gt; with a server) in a tarball via &lt;code&gt;stdin&lt;/code&gt; and converges a docker node using that recipe.&lt;/p&gt;
+
+&lt;p&gt;This methodology seems a little weird at first,  but it gives you the ability to ship your Chef cookbooks as self-contained tarballs, or even more interestingly use the &lt;code&gt;git archive&lt;/code&gt; command from your git repository to do this automatically and then pipe that directly to the &lt;code&gt;docker run&lt;/code&gt; command.&lt;/p&gt;
+
+&lt;p&gt;In order to recognize and run your cookbook ( or repo ) it needs to contain the following files: &lt;code&gt;Berksfile&lt;/code&gt;, &lt;code&gt;solo.json&lt;/code&gt;, &lt;code&gt;solo.rb&lt;/code&gt; in the root of your cookbook.   There is some provision for providing different locations for these via environment variables.   This is pre-ChefDK and will probably become easier with ChefDK.&lt;/p&gt;
+
+&lt;p&gt;I have provided an example in the ezbake repo that will install Java7 in the container.&lt;/p&gt;
+
+&lt;p&gt;This example shows:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Converging a container using a local chef recipe&lt;/li&gt;
+&lt;li&gt;Committing the container to an image on completion&lt;/li&gt;
+&lt;li&gt;Removing the build container&lt;/li&gt;
+&lt;li&gt;Running the new image&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code&gt;$ git clone paulczar/ezbake
+$ cd ezbake/examples
+$ ID=$(tar cf - . | sudo docker run -i -a stdin paulczar/ezbake) \
+  &amp;amp;&amp;amp; sudo docker attach $ID \
+  &amp;amp;&amp;amp; sudo docker commit $ID java7 
+  &amp;amp;&amp;amp; sudo docker rm $ID
+
+Running Berkshelf to collect your cookbooks:
+Installing java (1.22.0) from site: &#39;http://cookbooks.opscode.com/api/v1/cookbooks&#39;
+Converging your container:
+[2014-04-12T22:10:24+00:00] INFO: Forking chef instance to converge...
+....
+[2014-04-12T22:16:52+00:00] INFO: Chef Run complete in 154.563192281 seconds
+[2014-04-12T22:16:52+00:00] INFO: Running report handlers
+[2014-04-12T22:16:52+00:00] INFO: Report handlers complete
+
+$ sudo docker run -t java7 java -version
+java version &amp;quot;1.7.0_51&amp;quot;
+Java(TM) SE Runtime Environment (build 1.7.0_51-b13)
+Java HotSpot(TM) 64-Bit Server VM (build 24.51-b03, mixed mode)
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This could easily be built into a CI pipeline.   a git webhook could call jenkins which would clone the repo and then use a command like  &lt;code&gt;git archive master | docker run -i -a stdin paulczar/ezbake&lt;/code&gt; to converge a container from it.&lt;/p&gt;
+
+&lt;p&gt;It could also very easily be used in &lt;code&gt;Deis&lt;/code&gt; or &lt;code&gt;Solum&lt;/code&gt; as an alternative to a Heroku buildpack.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Running DEIS.IO on Rackspace Cloud</title>
+      <link>http://tech.paulcz.net/2014/02/running-deis-io-on-rackspace-cloud/</link>
+      <pubDate>Sun, 23 Feb 2014 00:00:00 UTC</pubDate>
+      
+      <guid>http://tech.paulcz.net/2014/02/running-deis-io-on-rackspace-cloud/</guid>
+      <description>
+
+&lt;p&gt;I recently did a presentation at the Cloud Austin meetup titled &lt;a href=&#34;http://tech.paulcz.net/presentation-cloud-austin-deis/#/&#34;&gt;Docking with Unicorns&lt;/a&gt; about new PAAS on the block &lt;a href=&#34;http://deis.io&#34;&gt;DEIS&lt;/a&gt;.   Building out DEIS is quite easy,  make more easy by some tight integration they have with Rackspace Cloud.    If you&amp;rsquo;re interested in what deis is go through my slides linked above, and the documentation on their website.    If you want to build out an environment to kick the tires a bit,  then click &amp;lsquo;Read on&amp;rsquo; below and follow me down the rabbit hole.&lt;/p&gt;
+
+&lt;h2 id=&#34;toc_0&#34;&gt;Chef setup&lt;/h2&gt;
+
+&lt;p&gt;Chef offers a free hosted service for up to five servers.  That&amp;rsquo;s plenty for this exercise so go to the &lt;a href=&#34;https://www.getchef.com/account&#34;&gt;registration page&lt;/a&gt; and create yourself a user.  At some point it will prompt you to generate and save a key, do that and download it.&lt;/p&gt;
+
+&lt;p&gt;Once you have signed up you can download a knife config file and generate a validation key from the &lt;a href=&#34;https://manage.opscode.com/organizations&#34;&gt;Organizations&lt;/a&gt; page.  We can save those down and then move them to a local working directory.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://lh5.googleusercontent.com/-3R-Z-bRi_s0/UwpipiLhhWI/AAAAAAAAN0Q/W6q_Rb7NFy8/w1240-h663-no/opscode-org-page.png&#34; alt=&#34;chef org setup&#34; /&gt;
+&lt;/p&gt;
+
+&lt;h3 id=&#34;toc_1&#34;&gt;Prepare Working Environment&lt;/h3&gt;
+
+&lt;p&gt;Create a &lt;code&gt;~/paas&lt;/code&gt; working directory and configure your local chef tools like this ( change the Download location to match the files you downloaded above ) :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ mkdir -p ~/paas/.chef
+$ cd ~/paas
+$ mv ~/Downloads/&amp;lt;username&amp;gt;.pem .chef/
+$ mv ~/Downloads/knife.rb .chef/
+$ mv ~/Downloads/&amp;lt;username&amp;gt;-validator.pem .chef/
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;toc_2&#34;&gt;Clone the Deis Repository&lt;/h3&gt;
+
+&lt;p&gt;Clone the deis project into your paas working directory:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cd ~/paas
+$ git clone https://github.com/opdemand/deis.git
+Cloning into &#39;deis&#39;...
+remote: Reusing existing pack: 5651, done.
+Receiving objects: 100% (5651/5651), 2.16 MiB | 1.37 MiB/s, done.
+remote: Total 5651 (delta 0), reused 0 (delta 0)
+Resolving deltas: 100% (3131/3131), done.
+Checking connectivity... done
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;toc_3&#34;&gt;Install Pre-reqs&lt;/h3&gt;
+
+&lt;p&gt;Assuming you have a working &lt;code&gt;Ruby 1.9.3+&lt;/code&gt; and the &lt;code&gt;bundler&lt;/code&gt; gem installed you should be able to use the &lt;code&gt;Gemfile&lt;/code&gt; from the deis project to ensure you have all the necessary tools:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cd ~/paas/deis
+$ bundle install
+bundle install
+Fetching gem metadata from https://rubygems.org/.......
+Fetching additional metadata from https://rubygems.org/..
+Using i18n (0.6.9)
+Using multi_json (1.8.4)
+Using activesupport (3.2.16)
+Using addressable (2.3.5)
+...
+Using bundler (1.5.2)
+Your bundle is complete!
+Use `bundle show [gemname]` to see where a bundled gem is installed.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;em&gt;I had some errors installing the eventmachine gem and had to follow &lt;a href=&#34;https://github.com/gitlabhq/gitlabhq/issues/1051#issuecomment-9176547&#34;&gt;this fix&lt;/a&gt; to get bundle install to work&lt;/em&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;toc_4&#34;&gt;Test Chef Connectivity&lt;/h3&gt;
+
+&lt;p&gt;To make sure we configured chef correctly and installed knife as part of the bundle we can run a quick knife command:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ bundle exec knife client list
+&amp;lt;USERNAME&amp;gt;-validator
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;toc_5&#34;&gt;Create an Environment for Deis&lt;/h3&gt;
+
+&lt;p&gt;Deis is currently hardcoded to use the &lt;code&gt;_default&lt;/code&gt; chef environment.    There is a current &lt;a href=&#34;https://github.com/opdemand/deis/issues/523&#34;&gt;issue&lt;/a&gt; on their github to resolve this.   Once that is done I&amp;rsquo;ll update these instructions to create a &lt;code&gt;deis&lt;/code&gt; environment.&lt;/p&gt;
+
+&lt;h3 id=&#34;toc_6&#34;&gt;Upload the Deis Cookbooks&lt;/h3&gt;
+
+&lt;p&gt;If that went well we can upload our cookbooks:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;cd ~/paas/deis
+$ bundle exec berks install
+Installing apt (2.3.8) from site: &#39;http://cookbooks.opscode.com/api/v1/cookbooks&#39;
+Installing docker (0.31.0) from site: &#39;http://cookbooks.opscode.com/api/v1/cookbooks&#39;
+Installing rsyslog (1.10.2) from site: &#39;http://cookbooks.opscode.com/api/v1/cookbooks&#39;
+Installing sudo (2.3.0) from site: &#39;http://cookbooks.opscode.com/api/v1/cookbooks&#39;
+...
+$ bundle exec berks upload
+Using apt (2.3.8)
+Using docker (0.31.0)
+Using rsyslog (1.10.2)
+Using sudo (2.3.0)
+Installing deis (0.5.1) from git: &#39;https://github.com/opdemand/deis-cookbook.git&#39; with branch: &#39;master&#39; at ref: &#39;6361706a1d3245d2a061ed55f5dd4b7cb60d5e5c&#39;
+Using git (2.7.0)
+...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;toc_7&#34;&gt;Create Deis Databags&lt;/h3&gt;
+
+&lt;p&gt;Deis uses some databags to help manage application state.  We can create them like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ bundle exec knife data bag create deis-formations
+Created data_bag[deis-formations]
+$ bundle exec knife data bag create deis-apps
+Created data_bag[deis-apps]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;toc_8&#34;&gt;Prepare Infrastructure&lt;/h2&gt;
+
+&lt;p&gt;I&amp;rsquo;m using Rackspace cloud servers for this as I have the (&lt;a href=&#34;http://developer.rackspace.com/blog/developer-love-welcome-to-the-rackspace-cloud-developer-discount.html)[Rackspace&#34;&gt;http://developer.rackspace.com/blog/developer-love-welcome-to-the-rackspace-cloud-developer-discount.html)[Rackspace&lt;/a&gt; Developer Discount] which is enough discount to host this for free.&lt;/p&gt;
+
+&lt;p&gt;Since Deis will want your rackspace credentials to configure worker nodes I recomment creating a user under (&lt;a href=&#34;https://mycloud.rackspace.com/account#users/create)[User&#34;&gt;https://mycloud.rackspace.com/account#users/create)[User&lt;/a&gt; Management] in your account to use for this.&lt;/p&gt;
+
+&lt;h3 id=&#34;toc_9&#34;&gt;Create a Cloud Load Balancer&lt;/h3&gt;
+
+&lt;p&gt;Log into mycloud.rackspace.com and click on the (&lt;a href=&#34;https://mycloud.rackspace.com/load_balancers)[Load&#34;&gt;https://mycloud.rackspace.com/load_balancers)[Load&lt;/a&gt; Balancers] button.  Select the Dallas Region (DFW) and hit &lt;code&gt;Create Load Balancer&lt;/code&gt;.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Set the Name to &lt;code&gt;deis&lt;/code&gt; and check the region is set to &lt;code&gt;Dallas (DFW)&lt;/code&gt; and hit &lt;code&gt;Create Load Balancer&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://lh4.googleusercontent.com/-E4cZvoKWlYU/Uwpiqr9xOKI/AAAAAAAAN0o/P3vGqPC8A98/w793-h592-no/rackspace-create-lb.png&#34; alt=&#34;creating load balancer&#34; /&gt;
+&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Take note of the public IP of the Load Balancer, we&amp;rsquo;ll need it later.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://lh4.googleusercontent.com/-ORvf6nzEduU/Uwpiqk5eP0I/AAAAAAAAN0k/WZ-NaJn3eJg/w770-h567-no/rackspace-lb.png&#34; alt=&#34;load balancer created&#34; /&gt;
+&lt;/p&gt;
+
+&lt;h3 id=&#34;toc_10&#34;&gt;Wildcard DNS&lt;/h3&gt;
+
+&lt;p&gt;Deis&amp;rsquo; proxy layer requires you to set up Wildcard DNS to point to your proxy layer.  There are many ways to achieve this here are two options:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;Rackspace Cloud DNS can host wildcard DNS entries, if you already have DNS hosted by rackspace using Cloud DNS simply add an A record for &lt;code&gt;*.deis&lt;/code&gt; under your domain and point it to the IP of your load balancer.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;The (&lt;a href=&#34;http://xip.io)[xip.io&#34;&gt;http://xip.io)[xip.io&lt;/a&gt;] domain does wildcard DNS based on your IP.  We can use this with our Cloud Load Balancer to load balance our applications.   My Load Balancer has a public IP of &lt;code&gt;50.56.167.26&lt;/code&gt; therefore my wildcard domain will be &lt;code&gt;50.56.167.26.xip.io&lt;/code&gt;.   Remember this.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&#34;toc_11&#34;&gt;Configure Knife for Rackspace&lt;/h3&gt;
+
+&lt;p&gt;The bundle install above already installed the rackspace knife plugin so we just need to add some details to &lt;code&gt;.chef/knife.rb&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cat &amp;lt;&amp;lt;&#39;EOF&#39; &amp;gt;&amp;gt; $HOME/.chef/knife.rb
+knife[:rackspace_api_username] = &amp;quot;#{ENV[&#39;OS_USERNAME&#39;]}&amp;quot;
+knife[:rackspace_api_key]      = &amp;quot;#{ENV[&#39;OS_PASSWORD&#39;]}&amp;quot;
+knife[:rackspace_version]      = &#39;v2&#39;
+knife[:rackspace_region]       = :dfw
+EOF
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;toc_12&#34;&gt;Install Rackspace Nova Client&lt;/h3&gt;
+
+&lt;p&gt;We also need the Nova client:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo pip install rackspace-novaclient
+$ cat &amp;lt;&amp;lt;&#39;EOF&#39; &amp;gt;&amp;gt; ~/paas/.chef/openrc
+export OS_AUTH_URL=https://identity.api.rackspacecloud.com/v2.0/
+export OS_AUTH_SYSTEM=rackspace
+export OS_REGION_NAME=DFW
+export OS_USERNAME=&amp;lt;RACKSPACE_USERNAME&amp;gt;
+export NOVA_RAX_AUTH=1
+export OS_PASSWORD=&amp;lt;RACKSPACE_API_KEY&amp;gt;
+export OS_NO_CACHE=1
+export OS_TENANT_NAME=&amp;lt;RACKSPACE_USERNAME&amp;gt;
+EOF
+$ source ~/paas/.chef/openrc
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;toc_13&#34;&gt;Test Rackspace Connectivity&lt;/h3&gt;
+
+&lt;p&gt;Make sure you can connect to Rackspace with Knife:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ bundle exec knife rackspace server list
+Instance ID  Name  Public IP  Private IP  Flavor  Image  State
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Make sure you can connect to Rackspace with nova:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ nova list
++--------------------------------------+-----------------+--------+------------+-------------+----------------------------------------------------------------------------------------+
+| ID                                   | Name            | Status | Task State | Power State | Networks                                                                               |
++--------------------------------------+-----------------+--------+------------+-------------+----------------------------------------------------------------------------------------+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;toc_14&#34;&gt;Build base images for Controller and Nodes.&lt;/h2&gt;
+
+&lt;p&gt;This isn&amp;rsquo;t strictly necessary,  but will help build your nodes quicker on subsequent builds.&lt;/p&gt;
+
+&lt;h3 id=&#34;toc_15&#34;&gt;Launce a new instance:&lt;/h3&gt;
+
+&lt;p&gt;If we create a base image and pre-install some software we&amp;rsquo;ll get a faster booting system for auto-provisioning:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ bundle exec knife rackspace server create \
+  --image &#39;80fbcb55-b206-41f9-9bc2-2dd7aac6c061&#39; \
+  --node-name &#39;deis-base-image&#39; \
+  --flavor &#39;performance1-1&#39;
+...
+...
+Instance ID: 56760bf1-b977-405e-9348-f70b15a14b87
+Host ID: 97da00a12312a7e455bda70c6dfab8833953e2a03b081aeedfd68152
+Name: deis-base-image
+Flavor: 1 GB Performance
+Image: Ubuntu 12.04 
+Metadata: []
+Public DNS Name: 23-253-69-98.xip.io
+Public IP Address: 23.253.69.98
+Private IP Address: 10.208.101.31
+Password: **************
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Take note of the &lt;code&gt;Instance ID&lt;/code&gt;, &lt;code&gt;Public IP Address&lt;/code&gt; and &lt;code&gt;Password&lt;/code&gt;.  We&amp;rsquo;ll need them later.&lt;/p&gt;
+
+&lt;h3 id=&#34;toc_16&#34;&gt;Add users / keys to instance&lt;/h3&gt;
+
+&lt;p&gt;We&amp;rsquo;re going to add our ssh key as well as a local &lt;code&gt;deis-ops&lt;/code&gt; user to the image to make it easier to manage and troubleshoot later:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ DEIS_IP=&amp;lt;IP_OF_SERVER&amp;gt;
+$ ssh-copy-id root@$DEIS_IP
+root@162.242.144.193&#39;s password: 
+Number of key(s) added: 1
+Now try logging into the machine, with:   &amp;quot;ssh &#39;root@162.242.144.193&#39;&amp;quot;
+and check to make sure that only the key(s) you wanted were added.
+$ ssh root@$DEIS_IP
+Welcome to Ubuntu 12.04.3 LTS (GNU/Linux 3.2.0-55-virtual x86_64)
+
+ * Documentation:  https://help.ubuntu.com/
+
+  System information as of Sun Feb 23 18:34:40 UTC 2014
+
+  System load:  0.08              Processes:           60
+  Usage of /:   5.5% of 19.68GB   Users logged in:     0
+  Memory usage: 6%                IP address for eth0: 162.242.144.193
+  Swap usage:   0%                IP address for eth1: 10.208.135.114
+
+  Graph this data and manage this system at https://landscape.canonical.com/
+
+Last login: Sun Feb 23 18:33:02 2014 from cpe-24-27-47-27.austin.res.rr.com
+root@deis-base-image:~# useradd --comment &#39;deis ops user&#39; --home-dir &#39;/home/deis-ops&#39; \
+  --shell &#39;/bin/bash&#39; --create-home deis-ops
+root@deis-base-image:~# mkdir -p /home/deis-ops/.ssh &amp;amp;&amp;amp; \
+   cp /root/.ssh/authorized_keys /home/deis-ops/.ssh/authorized_keys &amp;amp;&amp;amp; \
+  chown -R deis-ops:deis-ops /home/deis-ops &amp;amp;&amp;amp; \
+  chmod 0700 /home/deis-ops/.ssh &amp;amp;&amp;amp; \
+  chmod 0600 /home/deis-ops/.ssh/authorized_keys &amp;amp;&amp;amp; \
+  echo &#39;deis-ops ALL=(ALL) NOPASSWD:ALL&#39; &amp;gt; /etc/sudoers.d/deis-ops &amp;amp;&amp;amp; \
+  chmod 0440 /etc/sudoers.d/deis-ops
+root@deis-base-image:~# exit
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Check that you can log in with these new creds:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ssh deis-ops@$DEIS_IP
+deis$ sudo bash
+root@deis$ exit
+deis$ exit
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;toc_17&#34;&gt;Finish preparing node image&lt;/h3&gt;
+
+&lt;p&gt;Next we&amp;rsquo;re going to update the kernel and prepare the base node image.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ssh deis-ops@$DEIS_IP &#39;sudo apt-get update&#39;
+$ scp contrib/rackspace/*.sh deis-ops@$DEIS_IP:~/
+$ ssh deis-ops@$DEIS_IP &#39;sudo ~/prepare-node-image.sh&#39;
+$ ssh deis-ops@$DEIS_IP &#39;sudo apt-get install -yq linux-image-generic-lts-raring linux-headers-generic-lts-raring&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;toc_18&#34;&gt;Create an image from this server&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;$ nova image-create deis-base-image deis-node-image
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;After a few minutes you should see this response to running &lt;code&gt;nova image-list&lt;/code&gt;, if you&amp;rsquo;re impatient like me wrap your command with a &lt;code&gt;watch&lt;/code&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ watch &#39;nova image-list | grep deis&#39;
+| df958d26-6515-4dd9-a449-920e74ea93a2 | deis-base-image                                              | ACTIVE | 0fc7f68b-176d-49a9-82ff-2d5893d32acd |
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Once the image is active we can move onto the next steps.&lt;/p&gt;
+
+&lt;h3 id=&#34;toc_19&#34;&gt;Prepare controller image&lt;/h3&gt;
+
+&lt;p&gt;Next we want to prepare the VM for the controller image:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ssh deis-ops@$DEIS_IP &#39;sudo ~/prepare-controller-image.sh&#39;
+$ ssh deis-ops@$DEIS_IP &#39;sudo apt-get install -yq linux-image-generic-lts-raring linux-headers-generic-lts-raring&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;toc_20&#34;&gt;Create an image from this server&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;$ nova image-create deis-base-image deis-base-image
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;After a few minutes you should see this response to running &lt;code&gt;nova image-list&lt;/code&gt;, if you&amp;rsquo;re impatient like me wrap your command with a &lt;code&gt;watch&lt;/code&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ watch &#39;nova image-list | grep deis-node&#39;
+| f2236fa6-1e2d-4746-ac87-a3dd6b2de811 | deis-node-image                                              | ACTIVE | 633d5d88-54b3-463c-80fe-c119f4eb33a3 |
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;toc_21&#34;&gt;Delete the instance&lt;/h3&gt;
+
+&lt;p&gt;No need to keep the instance around and keep paying for it once you have the image:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ bundle exec knife rackspace server list | grep deis  
+42899699-68e7-4785-9f49-e0050f86249a  deis-base-image  162.242.144.193  10.208.135.114  performance1-1  80fbcb55-b206-41f9-9bc2-2dd7aac6c061  active
+$ bundle exec knife rackspace server delete 42899699-68e7-4785-9f49-e0050f86249a --purge
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;toc_22&#34;&gt;Create the Deis Controller server&lt;/h2&gt;
+
+&lt;h3 id=&#34;toc_23&#34;&gt;Launch the Server&lt;/h3&gt;
+
+&lt;p&gt;Launch the server from the image you created earlier:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ nova image-list | grep  deis-base-image
+| a58c9895-6349-442a-bba7-99611900209d | deis-base-image
+$ knife rackspace server create \
+  --image a58c9895-6349-442a-bba7-99611900209d \
+  --rackspace-metadata &amp;quot;{\&amp;quot;Name\&amp;quot;: \&amp;quot;deis-controller\&amp;quot;}&amp;quot; \
+  --rackspace-disk-config MANUAL \
+  --server-name deis-controller \
+  --node-name deis-controller \
+  --flavor &#39;performance1-2&#39;
+Instance ID: bb713170-9322-424a-8837-863a4b396705
+Name: deis-controller
+Flavor: 2 GB Performance
+Image: deis-base-image
+...
+Public IP Address: 23.253.104.13
+Private IP Address: 10.208.132.190
+Password: CQwDU4m97nvF
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Take note of the &lt;code&gt;Instance ID&lt;/code&gt; and &lt;code&gt;Public IP Address&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;If you have an easy to manage domain add an A record for &lt;code&gt;deis&lt;/code&gt; to it for the Public IP address.  If not
+add an entry to your hosts file ( or do both! I did ):&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo sh -c &amp;quot;echo &#39;&amp;lt;IP_OF_SERVER&amp;gt; deis&#39; &amp;gt;&amp;gt; /etc/hosts&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;toc_24&#34;&gt;Modify Chef Admin Group&lt;/h3&gt;
+
+&lt;p&gt;On the Chef management website click (&lt;a href=&#34;https://manage.opscode.com/groups/admins/edit)[Groups&#34;&gt;https://manage.opscode.com/groups/admins/edit)[Groups&lt;/a&gt;] and add the &lt;code&gt;deis-controller&lt;/code&gt; client and your validator client to the &lt;code&gt;admins&lt;/code&gt; group.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://lh5.googleusercontent.com/-oSqB1Tdnn4c/UwpioPAXpJI/AAAAAAAANz4/xa8BdmRuTzQ/w579-h580-no/chef-admins.png&#34; alt=&#34;chef admins group&#34; /&gt;
+&lt;/p&gt;
+
+&lt;h3 id=&#34;toc_25&#34;&gt;Converge the Deis Controller Server&lt;/h3&gt;
+
+&lt;p&gt;Edit the &lt;code&gt;deis-controller&lt;/code&gt; node via this command:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ EDITOR=vi knife node edit deis-controller
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;make it look like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+  &amp;quot;name&amp;quot;: &amp;quot;deis-controller&amp;quot;,
+  &amp;quot;chef_environment&amp;quot;: &amp;quot;_default&amp;quot;,
+  &amp;quot;normal&amp;quot;: {
+    &amp;quot;tags&amp;quot;: [
+
+    ]
+  },
+  &amp;quot;run_list&amp;quot;: [
+    &amp;quot;recipe[deis::controller]&amp;quot;
+  ]
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;then converge the node by running chef client on it:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ssh deis-ops@deis sudo chef-client
+[2014-02-23T19:25:32+00:00] INFO: Forking chef instance to converge...
+[2014-02-23T19:25:32+00:00] INFO: *** Chef 11.6.2 ***
+[2014-02-23T19:25:33+00:00] INFO: Run List is [recipe[deis::controller]]
+[2014-02-23T19:25:33+00:00] INFO: Run List expands to [deis::controller]
+[2014-02-23T19:25:33+00:00] INFO: Starting Chef Run for deis-controller
+[2014-02-23T19:25:33+00:00] INFO: Running start handlers
+[2014-02-23T19:25:33+00:00] INFO: Start handlers complete.
+...
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;toc_26&#34;&gt;Testing Deis&lt;/h2&gt;
+
+&lt;h3 id=&#34;toc_27&#34;&gt;Install the Deis Client with pip&lt;/h3&gt;
+
+&lt;p&gt;The Deis client is written in python and can be installed by &lt;code&gt;pip&lt;/code&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo pip install deis  
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;toc_28&#34;&gt;Register Admin User&lt;/h3&gt;
+
+&lt;p&gt;First user to register becomes the Admin:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ deis register http://deis:8000
+username: admin
+password: 
+password (confirm): 
+email: admin@example.com
+Registered admin
+Logged in as admin
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Push your public key to deis:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ deis keys:add ~/.ssh/id_rsa.pub 
+Uploading SSH_KEY to Deis...done
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;check the web server is serving content by browsing to (&lt;a href=&#34;http://deis)[http://deis&#34;&gt;http://deis)[http://deis&lt;/a&gt;] and entering your admin credentials.&lt;/p&gt;
+
+&lt;h3 id=&#34;toc_29&#34;&gt;Teach Deis your provider credentials&lt;/h3&gt;
+
+&lt;p&gt;Deis will automatically provision worker nodes if you teach it your credentials.&lt;/p&gt;
+
+&lt;p&gt;We already have our Rackspace credentials saved to &lt;code&gt;~/paas/.chef/openrc&lt;/code&gt; but Deis wants them named differently:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ export RACKSPACE_USERNAME=$OS_USERNAME
+$ export RACKSPACE_API_KEY=$OS_PASSWORD
+$ deis providers:discover
+No EC2 credentials discovered.
+Discovered Rackspace credentials: ****************
+Import Rackspace credentials? (y/n) : y
+Uploading Rackspace credentials... done
+No DigitalOcean credentials discovered.
+No Vagrant VMs discovered.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;toc_30&#34;&gt;Deploy Formations &amp;amp; Layers&lt;/h2&gt;
+
+&lt;h3 id=&#34;toc_31&#34;&gt;Formation&lt;/h3&gt;
+
+&lt;p&gt;Formations are collections of infrastructure for serving applications.   We&amp;rsquo;ll call our first Formation &lt;code&gt;dev&lt;/code&gt; for development.&lt;/p&gt;
+
+&lt;p&gt;Create formation (using the wildcard domain from our cloud load balancer created earlier in the &lt;code&gt;--domain&lt;/code&gt; argument):&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ deis formations:create dev --domain=50.56.167.26.xip.io
+Creating formation... done, created dev
+See `deis help layers:create` to begin building your formation
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;toc_32&#34;&gt;Layers&lt;/h3&gt;
+
+&lt;p&gt;Layers are a heterogenerous collection of nodes that perform one of two function:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Proxy - Directs traffic to the appropriate container running the application.&lt;/li&gt;
+&lt;li&gt;Runtime - Runs the containers that hold the applications.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;We&amp;rsquo;re going to create a layer called &lt;code&gt;nodes&lt;/code&gt; that will perform both the proxy and runtime functions:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ deis layers:create dev nodes rackspace-dfw --proxy=y --runtime=y
+Creating nodes layer... done in 4s
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;em&gt;note&lt;/em&gt; There&amp;rsquo;s currently a &lt;a href=&#34;https://github.com/opdemand/deis/issues/541&#34;&gt;bug&lt;/a&gt; that causes the first creation of a layer to fail.  if that happens run the following:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;deis formations:create dev --domain=50.56.167.26.xip.io
+Creating formation... done, created dev
+
+See `deis help layers:create` to begin building your formation
+$ deis layers:create dev nodes rackspace-dfw --proxy=y --runtime=y
+Creating nodes layer... 500 INTERNAL SERVER ERROR
+&amp;lt;h1&amp;gt;Server Error (500)&amp;lt;/h1&amp;gt;
+$ deis layers:destroy dev nodes
+Destroying nodes layer... done in 0s
+$ deis layers:create dev nodes rackspace-dfw --proxy=y --runtime=y
+Creating nodes layer... done in 2s
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;toc_33&#34;&gt;Build Nodes&lt;/h3&gt;
+
+&lt;p&gt;Next we tell deis to spin up two Cloud Servers which will become members of the &lt;code&gt;nodes&lt;/code&gt; layer.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ deis nodes:scale dev nodes=2
+Scaling nodes... but first, coffee!
+done in 345s
+Use `deis create --formation=dev` to create an application
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This can sometimes take longer than the &lt;code&gt;deis&lt;/code&gt; cli timeout.   Don&amp;rsquo;t fear,  just wait a bit longer, this could be a great time to explore the &lt;code&gt;deis&lt;/code&gt; cli by running &lt;code&gt;deis help&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;toc_34&#34;&gt;Update Cloud Load Balancer&lt;/h2&gt;
+
+&lt;p&gt;Add these two nodes to the (&lt;a href=&#34;https://mycloud.rackspace.com/load_balancers)[Cloud&#34;&gt;https://mycloud.rackspace.com/load_balancers)[Cloud&lt;/a&gt; Load Balancer] we created earlier.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://lh6.googleusercontent.com/-yaJfxoyDk4M/UwpioEndiOI/AAAAAAAANz0/aXannmisdbE/w903-h407-no/cloud-servers-list.png&#34; alt=&#34;cloud server list&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;This is simple to do through the GUI:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Click on your load balancer and under &lt;code&gt;Nodes&lt;/code&gt; click the &lt;code&gt;Add Cloud Servers&lt;/code&gt; button.&lt;/li&gt;
+&lt;li&gt;Check the box beside the two &lt;code&gt;dev-nodes&lt;/code&gt; servers and click &lt;code&gt;Add Selected Servers&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://lh6.googleusercontent.com/-zm6sB7l7YVk/Uwpin4BNJPI/AAAAAAAANzw/b-_J2ieyIuE/w773-h476-no/cloud-lb-nodes.png&#34; alt=&#34;cloud lb servers&#34; /&gt;
+&lt;/p&gt;
+
+&lt;h2 id=&#34;toc_35&#34;&gt;Deploy an Application&lt;/h2&gt;
+
+&lt;p&gt;So great, you have a PaaS, but what do you do now?  Deploy some apps of course!&lt;/p&gt;
+
+&lt;h3 id=&#34;toc_36&#34;&gt;NodeJS Example App&lt;/h3&gt;
+
+&lt;p&gt;Download the NodeJS example application so like:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ mkdir -p ~/paas/apps
+$ cd ~paas/apps
+$ git clone https://github.com/opdemand/example-nodejs-express.git
+$ cd example-nodejs-express
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;toc_37&#34;&gt;Create an Application in Deis&lt;/h3&gt;
+
+&lt;p&gt;Use the Deis command line tool to create a new application:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ deis create      
+Creating application... done, created exotic-sandwich
+Git remote deis added
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;toc_38&#34;&gt;Push your Application to Deis&lt;/h3&gt;
+
+&lt;p&gt;This will push, deploy and Launch the app.  The first one will take some time as deis has to download some docker images,  subsequent apps will be much faster:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ git push deis master                     
+git push deis master
+Counting objects: 184, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (89/89), done.
+Writing objects: 100% (184/184), 28.77 KiB | 0 bytes/s, done.
+Total 184 (delta 103), reused 165 (delta 92)
+-----&amp;gt; Node.js app detected
+-----&amp;gt; Requested node range: 0.10.x
+-----&amp;gt; Resolved node version: 0.10.26
+-----&amp;gt; Downloading and installing node
+-----&amp;gt; Installing dependencies
+       npm WARN package.json example-nodejs-express@0.0.1 No repository field.
+       npm http GET https://registry.npmjs.org/express
+       npm http 200 https://registry.npmjs.org/express
+...
+-----&amp;gt; Caching node_modules directory for future builds
+-----&amp;gt; Cleaning up node-gyp and npm artifacts
+-----&amp;gt; Building runtime environment
+-----&amp;gt; Discovering process types
+       Procfile declares types -&amp;gt; web
+-----&amp;gt; Compiled slug size is 5.5M
+-----&amp;gt; Building Docker image
+Uploading context 5.698 MB
+Uploading context 
+Step 0 : FROM deis/slugrunner
+ ---&amp;gt; bb0a27915014
+Step 1 : RUN mkdir -p /app
+ ---&amp;gt; Running in 1ae5cdeaad9a
+ ---&amp;gt; 6e6467466d48
+Step 2 : ADD slug.tgz /app
+ ---&amp;gt; 191a4345b1e4
+Step 3 : ENTRYPOINT [&amp;quot;/runner/init&amp;quot;]
+ ---&amp;gt; Running in d322512d5865
+ ---&amp;gt; 2866cf3e37c9
+Successfully built 2866cf3e37c9
+-----&amp;gt; Pushing image to private registry
+       Launching... done, v2
+
+-----&amp;gt; exotic-sandwich deployed to Deis
+       http://exotic-sandwich.50.56.167.26.xip.io
+
+       To learn more, use `deis help` or visit http://deis.io
+
+To ssh://git@deis:2222/exotic-sandwich.git
+ * [new branch]      master -&amp;gt; master
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;toc_39&#34;&gt;Did it work ?&lt;/h2&gt;
+
+&lt;p&gt;Open your web browser to the URL in the output of the previous command.  In my case this was &lt;code&gt;http://exotic-sandwich.50.56.167.26.xip.io&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;If everything worked the text in the browser window should read &lt;code&gt;Powered by Deis&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://lh6.googleusercontent.com/-cxuysxM_oM8/UwpipfiKFMI/AAAAAAAAN0U/M7T9dC6xJ-E/w446-h171-no/deis-app-1.png&#34; alt=&#34;deis app&#34; /&gt;
+&lt;/p&gt;
+
+&lt;h2 id=&#34;toc_40&#34;&gt;Configure and Scale your application&lt;/h2&gt;
+
+&lt;p&gt;We can set config parameters for our apps by running &lt;code&gt;deis config&lt;/code&gt;.   The example app we&amp;rsquo;re using has a config paramater &amp;lsquo;POWERED_BY&amp;rsquo; so we can set that by running:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ deis config:set POWERED_BY=&#39;DEIS and Rackspace&#39;
+=== exotic-sandwich
+POWERED_BY: DEIS and Rackspace
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://lh6.googleusercontent.com/-J5AcNytZLOQ/UwpipEdpeBI/AAAAAAAAN0E/WXWC08rxsBU/w507-h157-no/deis-app-2.png&#34; alt=&#34;deis app2&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;Expecting visitors?  Let&amp;rsquo;s scale your app to 5 nodes:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ deis scale web=5
+Scaling containers... but first, coffee!
+done in 54s
+
+=== exotic-sandwich Containers
+
+--- web: `node server.js`
+web.1 up 2014-02-23T20:22:07.241Z (dev-nodes-2)
+web.2 up 2014-02-23T20:28:21.778Z (dev-nodes-1)
+web.3 up 2014-02-23T20:28:21.788Z (dev-nodes-2)
+web.4 up 2014-02-23T20:28:21.799Z (dev-nodes-1)
+web.5 up 2014-02-23T20:28:21.810Z (dev-nodes-2)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;You can see what your app is doing by running &lt;code&gt;deis info&lt;/code&gt; and &lt;code&gt;deis logs&lt;/code&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ deis info
+=== exotic-sandwich Application
+{
+  &amp;quot;updated&amp;quot;: &amp;quot;2014-02-23T20:28:21.812Z&amp;quot;, 
+  &amp;quot;uuid&amp;quot;: &amp;quot;ef618db6-f5a8-4cab-a7d9-d01e78036e3a&amp;quot;, 
+  &amp;quot;created&amp;quot;: &amp;quot;2014-02-23T20:16:51.931Z&amp;quot;, 
+  &amp;quot;formation&amp;quot;: &amp;quot;dev&amp;quot;, 
+  &amp;quot;owner&amp;quot;: &amp;quot;admin&amp;quot;, 
+  &amp;quot;id&amp;quot;: &amp;quot;exotic-sandwich&amp;quot;, 
+  &amp;quot;containers&amp;quot;: &amp;quot;{\&amp;quot;web\&amp;quot;: 5}&amp;quot;
+}
+
+=== exotic-sandwich Containers
+
+--- web: `node server.js`
+web.1 up 2014-02-23T20:22:07.241Z (dev-nodes-2)
+web.2 up 2014-02-23T20:28:21.778Z (dev-nodes-1)
+web.3 up 2014-02-23T20:28:21.788Z (dev-nodes-2)
+web.4 up 2014-02-23T20:28:21.799Z (dev-nodes-1)
+web.5 up 2014-02-23T20:28:21.810Z (dev-nodes-2)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;$ deis logs
+Feb 23 20:22:57 dev-nodes exotic-sandwich[web.1]: Server listening on port 10001 in development mode
+Feb 23 20:25:38 dev-nodes exotic-sandwich[web.1]: Server listening on port 10001 in development mode
+Feb 23 20:26:49 dev-nodes exotic-sandwich[web.1]: Server listening on port 10001 in development mode
+Feb 23 20:28:28 dev-nodes exotic-sandwich[web.3]: Server listening on port 10003 in development mode
+Feb 23 20:28:29 dev-nodes exotic-sandwich[web.5]: Server listening on port 10005 in development mode
+Feb 23 20:29:11 dev-nodes exotic-sandwich[web.2]: Server listening on port 10002 in development mode
+Feb 23 20:29:12 dev-nodes exotic-sandwich[web.4]: Server listening on port 10004 in development mode
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Congratulations!  You&amp;rsquo;ve successfully built out your own cost effective PAAS and deployed your first application to it.&lt;/p&gt;
+
+&lt;p&gt;Speaking of costs &amp;hellip;  How much would this cost to run per month ?&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Cloud Load Balancer - $10.95 / month&lt;/li&gt;
+&lt;li&gt;Deis Controller - $57.60 / month&lt;/li&gt;
+&lt;li&gt;Deis Nodes (x2) - $115.20 / month&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Total:  $183.75 / month.&lt;/p&gt;
+
+&lt;p&gt;You could run all of this on a single server without a load balancer,  which means it would be just $57.60/month, which with the &lt;a href=&#34;http://developer.rackspace.com/devtrial/&#34;&gt;Rackspace Developer Discount&lt;/a&gt; would reduce down to just $7.60/month.&lt;/p&gt;
+
+&lt;h1 id=&#34;toc_41&#34;&gt;Epilogue&lt;/h1&gt;
+
+&lt;h2 id=&#34;toc_42&#34;&gt;Cleanup&lt;/h2&gt;
+
+&lt;p&gt;Destroy your app:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ deis destroy
+
+ !    WARNING: Potentially Destructive Action
+ !    This command will destroy the application: exotic-sandwich
+ !    To proceed, type &amp;quot;exotic-sandwich&amp;quot; or re-run this command with --confirm=exotic-sandwich
+
+&amp;gt; exotic-sandwich
+Destroying exotic-sandwich... done in 21s
+Git remote deis removed
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;list your servers:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ bundle exec knife rackspace server list
+Instance ID                           Name             Public IP       Private IP      Flavor          Image                                 State 
+7c43ecb9-1ba3-454c-a5f4-637b56961d68  dev-nodes        23.253.102.184  10.208.135.137  performance1-2  2d59cbce-92fa-412b-8a5e-6eb426ce7dc9  active
+f89c4b25-6486-422a-907a-16b3b3223a5e  dev-nodes        23.253.102.158  10.208.137.18   performance1-2  2d59cbce-92fa-412b-8a5e-6eb426ce7dc9  active
+bb713170-9322-424a-8837-863a4b396705  deis-controller  23.253.104.13   10.208.132.190  performance1-2  a58c9895-6349-442a-bba7-99611900209d  active
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Delete your servers by running the following command for each:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ bundle exec knife rackspace server delete 7c43ecb9-1ba3-454c-a5f4-637b56961d68 --purge
+Instance ID: 7c43ecb9-1ba3-454c-a5f4-637b56961d68
+Host ID: e0da0172f321babe99aec9686c7b99ac7fa5ff8fa1ada934f5fae842
+Name: dev-nodes
+Flavor: 2 GB Performance
+Image: deis-node-image
+Public IP Address: 23.253.102.184
+Private IP Address: 10.208.135.137
+
+Do you really want to delete this server? (Y/N) y
+[WARNING] Error Parsing response json - Yajl::ParseError
+WARNING: Deleted server 7c43ecb9-1ba3-454c-a5f4-637b56961d68
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Clean up your chef:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ bundle exec knife data bag delete deis-apps
+$ bundle exec knife data bag delete deis-formations
+$ bundle exec knife client delete dev-nodes-1
+$ bundle exec knife client delete dev-nodes-2
+$ bundle exec knife node delete dev-nodes-1
+$ bundle exec knife node delete dev-nodes-2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Delete your glance images:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ nova image-delete deis-base-image
+$ nova image-delete deis-node-image
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Finally delete your Cloud Load Balancer from the &lt;a href=&#34;https://mycloud.rackspace.com/load_balancers&#34;&gt;Rackspace UI&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Managing docker services with this one easy trick</title>
+      <link>http://tech.paulcz.net/2013/10/managing-docker-services-with-this-one-easy-trick/</link>
+      <pubDate>Sun, 20 Oct 2013 00:00:00 UTC</pubDate>
+      
+      <guid>http://tech.paulcz.net/2013/10/managing-docker-services-with-this-one-easy-trick/</guid>
+      <description>
+
+&lt;p&gt;I have been having a lot of internal debate about the idea of running more than one service in a docker container.   A Docker container is built to run a single process in the foreground and to live for only as long as that process is running.  This is great in a utopian world where servers are immutable and sysadmins drink tiki drinks on the beach,  however it doesn&amp;rsquo;t always translate well to the real world.&lt;/p&gt;
+
+&lt;p&gt;Examples where you might want to be able to run multiple servers span from the simple use case of running &lt;code&gt;sshd&lt;/code&gt; as well as your application to running a web app such as &lt;code&gt;wordpress&lt;/code&gt; where you might want both &lt;code&gt;apache&lt;/code&gt; and &lt;code&gt;mysql&lt;/code&gt; running in the same container.&lt;/p&gt;
+
+&lt;p&gt;Wrapping your applications in a supervisor daemon such as &lt;code&gt;runit&lt;/code&gt; seems like a perfect fit for this.  All you need to do is install &lt;code&gt;runit&lt;/code&gt; as part of your &lt;code&gt;dockerfile&lt;/code&gt; and then create appropriate service directories for the apps you want to run in the container.    I was doing some testing of this when I realized a quirk of &lt;code&gt;runit&lt;/code&gt; which I could exploit for evil.&lt;/p&gt;
+
+&lt;p&gt;To start or stop a service with &lt;code&gt;runit&lt;/code&gt; is simply a matter of creating or deleting a symlink in a service directory,   so in theory if you could expose that directory to the server hosting the container you could exploit that to start and stop services from outside of the container.  &lt;code&gt;Docker&lt;/code&gt; volume mapping allows exactly this!&lt;/p&gt;
+
+&lt;p&gt;Below you will find examples of running three services (logstash,elasticsearch,kibana) that make up the &lt;code&gt;logstash&lt;/code&gt; suite.&lt;/p&gt;
+
+&lt;h2 id=&#34;toc_0&#34;&gt;Start by cloning the demo git repository and run demo.sh&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;$ git clone https://github.com/paulczar/docker-runit-demo.git
+$ cd docker-runit-demo
+$ ./demo.sh
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;toc_1&#34;&gt;demo.sh script&lt;/h3&gt;
+
+&lt;h4 id=&#34;toc_2&#34;&gt;Step 1:  Build the container&lt;/h4&gt;
+
+&lt;p&gt;The script uses the below &lt;code&gt;Dockerfile&lt;/code&gt; to build the base container that we&amp;rsquo;ll be running.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# Installs runit for service management
+#
+# Author: Paul Czarkowski
+# Date: 10/20/2013
+
+FROM paulczar/jre7
+MAINTAINER Paul Czarkowski &amp;quot;paul@paulcz.net&amp;quot;
+
+RUN apt-get update
+
+RUN apt-get -y install curl wget git nginx
+RUN apt-get -y install runit || echo
+
+CMD [&amp;quot;/usr/sbin/runsvdir-start&amp;quot;]
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;toc_3&#34;&gt;Step 2: Install the applications&lt;/h4&gt;
+
+&lt;p&gt;This will take a few minutes the first time as it needs to download &lt;code&gt;logstash&lt;/code&gt;, &lt;code&gt;kibana&lt;/code&gt;, and &lt;code&gt;elasticsearch&lt;/code&gt; and stage them in a local &lt;code&gt;./opt&lt;/code&gt;directory.&lt;/p&gt;
+
+&lt;h4 id=&#34;toc_4&#34;&gt;Step 3: Start the Docker container&lt;/h4&gt;
+
+&lt;p&gt;Starts the &lt;code&gt;Docker&lt;/code&gt; container with the following command:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;docker run -d -p 8080:80 -p 5014:514 -p 9200:9200 \
+  -v $BASE/opt:/opt \
+  -v $BASE/sv:/etc/sv \
+  -v $BASE/init:/etc/init \
+  -v $BASE/service:/etc/service \
+  demo/runit
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The container should be up and running&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ docker ps
+ID                  IMAGE               COMMAND                CREATED             STATUS              PORTS
+eb495ad92ba0        demo/runit:latest   /usr/sbin/runsvdir-s   4 seconds ago       Up 3 seconds        5014-&amp;gt;514, 8080-&amp;gt;80, 9200-&amp;gt;9200   
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;However there aren&amp;rsquo;t any services running!&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ curl localhost:8080
+curl: (56) Recv failure: Connection reset by peer
+$ curl localhost:9200
+curl: (56) Recv failure: Connection reset by peer
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We can start the services with the following commands&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cd service
+$ ln -s ../sv/elasticsearch
+$ ln -s ../sv/logstash
+$ ln -s ../sv/kibana
+cd ..
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We can now see the services are running, test the ports and send some data to logstash.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ curl localhost:8080      
+&amp;lt;!DOCTYPE html&amp;gt;&amp;lt;!--[if IE 8]&amp;gt;&amp;lt;html class=&amp;quot;no-js lt-ie9&amp;quot; lang=&amp;quot;en&amp;quot;&amp;gt;&amp;lt;![endif]--&amp;gt;&amp;lt;!--[if gt IE 8]&amp;gt;&amp;lt;!--&amp;gt;&amp;lt;html class=&amp;quot;no-js&amp;quot; lang=&amp;quot;en&amp;quot;&amp;gt;
+...
+curl localhost:9200
+{
+  &amp;quot;ok&amp;quot; : true,
+  &amp;quot;status&amp;quot; : 200,
+...
+$tail -100 /var/log/syslog | nc localhost 5014
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Stop a service ?&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ rm service/elasticsearch
+$ rm service/logstash
+$ rm service/kibana
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;toc_5&#34;&gt;Bonus Round: Logs!&lt;/h2&gt;
+
+&lt;p&gt;The beautify of doing this is that we&amp;rsquo;re actually logging the application output to a mounted volume.   This means we now have access to their logs from the host machine.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ tail opt/logstash/logs/current
+$ tail opt/elasticsearch-0.90.5/logs/current
+$ tail opt/kibana/logs/access.log
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;toc_6&#34;&gt;Cleanup&lt;/h2&gt;
+
+&lt;p&gt;Unfortunately any files created inside the docker instance are owned by root ( an artifact of docker daemon running as root ).   If you&amp;rsquo;re in The following script will clean out any such files after you&amp;rsquo;ve stopped the docker container.&lt;/p&gt;
+
+&lt;p&gt;It will delete any files/dirs inside your current directory that are owned by root.  Obviously it can be very dangerous to run &amp;hellip; so be careful where you run it from!&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo find . -uid 0   -exec rm -rfv {} \;
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Creating immutable servers with chef and docker.io</title>
+      <link>http://tech.paulcz.net/2013/09/creating-immutable-servers-with-chef-and-docker-dot-io/</link>
+      <pubDate>Sat, 07 Sep 2013 00:00:00 UTC</pubDate>
+      
+      <guid>http://tech.paulcz.net/2013/09/creating-immutable-servers-with-chef-and-docker-dot-io/</guid>
+      <description>
+
+&lt;p&gt;Building applications in a &lt;a href=&#34;http://docker.io&#34;&gt;docker.io&lt;/a&gt; Dockerfile is relatively simple,  but sometimes you want to just install the application exactly as you would normally via already built chef cookbooks.   Turns out this is actually pretty simple.&lt;/p&gt;
+
+&lt;p&gt;The first thing you&amp;rsquo;ll need to do is build a container with chef-client and berkshelf installed.   You can grab the one I&amp;rsquo;ve built by running &lt;code&gt;docker pull paulczar/chef-solo&lt;/code&gt; or build one youself from a &lt;code&gt;Dockerfile&lt;/code&gt; that looks a little something like the following&amp;hellip;&lt;/p&gt;
+
+&lt;h3 id=&#34;toc_0&#34;&gt;Creating a docker.io container with chef and berkshelf&lt;/h3&gt;
+
+&lt;p&gt;``` ruby Dockerfile&lt;/p&gt;
+
+&lt;h1 id=&#34;toc_1&#34;&gt;DOCKER-VERSION 0.5.3&lt;/h1&gt;
+
+&lt;p&gt;FROM ubuntu:12.10
+MAINTAINER Paul Czarkowski &amp;ldquo;paul@paulcz.net&amp;rdquo;&lt;/p&gt;
+
+&lt;p&gt;RUN apt-get -y update
+RUN apt-get -y install curl build-essential libxml2-dev libxslt-dev git
+RUN curl -L &lt;a href=&#34;https://www.opscode.com/chef/install.sh&#34;&gt;https://www.opscode.com/chef/install.sh&lt;/a&gt; | bash
+RUN echo &amp;ldquo;gem: &amp;ndash;no-ri &amp;ndash;no-rdoc&amp;rdquo; &amp;gt; ~/.gemrc
+RUN /opt/chef/embedded/bin/gem install berkshelf&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;
+_you&#39;ll notice I&#39;m using the embedded chef ruby to install the berkshelf gem,  this is a handy shortcut to avoid messing around with random ruby versions from your distributions packaging._
+
+run `$ docker build -t paulczar/chef-solo .` to build a usable docker container from the above `Dockerfile`.
+
+### Using chef-solo and berkshelf to build an application in a docker.io container ###
+
+My [example application](https://github.com/paulczar/docker-chef-solo) will install `Kibana3` to your docker container.   I&#39;ll step through how it works below.
+
+#### Chef-Solo ####
+
+To run `chef-solo` successfully we require two files.   `solo.rb` to set up file locations, and `solo.json&#39; to set up the json / run list required for your application.
+
+``` ruby chef.rb
+root = File.absolute_path(File.dirname(__FILE__))
+
+file_cache_path root
+cookbook_path root + &#39;/cookbooks&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;``` json chef.json
+{
+  &amp;ldquo;kibana&amp;rdquo;: {
+    &amp;ldquo;webserver_listen&amp;rdquo;: &amp;ldquo;0.0.0.0&amp;rdquo;
+  },
+  &amp;ldquo;run_list&amp;rdquo;: [
+    &amp;ldquo;recipe[kibana::default]&amp;rdquo;
+  ]
+}&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;
+#### Berkshelf ####
+
+To run `berkshelf` we need to build a Berksfile which contains a list of all the chef cookbooks required for the applocation.   Berkshelf will download these cookbooks to a local directory which will be usable by chef-solo.
+
+``` ruby Berksfile
+site :opscode
+
+cookbook &#39;build-essential&#39;
+cookbook &#39;apache2&#39;
+cookbook &#39;git&#39;
+cookbook &#39;kibana&#39;, github: &#39;lusis/chef-kibana&#39;
+cookbook &#39;nginx&#39; , github: &#39;opscode-cookbooks/nginx&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;em&gt;You can see some of the cookbooks are being pulled from the opscode repository,  whereas others are being pulled directly from github.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;toc_2&#34;&gt;Dockerfile&lt;/h4&gt;
+
+&lt;p&gt;All that&amp;rsquo;s left now is to create a Dockerfile that will bring it all together.&lt;/p&gt;
+
+&lt;p&gt;``` ruby Dockerfile&lt;/p&gt;
+
+&lt;h1 id=&#34;toc_3&#34;&gt;DOCKER-VERSION 0.5.3&lt;/h1&gt;
+
+&lt;p&gt;FROM paulczar/chef-client
+MAINTAINER Paul Czarkowski &amp;ldquo;paul@paulcz.net&amp;rdquo;&lt;/p&gt;
+
+&lt;p&gt;RUN apt-get -y update
+ADD . /chef
+RUN cd /chef &amp;amp;&amp;amp; /opt/chef/embedded/bin/berks install &amp;ndash;path /chef/cookbooks
+RUN chef-solo -c /chef/solo.rb -j /chef/solo.json
+RUN echo &amp;ldquo;daemon off;&amp;rdquo; &amp;gt;&amp;gt; /etc/nginx/nginx.conf&lt;/p&gt;
+
+&lt;p&gt;CMD [&amp;ldquo;nginx&amp;rdquo;]
+```&lt;/p&gt;
+
+&lt;p&gt;Run &lt;code&gt;$ docker build -t demo/kibana3 .&lt;/code&gt; to build your application.&lt;/p&gt;
+
+&lt;p&gt;It will add the local files ( &lt;code&gt;solo.rb&lt;/code&gt;, &lt;code&gt;solo.json&lt;/code&gt;, &lt;code&gt;Berksfile&lt;/code&gt; ) to /chef in the server and then call berkshelf to download the cookbooks and chef-solo to install your application.   Finally it will give &lt;code&gt;nginx&lt;/code&gt; a directive to run in the foreground so that we don&amp;rsquo;t have to do any sneaky prcess control to get it to work with the way &lt;code&gt;docker.io&lt;/code&gt; runs processes.&lt;/p&gt;
+
+&lt;p&gt;To run the resultant &lt;code&gt;docker.io&lt;/code&gt; container you simply need to run &lt;code&gt;$ docker run -d -p 80 demo/kibana3&lt;/code&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Logstash &#43; Opscode Omnibus</title>
+      <link>http://tech.paulcz.net/2013/05/logstash-plus-opscode-omnibus/</link>
+      <pubDate>Mon, 06 May 2013 00:00:00 UTC</pubDate>
+      
+      <guid>http://tech.paulcz.net/2013/05/logstash-plus-opscode-omnibus/</guid>
+      <description>&lt;p&gt;At &lt;a href=&#34;http://devopsdays.org/events/2013-austin/&#34;&gt;DevOps Days Austin&lt;/a&gt; &lt;a href=&#34;http://twitter.com/mattray&#34;&gt;@mattray&lt;/a&gt; did an Openspace session on &lt;a href=&#34;https://github.com/opscode/omnibus-ruby&#34;&gt;Omnibus&lt;/a&gt; which is a toolset based around the concept of installing an app and all of it&amp;rsquo;s prerequisites from source into a directory and then building a package ( either .deb or .rpm ) of that using &lt;a href=&#34;https://github.com/jordansissel/fpm&#34;&gt;fpm&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Having battled many times with OS Packages trying to get newer versions of Ruby, or Redis or other software installed and having to hunt down some random package repo or manually build from source this seems like an excellent idea.&lt;/p&gt;
+
+&lt;p&gt;To learn the basics I decided to build an &lt;a href=&#34;https://github.com/paulczar/omnibus-fpm&#34;&gt;omnibus package for fpm&lt;/a&gt; which helped me work out the kinks and learn the basics.&lt;/p&gt;
+
+&lt;p&gt;From there I moved onto something a little more ambitious&amp;hellip; &lt;a href=&#34;http://logstash.net/&#34;&gt;logstash&lt;/a&gt;, which is an awesome opensource project for log aggregation and searching.&lt;/p&gt;
+
+&lt;p&gt;Using Omnibus I took the Logstash .jar file and bundled in Redis, Kibana, Kibana3(+NodeJS), RabbitMQ, Elasticsearch along with all of their depedencies into a big fat package which installs to /opt/logstash and includes init scripts and default configs for each.&lt;/p&gt;
+
+&lt;p&gt;The Logstash Omnibus project can be found &lt;a href=&#34;https://github.com/paulczar/omnibus-logstash&#34;&gt;here&lt;/a&gt;.  I also uploaded the resultant packages for &lt;a href=&#34;https://s3-us-west-2.amazonaws.com/paulcz-packages/logstash-omnibus-1.1.10_amd64.deb&#34;&gt;Ubuntu 12.04&lt;/a&gt; and &lt;a href=&#34;https://s3-us-west-2.amazonaws.com/paulcz-packages/logstash-omnibus-1.1.10.el6.x86_64.rpm&#34;&gt;RHEL 6&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;This gives us a really powerful platform to deploy logstash and all of its prequisites in a completely repeatable manner and not have to worry about the existing versions of Ruby, Java, etc.    It also gives a super simple testing platform where a new user to logstash can install logstash with a single &lt;code&gt;dpkg&lt;/code&gt; or &lt;code&gt;rpm&lt;/code&gt; command and immediately be able to push logs to it via syslog or redis.&lt;/p&gt;
+
+&lt;p&gt;Read more about using and building the &lt;a href=&#34;https://github.com/paulczar/omnibus-logstash/blob/master/README.md&#34;&gt;Logstash Omnibus package here&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Vagrant&#43;Puppet&#43;FPM=Amazeballs</title>
+      <link>http://tech.paulcz.net/2013/04/vagrant-plus-puppet-plus-fpm-equals-amazeballs/</link>
+      <pubDate>Sun, 07 Apr 2013 00:00:00 UTC</pubDate>
+      
+      <guid>http://tech.paulcz.net/2013/04/vagrant-plus-puppet-plus-fpm-equals-amazeballs/</guid>
+      <description>&lt;p&gt;Lately I&amp;rsquo;ve been doing a lot of prototyping with &lt;a href=&#34;http://www.vagrantup.com/&#34;&gt;Vagrant&lt;/a&gt;, specifically for a couple of distinct activities:-&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;building puppet modules using &lt;a href=&#34;https://github.com/elasticdog/puppet-sandbox&#34;&gt;the excellent puppet sandbox&lt;/a&gt; project&lt;/li&gt;
+&lt;li&gt;and building RPM packages with &lt;a href=&#34;https://github.com/jordansissel/fpm&#34;&gt;FPM&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;I realized I was spending a bunch of time flipping back and forth between Vagrant environments and I had no quick way to utilize RPMs built with FPM inside my puppet modules.&lt;/p&gt;
+
+&lt;p&gt;An idea was born.   I forked off the &lt;a href=&#34;https://github.com/paulczar/puppet-sandbox&#34;&gt;puppet sandbox&lt;/a&gt; project and added a Yum repo module &lt;code&gt;repository&lt;/code&gt; to the standalone puppet provisioner that vagrant uses when it first brings up a box.   It adds a Yum repo on the puppet server called &lt;code&gt;sandbox&lt;/code&gt; and adds a repo file to the client boxes pointing to the repo.   Now I can simply push an RPM to &lt;code&gt;packages/rpm&lt;/code&gt; and run &lt;code&gt;vagrant provision puppet&lt;/code&gt; which reruns puppet and rebuilds the yum repo.&lt;/p&gt;
+
+&lt;p&gt;Given that I often flip back and forth between Ubuntu and CentOS boxes I also created &lt;code&gt;Vagrantfile.centos63&lt;/code&gt; and &lt;code&gt;Vagrantfile.precise64&lt;/code&gt; so I can swiftly destroy the existing environment and bring up another of a different flavour by simply symlinking &lt;code&gt;Vagrantfile&lt;/code&gt; to the appropriate file.&lt;/p&gt;
+
+&lt;p&gt;This worked out pretty well for a while until I realized I was still jumping back and forth between vagrant environments and I realized I had another improvement to make.   So I then went on to create a definition in the puppet sandbox &lt;code&gt;Vagrantfile&lt;/code&gt; file for a &lt;code&gt;FPM server&lt;/code&gt; and a new module in the provisioner to install FPM on it.   Given that this module simply adds a few packages this module works for both CentOS and Ubuntu.&lt;/p&gt;
+
+&lt;p&gt;I also created a couple of sample scripts to download source and build RPMs for both Redis and Elasticsearch which get pushed via the provisioner to &lt;code&gt;/tmp/redis-rpm.sh&lt;/code&gt; and &lt;code&gt;/tmp/elasticsearch-rpm.sh&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Now ( For CentOS boxes at least ) I can very quickly iterate on puppet modules and create RPM packages on the fly and have them instantly available.   The process is very simple and looks a little something like this :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ git clone https://github.com/paulczar/puppet-sandbox
+$ cd puppet-sandbox
+$ vagrant up puppet fpm client1
+$ vagrant ssh fpm
+[vagrant@fpm ~]$ sudo /tmp/redis-rpm.sh
+  ... 
+  ... A bunch of scrolling text while files are downloaded and rpm is built
+  ...
+[vagrant@fpm ~]$ exit
+$ vagrant provision puppet
+$ vagrant ssh client1
+[vagrant@client1 ~]$ sudo yum clean all
+[vagrant@client1 ~]$ sudo yum -y install redis
+[vagrant@client1 ~]$ sudo service redis-server start
+[vagrant@client1 ~]$ redis-cli ping
+PONG
+[vagrant@client1 ~]$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If I&amp;rsquo;m building a puppet module that needs redis I can now add the following to it&amp;rsquo;s init.pp ( or more properly create a module for redis and request it from the module I&amp;rsquo;m building )&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;  package { &#39;redis&#39;:
+    ensure =&amp;gt; &#39;present&#39;;
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Of course Debian/Ubuntu doesn&amp;rsquo;t use Yum/RPM for package management.    I&amp;rsquo;d love to accept a pull request from somebody who wants to extend it to also support a local APT repository.   I left breadcrumbs in the &lt;code&gt;repository&lt;/code&gt; module for some appropriate classes to be spliced in&amp;hellip;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Creating a Github Pages Blog With Octopress</title>
+      <link>http://tech.paulcz.net/2012/12/creating-a-github-pages-blog-with-octopress/</link>
+      <pubDate>Sat, 15 Dec 2012 00:00:00 UTC</pubDate>
+      
+      <guid>http://tech.paulcz.net/2012/12/creating-a-github-pages-blog-with-octopress/</guid>
+      <description>
+
+&lt;p&gt;A lot of tech bloggers will write their blog posts in &lt;a href=&#34;http://daringfireball.net/projects/markdown/&#34;&gt;Markdown&lt;/a&gt;, convert it to HTML and paste that HTML into their blog of choice and then in the blog&amp;rsquo;s editor clean it up to suit their blog.   This is an excellent way to create easy to read portable documents that can easily be published in multiple formats.&lt;/p&gt;
+
+&lt;p&gt;However what if there was a way to skip the second part of that and just create a markdown page, submit it into your source control ( you &lt;em&gt;do&lt;/em&gt; use source control right? ) and your blog would automagically update.&lt;/p&gt;
+
+&lt;p&gt;In comes &lt;a href=&#34;http://octopress.org/&#34;&gt;Octopress&lt;/a&gt;,  it&amp;rsquo;s a framework that wraps around &lt;a href=&#34;https://help.github.com/articles/using-jekyll-with-pages&#34;&gt;Jekyll&lt;/a&gt; which is &lt;a href=&#34;https://github.com/&#34;&gt;Github&amp;rsquo;s&lt;/a&gt; blogging engine that powers &lt;a href=&#34;http://pages.github.com/&#34;&gt;Github Pages&lt;/a&gt;.   Essentially you edit Markdown files and &lt;a href=&#34;http://octopress.org/&#34;&gt;Octopress&lt;/a&gt; will compile it into a static-html &lt;a href=&#34;https://help.github.com/articles/using-jekyll-with-pages&#34;&gt;Jekyll&lt;/a&gt; blog.     This means that your blog will be lightning fast ( no need to run an interpreted language in your web server ) and ultra portable.&lt;/p&gt;
+
+&lt;p&gt;Another side benefit is that you can host it for free on &lt;a href=&#34;https://github.com/&#34;&gt;Github&lt;/a&gt; ( as long as you&amp;rsquo;re okay with sharing your source &amp;hellip; and you should be! ) or for free on &lt;a href=&#34;http://www.heroku.com/&#34;&gt;Heroku&lt;/a&gt; ( don&amp;rsquo;t have to share your source ) or host it on any simple no frills Apache, LightHTTP, nginx, node.js, etc server.&lt;/p&gt;
+
+&lt;p&gt;Here is how I&amp;rsquo;m porting my blogger site to Octopress hosted on Github Pages.   I&amp;rsquo;m not using any of the fancy &lt;a href=&#34;https://github.com/mojombo/jekyll/wiki/blog-migrations&#34;&gt;Jekyll migration tools&lt;/a&gt; as I only have a few posts and it will help me get used to the extended syntax that Octopress uses in Markdown.&lt;/p&gt;
+
+&lt;p&gt;As usual the first step is to install any dependencies.   These instructions are for &lt;a href=&#34;http://www.ubuntu.com/&#34;&gt;Ubuntu 12.10&lt;/a&gt; &amp;hellip; modify to suit your OS of choice.&lt;/p&gt;
+
+&lt;p&gt;Most of these steps are taken directly from the &lt;a href=&#34;http://octopress.org/docs/&#34;&gt;Octopress Documentation&lt;/a&gt;,   I&amp;rsquo;m just condensing them into a single document to suit the exact scenario being described in this post.&lt;/p&gt;
+
+&lt;h2 id=&#34;toc_0&#34;&gt;Before You Begin&lt;/h2&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Install Git&lt;/li&gt;
+&lt;li&gt;Install Ruby 1.9.3 via your OS package management or &lt;a href=&#34;http://octopress.org/docs/setup/rbenv/&#34;&gt;rbenv&lt;/a&gt; or &lt;a href=&#34;http://octopress.org/docs/setup/rvm/&#34;&gt;RVM&lt;/a&gt;.&lt;br /&gt;
+&lt;em&gt;If using package management may need to install ruby-dev&lt;/em&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Check your Ruby version is at least 1.9.3 and install bundler:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ruby --version 
+sudo gem install bundler
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;toc_1&#34;&gt;Initial Setup&lt;/h2&gt;
+
+&lt;p&gt;Clone the octopress repository and set it up&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;git clone git://github.com/imathis/octopress.git octopress
+cd octopress
+bundle install
+
+rake install
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We&amp;rsquo;re going to use Github pages.   Octopress has some rake tasks to make this easier for you.    Your blog will be hosted at &lt;code&gt;http://username.github.com&lt;/code&gt; and you need to create a &lt;a href=&#34;https://github.com/repositories/new&#34;&gt;new Github repository&lt;/a&gt; called &lt;code&gt;username.github.com&lt;/code&gt; that github pages will use the master branch as the html source for your blog.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;rake setup_github_pages
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This rake points our clone to the new repistory we just set up, configures your blog&amp;rsquo;s URL and sets up a master branch in the &lt;code&gt;_deploy&lt;/code&gt; directory for deployment.&lt;/p&gt;
+
+&lt;p&gt;edit &lt;code&gt;_config.yml&lt;/code&gt; and fill in your blog name and other details.   There&amp;rsquo;s also some configs for twitter/G+/etc plugins that are worth configuring.&lt;/p&gt;
+
+&lt;h2 id=&#34;toc_2&#34;&gt;Write some blog content&lt;/h2&gt;
+
+&lt;p&gt;&lt;em&gt;Great time to read &lt;a href=&#34;http://octopress.org/docs/blogging&#34;&gt;Blogging Basics&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Create an &lt;code&gt;About&lt;/code&gt; page and a &lt;code&gt;First Post!&lt;/code&gt; blog post:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;rake new_page[&amp;quot;About&amp;quot;]
+rake new_post[&amp;quot;First Post!&amp;quot;]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Edit the Markdown pages that it creates for you with your preferred &lt;a href=&#34;http://sourceforge.net/p/retext/home/ReText/&#34;&gt;Markdown editor&lt;/a&gt;.   The output of the rake commands should provide appropriate hints as to the location of the created files.&lt;/p&gt;
+
+&lt;p&gt;Generate and preview the blog:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;rake generate
+rake preview
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This will generate the contents of your blog and allow you to preview it at [&lt;a href=&#34;http://localhost:4000&#34;&gt;http://localhost:4000&lt;/a&gt;].&lt;/p&gt;
+
+&lt;p&gt;Once you&amp;rsquo;re happy with the contents we can deploy your blog for the first time.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;rake deploy
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This will copy the generated files into &lt;code&gt;_deploy/&lt;/code&gt;, add them to git, commit and push them up to the master branch. In a few seconds you should get an email from Github telling you that your commit has been received and will be published on your site.   Being your first commit it could take 10 minutes for the blog to be available at [&lt;a href=&#34;http://username.github.com&#34;&gt;http://username.github.com&lt;/a&gt;]&lt;/p&gt;
+
+&lt;p&gt;Don&amp;rsquo;t forget to commit your changes to the source branch:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;git add .
+git commit -m &#39;Added About page and first post!&#39;
+git push origin source
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;toc_3&#34;&gt;Want to edit your blog from another machine,  or edit an existing octopress blog?&lt;/h2&gt;
+
+&lt;p&gt;This is pretty simple ( assuming you have the prerequisites already install ).&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;If you run Dropbox you can do this inside of your dropbox folders to make this instantly avaiable on any system you use.&lt;/em&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;git clone git@github.com:username/username.github.com.git
+cd username.github.com
+git checkout source
+mkdir _deploy
+cd _deploy
+git init
+git remote add origin git@github.com:username/username.github.com.git
+git pull origin master
+cd ..
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;once this is done you can run &lt;code&gt;rake new_post[&amp;quot;title&amp;quot;]&lt;/code&gt; and all the other rake commands needed to edit/preview/publish your blog.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Running KVM and Openvswitch on Ubuntu 12.10</title>
+      <link>http://tech.paulcz.net/2012/12/running-kvm-and-openvswitch-on-ubuntu-12-dot-10/</link>
+      <pubDate>Thu, 13 Dec 2012 00:00:00 UTC</pubDate>
+      
+      <guid>http://tech.paulcz.net/2012/12/running-kvm-and-openvswitch-on-ubuntu-12-dot-10/</guid>
+      <description>
+
+&lt;p&gt;I&amp;rsquo;ve got an aging VMWare ESXi 4.0 server that needs to be replaced with something a little more modern and flexing.   Obviously at home I don&amp;rsquo;t need all the cool features that licensed VMWare comes with,  but I do want more than just the basic free version.&lt;/p&gt;
+
+&lt;p&gt;After a few weeks of installing and testing alternatives  ( I&amp;rsquo;d really love to run openstack,  but it&amp;rsquo;s just not worth it at home for a single box ) I&amp;rsquo;ve settled on Ubuntu 12.10 server running KVM and Openvswitch.&lt;/p&gt;
+
+&lt;p&gt;After installing Ubuntu 12.10 I did the following to get KVM up and running&amp;hellip;   I cribbed this mostly from &lt;a href=&#34;http://blog.allanglesit.com/2012/10/linux-kvm-ubuntu-12-10-with-openvswitch/&#34;&gt;blog.allanglesit.com&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Install updates and Pre-requisites&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;First of all, make sure Ubuntu is fully up to date:
+&lt;em&gt;sudo to root as pretty much every command here needs to be run as root&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;{% codeblock lang:bash %}
+sudo bash
+apt-get update
+apt-get upgrade
+{% endcodeblock %}&lt;/p&gt;
+
+&lt;p&gt;Now we can go ahead and install the necessary packages:&lt;/p&gt;
+
+&lt;p&gt;{% codeblock lang:bash %}
+apt-get -y install aptitude apt-show-versions ntp ntpdate vim kvm \
+ libvirt-bin vlan virtinst virt-manager virt-viewer openssh-server \
+ iperf pv openvswitch-controller openvswitch-brcompat \
+ openvswitch-switch nfs-common
+{% endcodeblock %}&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Kill off the default libvirt bridge and nuke ebtables&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;We want to delete the default libvirt interface and we don&amp;rsquo;t need ebtables so we&amp;rsquo;ll get rid of that.&lt;/p&gt;
+
+&lt;p&gt;{% codeblock lang:bash %}
+virsh net-destroy default
+virsh net-autostart &amp;ndash;disable default
+service libvirt-bin stop
+service qemu-kvm stop
+aptitude purge -y ebtables
+service openvswitch-switch restart
+service openvswitch-controller restart
+{% endcodeblock %}&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Configure network interfaces&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;We&amp;rsquo;ll be using just a single interface which will be used for both the bridge and the host itself.    We will also be bridging that network into the the vswitch and then configuring an interface for the host OS.    The network configuration will look something like this:&lt;/p&gt;
+
+&lt;p&gt;{% codeblock /etc/network/interfaces %}&lt;/p&gt;
+
+&lt;h1 id=&#34;toc_0&#34;&gt;The loopback network interface&lt;/h1&gt;
+
+&lt;p&gt;auto lo
+iface lo inet loopback&lt;/p&gt;
+
+&lt;h1 id=&#34;toc_1&#34;&gt;The primary network interface - bridge!&lt;/h1&gt;
+
+&lt;p&gt;auto eth0
+iface eth0 inet manual
+up ifconfig $IFACE 0.0.0.0 up
+down ifconfig $IFACE down&lt;/p&gt;
+
+&lt;h1 id=&#34;toc_2&#34;&gt;The host OS network interface&lt;/h1&gt;
+
+&lt;h1 id=&#34;toc_3&#34;&gt;DNS settings here,  12.10 resets resolv.conf on reboot.&lt;/h1&gt;
+
+&lt;p&gt;auto ovsbr0p1
+iface ovsbr0p1 inet static
+address 192.168.50.10
+netmask 255.255.255.0
+gateway 192.168.50.1
+dns-nameservers 192.168.50.1
+dns-search example.com
+{% endcodeblock %}&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Configure the openvswitch network&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Now we need to configure the network on the openvswitch.     We need to define the bridge, connect it to the uplink interface and create a port for the host OS.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;note: if you&amp;rsquo;re doing this via SSH it will probably break your session&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;{% codeblock lang:bash %}
+ovs-vsctl add-br ovsbr0
+ovs-vsctl add-port ovsbr0 eth0
+ovs-vsctl add-port ovsbr0 ovsbr0p1 &amp;ndash; set interface ovsbr0p1 type=internal
+reboot
+{% endcodeblock %}&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Modify network service sleep times&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;That took forever to boot.    We can fix that by modifying sleeps in /etc/init/failsafe.conf and reboot again to make sure it helped.&lt;/p&gt;
+
+&lt;p&gt;Change :&lt;/p&gt;
+
+&lt;p&gt;{% codeblock %}
+$PLYMOUTH message &amp;ndash;text=&amp;ldquo;Waiting for network configuration&amp;hellip;&amp;rdquo; || :
+sleep 40
+$PLYMOUTH message &amp;ndash;text=&amp;ldquo;Waiting up to 60 more seconds for network configuration&amp;hellip;&amp;rdquo; || :
+sleep 59
+$PLYMOUTH message &amp;ndash;text=&amp;ldquo;Booting system without full network configuration&amp;hellip;&amp;rdquo; || :
+{% endcodeblock %}&lt;/p&gt;
+
+&lt;p&gt;To :&lt;/p&gt;
+
+&lt;p&gt;{% codeblock %}
+$PLYMOUTH message &amp;ndash;text=&amp;ldquo;Waiting for network configuration&amp;hellip;&amp;rdquo; || :
+sleep 1
+$PLYMOUTH message &amp;ndash;text=&amp;ldquo;Waiting up to 60 more seconds for network configuration&amp;hellip;&amp;rdquo; || :
+sleep 1
+$PLYMOUTH message &amp;ndash;text=&amp;ldquo;Booting system without full network configuration&amp;hellip;&amp;rdquo; || :
+{% endcodeblock %}&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;LVM configure&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;We&amp;rsquo;re going to also use LVM to for the KVM virtual machines to use as storage.    I have a pair of 500g disks in a software raid1 which I&amp;rsquo;ll use for this.&lt;/p&gt;
+
+&lt;p&gt;{% codeblock lang:bash %}
+pvcreate /dev/md0
+vgcreate data-disk /dev/md0
+lvcreate -L 10G -n ISO data-disk
+mkfs.ext4 /dev/data-disk/ISO
+mkdir -p /data-disk/ISO
+echo &amp;ldquo;/dev/data-disk/ISO /data-disk/ISO defaults    ext4    0 0&amp;rdquo; &amp;gt;&amp;gt; /etc/fstab
+mount -a
+{% endcodeblock %}&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Create VM&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Now we can go ahead and create our first VM.   I&amp;rsquo;ve already downloaded the Ubuntu ISO to /data-disk/ISO&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;note: virt-install does not support setting a virtualport type of openvswitch yet .. so we have to trick it&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;{% codeblock lang:bash %}
+lvcreate -L 8G -n VM-UbuntuTest data-disk
+virt-install &amp;ndash;name UbuntuTest &amp;ndash;hvm &amp;ndash;noautoconsole &amp;ndash;ram 1024 \
+&amp;ndash;disk path=/dev/data-disk/VM-UbuntuTest &amp;ndash;nonetworks &amp;ndash;vnc \
+&amp;ndash;os-type=linux &amp;ndash;os-variant=ubuntuquantal \
+&amp;ndash;cdrom /data-disk/ISO/ubuntu-12.10-server-amd64.iso
+{% endcodeblock %}&lt;/p&gt;
+
+&lt;p&gt;set up the networking by editing the VM&amp;rsquo;s XML and adding a network interface stanza just before the &amp;lt;/devices&amp;gt;.&lt;/p&gt;
+
+&lt;p&gt;{% codeblock lang:bash %}
+virsh edit UbuntuTest
+{% endcodeblock %}&lt;/p&gt;
+
+&lt;p&gt;{% codeblock lang:xml %}
+&lt;interface type=&#39;bridge&#39;&gt;
+ &lt;source bridge=&#39;ovsbr0&#39;/&gt;
+ &lt;virtualport type=&#39;openvswitch&#39; /&gt;
+ &lt;model type=&#39;virtio&#39;/&gt;
+&lt;/interface&gt;
+{% endcodeblock %}&lt;/p&gt;
+
+&lt;p&gt;The VM will need to be reset to pick up the network change,  however that will cause it to drop the ISO mount.  We can either continue through with the OS install without networking or reset the VM and then re-attach the ISO as a CD.    I connected to it from my desktop using the VirtualMachineManager GUI to do that but you could use virsh commands if you want to stick to CLI.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Moving VMs from VMWare to KVM</title>
+      <link>http://tech.paulcz.net/2012/12/moving-vms-from-vmware-to-kvm/</link>
+      <pubDate>Sun, 09 Dec 2012 00:00:00 UTC</pubDate>
+      
+      <guid>http://tech.paulcz.net/2012/12/moving-vms-from-vmware-to-kvm/</guid>
+      <description>&lt;p&gt;I&amp;rsquo;m migrating from my old VMWare ESXi box to a new machine running Ubuntu 12.10 and KVM.    Not wanting to rebuild all of my VMs I set about trying to work out the best way to migrate the VMs.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Steps to make Windows migrate without Bluescreen&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;If you migrate a windows box it&amp;rsquo;ll bluescreen due to the shock of so much hardware changing.   The following .reg hack will prevent this from happening by opening up access to a bunch of random system drivers.   Copy and run the .reg file in your VM before doing any further steps.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://gist.github.com/4247499&#34;&gt;c:\temp\vmdriverhack.reg&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Move your VM to shared storage&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;I mounted an nfs partition to vmware from my freenas box and migrated the data across using the vmware datastore tools.   If you don&amp;rsquo;t have a NAS you could export a directory from your KVM server to achieve the same goal.&lt;/p&gt;
+
+&lt;p&gt;To move VMs in ESXi we click on the ESXi server, pick the Configuration tab,  click on &amp;lsquo;Storage&amp;rsquo; and then right-click on the datastore and select &amp;lsquo;Browse Datastore&amp;rsquo;.   Select the VM folder you wish to move and click the move icon.&lt;/p&gt;
+
+&lt;p&gt;{% img &lt;a href=&#34;https://lh6.googleusercontent.com/-R5x6JyT5x14/UMUkr4qNr4I/AAAAAAAAAHY/CYhOlizOLb8/s640/VMWare-move-1.png&#34;&gt;https://lh6.googleusercontent.com/-R5x6JyT5x14/UMUkr4qNr4I/AAAAAAAAAHY/CYhOlizOLb8/s640/VMWare-move-1.png&lt;/a&gt; %}&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Convert your VM to qcow2 format&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Next we need to make your VM available to the KVM server.   Again I just mounted my nfs volume to it.     You could run the VM from NFS if you want,  but I want to run it locally.&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;
+kvm-img convert -O qcow2 /mnt/freenas/vms/WindowsGuest/WindowsGuest.vmdk \
+  /data-disk/VMs/WindowsGuest.qcow2
+&lt;/code&gt;`&lt;/p&gt;
+
+&lt;p&gt;It&amp;rsquo;ll take a while to convert.   Once it&amp;rsquo;s done you can make it available to KVM.    I used the VirtualMachineManager GUI,  but you could use virsh if you want.   Simply create a new VM like you would usually except check the &amp;lsquo;Import existing disk image&amp;rsquo; option.&lt;/p&gt;
+
+&lt;p&gt;{% img &lt;a href=&#34;https://lh6.googleusercontent.com/-dXfvXbUOE5c/UMUkwnky73I/AAAAAAAAAHg/DDjgO2CAwqI/s800/vmware-2.png&#34;&gt;https://lh6.googleusercontent.com/-dXfvXbUOE5c/UMUkwnky73I/AAAAAAAAAHg/DDjgO2CAwqI/s800/vmware-2.png&lt;/a&gt; %}&lt;/p&gt;
+
+&lt;p&gt;Then choose your VM image and set the OS versions.&lt;/p&gt;
+
+&lt;p&gt;{% img &lt;a href=&#34;https://lh3.googleusercontent.com/-OybiOO1KsGI/UMUk9JbhzpI/AAAAAAAAAHo/zayosuFa5co/s800/vmware-3.png&#34;&gt;https://lh3.googleusercontent.com/-OybiOO1KsGI/UMUk9JbhzpI/AAAAAAAAAHo/zayosuFa5co/s800/vmware-3.png&lt;/a&gt; %}&lt;/p&gt;
+
+&lt;p&gt;If Windows then choose &amp;lsquo;edit VM before starting it and select the realtek network adaptor.&lt;/p&gt;
+
+&lt;p&gt;{% img &lt;a href=&#34;https://lh4.googleusercontent.com/-MHBkRrhkCI4/UMUlQJ_6ZcI/AAAAAAAAAHw/-Dj9UYNszgU/s800/VMWare-4.png&#34;&gt;https://lh4.googleusercontent.com/-MHBkRrhkCI4/UMUlQJ_6ZcI/AAAAAAAAAHw/-Dj9UYNszgU/s800/VMWare-4.png&lt;/a&gt; %}&lt;/p&gt;
+
+&lt;p&gt;Once created the VM should start up fine.   If the VM is running Windows you&amp;rsquo;ll probably need to re-activate it as the hardware change will make it think you&amp;rsquo;ve pirated it.&lt;/p&gt;
+
+&lt;p&gt;{% img &lt;a href=&#34;https://lh5.googleusercontent.com/-iJuM6CXhWVo/UMUlnT4qjHI/AAAAAAAAAH4/mahRyoBn4ZM/s800/vmware-5.png&#34;&gt;https://lh5.googleusercontent.com/-iJuM6CXhWVo/UMUlnT4qjHI/AAAAAAAAAH4/mahRyoBn4ZM/s800/vmware-5.png&lt;/a&gt; %}&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Moving from a self hosted Wordpress blog to Blogger</title>
+      <link>http://tech.paulcz.net/2012/10/moving-from-a-self-hosted-wordpress-blog-to-blogger/</link>
+      <pubDate>Sun, 21 Oct 2012 00:00:00 UTC</pubDate>
+      
+      <guid>http://tech.paulcz.net/2012/10/moving-from-a-self-hosted-wordpress-blog-to-blogger/</guid>
+      <description>
+
+&lt;p&gt;I have a self hosted &lt;a href=&#34;http://xesla.ro&#34;&gt;wordpress food blog&lt;/a&gt; hosted on an old silly domain that I&amp;rsquo;ve wanted to move away from for a while.   I also want to stop paying hosting fees some time soon.   Since I&amp;rsquo;m already looking at moving a lot of my day-to-day activities to the &amp;lsquo;cloud&amp;rsquo;  it made sense to pick a blogging platform that ties into a major cloud hub.   Google&amp;rsquo;s Blogger was the obvious choice as I&amp;rsquo;m already using the Google Apps platform for my new domain &lt;code&gt;paulcz.net&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Creating a blog on blogger is dead simple.   I went ahead and created two: &lt;a href=&#34;http://food.paulcz.net&#34;&gt;food.paulcz.net&lt;/a&gt; for the new food blog and &lt;a href=&#34;http://tech.paulcz.net&#34;&gt;tech.paulcz.net&lt;/a&gt; to start journalling random tech things.     Transfering the blog content itself  is quite simple,  however, doing it in a way as to preserve links between posts, from other sites, and teaching the search engines how to find your new site requires a little more trickery.&lt;/p&gt;
+
+&lt;p&gt;I&amp;rsquo;m assuming you already have some technical know-how &amp;hellip;  this isn&amp;rsquo;t for the Octogenarians or Luddites in the audience.     You&amp;rsquo;ll need access to a linux host and have a basic understanding of editing files in vim and navigating the linux  command prompt as well as be able to navigate the Wordpress  and Blogger interfaces.&lt;/p&gt;
+
+&lt;p&gt;These examples  use my own blog so where you see &lt;a href=&#34;http://food.paulcz.net&#34;&gt;food.paulcz.net&lt;/a&gt; please modify the text to your own blog URL if you want to use them.   Some of the scripting is a bit silly and could be cleaner but they&amp;rsquo;re throwaway scripts and I didn&amp;rsquo;t want to spend too much time on them.&lt;/p&gt;
+
+&lt;h2 id=&#34;toc_0&#34;&gt;Step 1.   Perform Initial Import/Export of blog.&lt;/h2&gt;
+
+&lt;p&gt;Log into your wordpress blog and export the blog to an XMLfile ( &lt;code&gt;wordpress_export.xml&lt;/code&gt; ).     You should be able to do this by going to &lt;code&gt;Dashboard -&amp;gt; Tools -&amp;gt; Export -&amp;gt; Download Export file&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Browse  to &lt;a href=&#34;http://wordpress2blogger.appspot.com/&#34;&gt;http://wordpress2blogger.appspot.com/&lt;/a&gt;.   This site will convert the file from Wordpress format to Blogger format.   Upload and Convert your file, saving it to &lt;code&gt;blogger_export.xml&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Log into blogger and create a new blog.   if you&amp;rsquo;re using your own domain set up the address in basic settings and then go to &lt;code&gt;Other Settings -&amp;gt; Import blog&lt;/code&gt;  and select the &lt;code&gt;blogger-export.xml&lt;/code&gt; file.   You&amp;rsquo;ll also need to publish all the posts ( they don&amp;rsquo;t seem to publish by default ).  You can do this  50 at a  time from the Posts section.&lt;/p&gt;
+
+&lt;p&gt;Now if you have a small blog, or don&amp;rsquo;t have any intrasite links you&amp;rsquo;re basically done here.   However A lot of my posts have links back to other posts and these are not converted.   This means that there&amp;rsquo;s tons of links on my new blog posting back to my old blog.&lt;/p&gt;
+
+&lt;p&gt;Thankfully I don&amp;rsquo;t upload images to the blog, rather link to them on my picasa/google+ albums.   This means I don&amp;rsquo;t have to deal with some wacky image stuff.&lt;/p&gt;
+
+&lt;h2 id=&#34;toc_1&#34;&gt;Step 2.   Modify links to point to new site.&lt;/h2&gt;
+
+&lt;p&gt;The first thing to do is get a list of all blog post links on your new Blogger site.   This is pretty easy,  you can do it via an RSS feed and some perl magic.&lt;/p&gt;
+
+&lt;p&gt;Browse to your new blog like so:   &lt;a href=&#34;http://food.paulcz.net/feeds/posts/default?start-index=1&amp;amp;max-results=999&#34;&gt;http://food.paulcz.net/feeds/posts/default?start-index=1&amp;amp;max-results=999&lt;/a&gt;.   This  will give you a page showing your entire blog ( assuming you have less than 999 posts ).    Save this file from your browser as default.xhtml.&lt;/p&gt;
+
+&lt;p&gt;now create a perl script called &lt;code&gt;urls.pl&lt;/code&gt; &amp;hellip;    notice the URL ( with \ escaped characters ) .. you&amp;rsquo;ll need to modify this to match your new blogger url.&lt;/p&gt;
+
+&lt;p&gt;``` perl urls.pl
+#!/usr/bin/perl
+open (TXT,&amp;rdquo;&amp;lt; default.xhtml&amp;rdquo;);
+while (&lt;TXT&gt;) {
+ chomp;
+ /(http:\/\/food.paulcz.net\/\d\d\d\d.*?html)/;
+ print $1 . &amp;ldquo;\n&amp;rdquo;;
+}&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;
+Then run the following:
+
+``` bash Terminal
+perl urls.pl | uniq &amp;gt; blogger_urls.txt&#39;
+grep &amp;quot;&amp;lt;link&amp;gt;&amp;quot; wordpress_export.xml | sed &amp;quot;s/&amp;lt;link&amp;gt;//&amp;quot; | sed &amp;quot;s/&amp;lt;\/link&amp;gt;//&amp;quot; \
+ | perl -e &#39;print reverse &amp;lt;&amp;gt;&#39; &amp;gt; wordpress_posts.txt
+cp blogger_export.xml blogger_munge.xml
+vim -O wordpress_posts.txt blogger_urls.txt
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This  will extract a unique list of URLs  of posts from both your new blogger and old wordpress sites. Chances are they won&amp;rsquo;t match up exactly and some hand editing will be required.  That&amp;rsquo;s okay the  last line  above will open the  files side-by-side in vim  to allow you  to clean this  up.     Hand edit each side  to ensure that both URLs on the same line match the same a posts.&lt;/p&gt;
+
+&lt;p&gt;Once that is done we can write  and run some more perl to create a shell script  that will modify the  &lt;code&gt;blogger_munge.xml&lt;/code&gt; file ( copied from the original &lt;code&gt;blogger_export.xml&lt;/code&gt; above ) replacing all your old links.&lt;/p&gt;
+
+&lt;p&gt;Create the following perl script named &lt;code&gt;create_sed.pl&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;``` perl create_sed.pl
+#!/usr/bin/perl
+my @combined;
+open(TXT, &amp;ldquo;&amp;lt; wordpress_posts.txt&amp;rdquo;);
+my @wordpress = &lt;TXT&gt;;
+close TXT;
+open(TXT, &amp;ldquo;&amp;lt; blogger_urls&amp;rdquo;);
+my @blogger = &lt;TXT&gt;;
+chomp(@wordpress);
+chomp(@blogger);
+$size = $#blogger;
+for ( $count=0;$count&amp;lt;=$size;$count++ ) {
+ $string = $wordpress[$count] . &amp;ldquo;|&amp;rdquo; . $blogger[$count];
+ push(@combined, $string);
+}&lt;/p&gt;
+
+&lt;p&gt;foreach ( @combined ) {
+ s/\//\\//g;
+ s/./\./g;
+ s/|/\//;
+ print &amp;ldquo;sed -i \&amp;rsquo;s/$_/g\&amp;rsquo; blogger-munge.xml\n&amp;rdquo;;
+}&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;
+Now run `create_sed.pl`, and the resultant `munge.sh` script.
+
+``` bash Terminal
+perl create_sed.pl  &amp;gt; munge.sh
+sh munge.sh
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;now you have a blogger_munge.xml file that links back to its own articles.    There may be some residual links  back to your old  site.   If you&amp;rsquo;re a perfectionist you  could hand edit  the XML to fix this,  but I&amp;rsquo;d say its now good  enough.&lt;/p&gt;
+
+&lt;h2 id=&#34;toc_2&#34;&gt;Step 3. Re-Create your blogger blog.&lt;/h2&gt;
+
+&lt;p&gt;Now you&amp;rsquo;ll want to delete your initial blogger blog and recreate it.   Remember to set your URL again, then import the &lt;code&gt;blogger_munge.xml&lt;/code&gt; file and republish all the posts.&lt;/p&gt;
+
+&lt;h2 id=&#34;toc_3&#34;&gt;Step 4.  Set redirects from your old blog space.&lt;/h2&gt;
+
+&lt;p&gt;Since we have the matching pairs of URLs  it becomes quite simple to set up some permanent redirects from your apache config, or even better from inside a &lt;code&gt;.htaccess&lt;/code&gt; file.  Setting a permanent redirect not only redirects the user to the correct place,  but in theory also informs a search engine ( on its next pass over your blog )  to update its database to the new location.&lt;/p&gt;
+
+&lt;p&gt;Links from around the web pointing at your old domain will continue to work for as long as the redirects work.    At some point if you want to retire your old domain this will break those links&amp;hellip;   But there&amp;rsquo;s not a great deal you can do about that.&lt;/p&gt;
+
+&lt;p&gt;save the following perl snippet as &lt;code&gt;rewrite.pl&lt;/code&gt;.  remember to rewrite any strings specific to my domains to match your own:&lt;/p&gt;
+
+&lt;p&gt;``` perl rewrite.pl
+#!/usr/bin/perl
+my @combined;
+my @wordpress;
+open(TXT, &amp;ldquo;&amp;lt; wordpress&lt;em&gt;posts.txt&amp;rdquo;);
+while (&lt;TXT&gt;) {
+ chomp;
+ s/\/$//;  # remove trailing /
+ my @temp = split &amp;ldquo;/&amp;rdquo;;
+ $last = pop @temp;
+ push(@wordpress, $last);
+}
+close TXT;
+open(TXT, &amp;ldquo;&amp;lt; blogger_urls&amp;rdquo;);
+my @blogger = &lt;TXT&gt;;
+chomp(@blogger);
+$size = $#blogger;
+for ( $count=0;$count&amp;lt;=$size;$count++ ) {
+ $string = $wordpress[$count] . &amp;ldquo;|&amp;rdquo; . $blogger[$count];
+ push(@combined, $string);
+}
+print &amp;ldquo;rewriteEngine on\n&amp;rdquo;;
+foreach ( @combined ) {
+ s/|/ /;
+ s/^http:\/\/*.?\///;
+ print &amp;ldquo;rewriteRule $&lt;/em&gt; [R=permanent,L]\n&amp;rdquo;;
+}
+print &amp;ldquo;rewriteRule ^.*\$ &lt;a href=&#34;http://food.paulcz.net&#34;&gt;http://food.paulcz.net&lt;/a&gt; [R=permanent,L]\n&amp;rdquo;;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;
+Run the script and output to a file.   The contents of this file can be added to a .htaccess file and will immediately start redirecting your traffic to the correct post on your new blog.   Any hits that don&#39;t match a mapped blog post will get redirected to the main page of your blog.
+
+``` bash Terminal
+perl rewrite.pl &amp;gt; rewrite.txt 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Inspect the file and if it looks correct you can append it to your &lt;code&gt;.htaccess&lt;/code&gt; file.   If you have other redirect rules already in your &lt;code&gt;.htaccess&lt;/code&gt; file you&amp;rsquo;ll need to remove them or comment them out.&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;bash Terminal
+cat rewrite.txt &amp;gt;&amp;gt; /var/www/html/.htaccess
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;There&amp;rsquo;s no need to restart apache for a changed .htaccess file,  so you can immediately test that the redirects are working &amp;hellip;&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;a href=&#34;http://xesla.ro&#34;&gt;http://xesla.ro&lt;/a&gt; &amp;ndash;&amp;gt; &lt;a href=&#34;http://food.paulcz.net/&#34;&gt;http://food.paulcz.net/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://xesla.ro/wordpress/cooking/prickly-pear-syrup&#34;&gt;http://xesla.ro/&amp;hellip;/prickly-pear-syrup&lt;/a&gt; &amp;ndash;&amp;gt; &lt;a href=&#34;http://food.paulcz.net/2012/08/prickly-pear-syrup.html&#34;&gt;http://food.paulcz.net/&amp;hellip;/prickly-pear-syrup.html&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Perfect!  we&amp;rsquo;re working.&lt;/p&gt;
+
+&lt;h2 id=&#34;toc_4&#34;&gt;Step 5.   More Things to do &amp;hellip; ?&lt;/h2&gt;
+
+&lt;p&gt;This has taken care of almost everything I care about.  However I do want to be able to cancel my webhost subscription so I&amp;rsquo;ll need to try and find a cloud type service to perform the redirects for me.    &lt;a href=&#34;www.heroku.com&#34;&gt;Heroku&lt;/a&gt; is probably the place I&amp;rsquo;ll go for that.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

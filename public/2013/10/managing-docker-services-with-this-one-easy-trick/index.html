@@ -1,0 +1,216 @@
+  <!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <title> Managing docker services with this one easy trick &middot; Paul Czarkowski </title>
+    
+    <link rel="stylesheet" type="text/css" href="http://tech.paulcz.net/css/uno.min.css" />
+    <link rel="stylesheet" type="text/css" href="http://tech.paulcz.net/css/lightGallery.css" />
+    
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+    <link href="" rel="alternate" type="application/rss+xml" title="Paul Czarkowski" />
+    
+    <script src="http://tech.paulcz.net/js/jquery.min.js"></script>
+    <script src="http://tech.paulcz.net/js/main.min.js">
+    </script>
+</head>
+
+  <body>
+    <span class="mobile btn-mobile-menu">
+        <i class="fa fa-bars btn-mobile-menu__icon"></i>
+        <i class="fa fa-times btn-mobile-close__icon hidden"></i>
+    </span>
+<header class="panel-cover panel-cover--collapsed" >
+    <div class="panel-main">
+        <div class="panel-main__inner panel-inverted">
+            <div class="panel-main__content"> 
+                <h1 class="panel-cover__title panel-title">
+                    <a href="http://tech.paulcz.net" title="link to homepage for Paul Czarkowski">Paul Czarkowski</a>
+                </h1>
+                <hr class="panel-cover__divider" />
+                <p class="panel-cover__description">  Random musings mostly about tech  </p>
+                <hr class="panel-cover__divider panel-cover__divider--secondary" />
+                <div class="navigation-wrapper">
+                    <nav class="cover-navigation cover-navigation--primary">
+                        <ul class="navigation">
+                            <li class="navigation__item"><a href="/#blog" title="link to Paul Czarkowski blog" class="blog-button">Blog</a> </li>
+                            </br>  </ul>
+                    </nav> <nav class="cover-navigation navigation--social">
+    <ul class="navigation"> 
+        
+        <li class="navigation__item">
+            <a href="http://twitter.com/pczarkowski" title="@pczarkowski on Twitter"> <i class='fa fa-tt'></i> <span class="label">Twitter</span> </a>
+        </li>   
+        
+        <li class="navigation__item">
+            <a href="https://github.com/paulczar" title="paulczar on github"> <i class='fa fa-github'></i> <span class="label">Github</span> </a>
+        </li>  </br>   
+        
+        <li class="navigation__item">
+            <a href="mailto:username.taken&#43;tech@gmail.com" title="Email username.taken&#43;tech@gmail.com"> <i class='fa fa-envelope-o'></i> <span class="label">Email</span> </a>
+        </li>  </ul>
+</nav>
+ </div>
+            </div>
+        </div>
+        <div class="panel-cover--overlay"></div>
+    </div>
+</header>
+
+    <div class="content-wrapper">
+      <div class="content-wrapper__inner">
+        <div class="post">
+          <h1>Managing docker services with this one easy trick</h1>
+          <span class="post-date">Sun, Oct 20, 2013</span>
+          
+
+<p>I have been having a lot of internal debate about the idea of running more than one service in a docker container.   A Docker container is built to run a single process in the foreground and to live for only as long as that process is running.  This is great in a utopian world where servers are immutable and sysadmins drink tiki drinks on the beach,  however it doesn&rsquo;t always translate well to the real world.</p>
+
+<p>Examples where you might want to be able to run multiple servers span from the simple use case of running <code>sshd</code> as well as your application to running a web app such as <code>wordpress</code> where you might want both <code>apache</code> and <code>mysql</code> running in the same container.</p>
+
+<p>Wrapping your applications in a supervisor daemon such as <code>runit</code> seems like a perfect fit for this.  All you need to do is install <code>runit</code> as part of your <code>dockerfile</code> and then create appropriate service directories for the apps you want to run in the container.    I was doing some testing of this when I realized a quirk of <code>runit</code> which I could exploit for evil.</p>
+
+<p>To start or stop a service with <code>runit</code> is simply a matter of creating or deleting a symlink in a service directory,   so in theory if you could expose that directory to the server hosting the container you could exploit that to start and stop services from outside of the container.  <code>Docker</code> volume mapping allows exactly this!</p>
+
+<p>Below you will find examples of running three services (logstash,elasticsearch,kibana) that make up the <code>logstash</code> suite.</p>
+
+<h2 id="toc_0">Start by cloning the demo git repository and run demo.sh</h2>
+
+<pre><code>$ git clone https://github.com/paulczar/docker-runit-demo.git
+$ cd docker-runit-demo
+$ ./demo.sh
+</code></pre>
+
+<h3 id="toc_1">demo.sh script</h3>
+
+<h4 id="toc_2">Step 1:  Build the container</h4>
+
+<p>The script uses the below <code>Dockerfile</code> to build the base container that we&rsquo;ll be running.</p>
+
+<pre><code># Installs runit for service management
+#
+# Author: Paul Czarkowski
+# Date: 10/20/2013
+
+FROM paulczar/jre7
+MAINTAINER Paul Czarkowski &quot;paul@paulcz.net&quot;
+
+RUN apt-get update
+
+RUN apt-get -y install curl wget git nginx
+RUN apt-get -y install runit || echo
+
+CMD [&quot;/usr/sbin/runsvdir-start&quot;]
+
+</code></pre>
+
+<h4 id="toc_3">Step 2: Install the applications</h4>
+
+<p>This will take a few minutes the first time as it needs to download <code>logstash</code>, <code>kibana</code>, and <code>elasticsearch</code> and stage them in a local <code>./opt</code>directory.</p>
+
+<h4 id="toc_4">Step 3: Start the Docker container</h4>
+
+<p>Starts the <code>Docker</code> container with the following command:</p>
+
+<pre><code>docker run -d -p 8080:80 -p 5014:514 -p 9200:9200 \
+  -v $BASE/opt:/opt \
+  -v $BASE/sv:/etc/sv \
+  -v $BASE/init:/etc/init \
+  -v $BASE/service:/etc/service \
+  demo/runit
+</code></pre>
+
+<p>The container should be up and running</p>
+
+<pre><code>$ docker ps
+ID                  IMAGE               COMMAND                CREATED             STATUS              PORTS
+eb495ad92ba0        demo/runit:latest   /usr/sbin/runsvdir-s   4 seconds ago       Up 3 seconds        5014-&gt;514, 8080-&gt;80, 9200-&gt;9200   
+</code></pre>
+
+<p>However there aren&rsquo;t any services running!</p>
+
+<pre><code>$ curl localhost:8080
+curl: (56) Recv failure: Connection reset by peer
+$ curl localhost:9200
+curl: (56) Recv failure: Connection reset by peer
+</code></pre>
+
+<p>We can start the services with the following commands</p>
+
+<pre><code>$ cd service
+$ ln -s ../sv/elasticsearch
+$ ln -s ../sv/logstash
+$ ln -s ../sv/kibana
+cd ..
+</code></pre>
+
+<p>We can now see the services are running, test the ports and send some data to logstash.</p>
+
+<pre><code>$ curl localhost:8080      
+&lt;!DOCTYPE html&gt;&lt;!--[if IE 8]&gt;&lt;html class=&quot;no-js lt-ie9&quot; lang=&quot;en&quot;&gt;&lt;![endif]--&gt;&lt;!--[if gt IE 8]&gt;&lt;!--&gt;&lt;html class=&quot;no-js&quot; lang=&quot;en&quot;&gt;
+...
+curl localhost:9200
+{
+  &quot;ok&quot; : true,
+  &quot;status&quot; : 200,
+...
+$tail -100 /var/log/syslog | nc localhost 5014
+</code></pre>
+
+<p>Stop a service ?</p>
+
+<pre><code>$ rm service/elasticsearch
+$ rm service/logstash
+$ rm service/kibana
+</code></pre>
+
+<h2 id="toc_5">Bonus Round: Logs!</h2>
+
+<p>The beautify of doing this is that we&rsquo;re actually logging the application output to a mounted volume.   This means we now have access to their logs from the host machine.</p>
+
+<pre><code>$ tail opt/logstash/logs/current
+$ tail opt/elasticsearch-0.90.5/logs/current
+$ tail opt/kibana/logs/access.log
+</code></pre>
+
+<h2 id="toc_6">Cleanup</h2>
+
+<p>Unfortunately any files created inside the docker instance are owned by root ( an artifact of docker daemon running as root ).   If you&rsquo;re in The following script will clean out any such files after you&rsquo;ve stopped the docker container.</p>
+
+<p>It will delete any files/dirs inside your current directory that are owned by root.  Obviously it can be very dangerous to run &hellip; so be careful where you run it from!</p>
+
+<pre><code>$ sudo find . -uid 0   -exec rm -rfv {} \;
+</code></pre>
+
+        </div>
+        <section class="post-comments">
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+
+(function() {
+     
+     
+     if (window.location.hostname == "localhost")
+             return;
+
+	         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+		     var disqus_shortname = '';
+		         dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+			     (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+			     })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+</section>
+
+
+      </div>
+    </div>
+  </body>
+  
+</html>

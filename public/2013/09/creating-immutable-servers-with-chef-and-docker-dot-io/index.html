@@ -1,0 +1,190 @@
+  <!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <title> Creating immutable servers with chef and docker.io &middot; Paul Czarkowski </title>
+    
+    <link rel="stylesheet" type="text/css" href="http://tech.paulcz.net/css/uno.min.css" />
+    <link rel="stylesheet" type="text/css" href="http://tech.paulcz.net/css/lightGallery.css" />
+    
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+    <link href="" rel="alternate" type="application/rss+xml" title="Paul Czarkowski" />
+    
+    <script src="http://tech.paulcz.net/js/jquery.min.js"></script>
+    <script src="http://tech.paulcz.net/js/main.min.js">
+    </script>
+</head>
+
+  <body>
+    <span class="mobile btn-mobile-menu">
+        <i class="fa fa-bars btn-mobile-menu__icon"></i>
+        <i class="fa fa-times btn-mobile-close__icon hidden"></i>
+    </span>
+<header class="panel-cover panel-cover--collapsed" >
+    <div class="panel-main">
+        <div class="panel-main__inner panel-inverted">
+            <div class="panel-main__content"> 
+                <h1 class="panel-cover__title panel-title">
+                    <a href="http://tech.paulcz.net" title="link to homepage for Paul Czarkowski">Paul Czarkowski</a>
+                </h1>
+                <hr class="panel-cover__divider" />
+                <p class="panel-cover__description">  Random musings mostly about tech  </p>
+                <hr class="panel-cover__divider panel-cover__divider--secondary" />
+                <div class="navigation-wrapper">
+                    <nav class="cover-navigation cover-navigation--primary">
+                        <ul class="navigation">
+                            <li class="navigation__item"><a href="/#blog" title="link to Paul Czarkowski blog" class="blog-button">Blog</a> </li>
+                            </br>  </ul>
+                    </nav> <nav class="cover-navigation navigation--social">
+    <ul class="navigation"> 
+        
+        <li class="navigation__item">
+            <a href="http://twitter.com/pczarkowski" title="@pczarkowski on Twitter"> <i class='fa fa-tt'></i> <span class="label">Twitter</span> </a>
+        </li>   
+        
+        <li class="navigation__item">
+            <a href="https://github.com/paulczar" title="paulczar on github"> <i class='fa fa-github'></i> <span class="label">Github</span> </a>
+        </li>  </br>   
+        
+        <li class="navigation__item">
+            <a href="mailto:username.taken&#43;tech@gmail.com" title="Email username.taken&#43;tech@gmail.com"> <i class='fa fa-envelope-o'></i> <span class="label">Email</span> </a>
+        </li>  </ul>
+</nav>
+ </div>
+            </div>
+        </div>
+        <div class="panel-cover--overlay"></div>
+    </div>
+</header>
+
+    <div class="content-wrapper">
+      <div class="content-wrapper__inner">
+        <div class="post">
+          <h1>Creating immutable servers with chef and docker.io</h1>
+          <span class="post-date">Sat, Sep 7, 2013</span>
+          
+
+<p>Building applications in a <a href="http://docker.io">docker.io</a> Dockerfile is relatively simple,  but sometimes you want to just install the application exactly as you would normally via already built chef cookbooks.   Turns out this is actually pretty simple.</p>
+
+<p>The first thing you&rsquo;ll need to do is build a container with chef-client and berkshelf installed.   You can grab the one I&rsquo;ve built by running <code>docker pull paulczar/chef-solo</code> or build one youself from a <code>Dockerfile</code> that looks a little something like the following&hellip;</p>
+
+<h3 id="toc_0">Creating a docker.io container with chef and berkshelf</h3>
+
+<p>``` ruby Dockerfile</p>
+
+<h1 id="toc_1">DOCKER-VERSION 0.5.3</h1>
+
+<p>FROM ubuntu:12.10
+MAINTAINER Paul Czarkowski &ldquo;paul@paulcz.net&rdquo;</p>
+
+<p>RUN apt-get -y update
+RUN apt-get -y install curl build-essential libxml2-dev libxslt-dev git
+RUN curl -L <a href="https://www.opscode.com/chef/install.sh">https://www.opscode.com/chef/install.sh</a> | bash
+RUN echo &ldquo;gem: &ndash;no-ri &ndash;no-rdoc&rdquo; &gt; ~/.gemrc
+RUN /opt/chef/embedded/bin/gem install berkshelf</p>
+
+<pre><code>
+_you'll notice I'm using the embedded chef ruby to install the berkshelf gem,  this is a handy shortcut to avoid messing around with random ruby versions from your distributions packaging._
+
+run `$ docker build -t paulczar/chef-solo .` to build a usable docker container from the above `Dockerfile`.
+
+### Using chef-solo and berkshelf to build an application in a docker.io container ###
+
+My [example application](https://github.com/paulczar/docker-chef-solo) will install `Kibana3` to your docker container.   I'll step through how it works below.
+
+#### Chef-Solo ####
+
+To run `chef-solo` successfully we require two files.   `solo.rb` to set up file locations, and `solo.json' to set up the json / run list required for your application.
+
+``` ruby chef.rb
+root = File.absolute_path(File.dirname(__FILE__))
+
+file_cache_path root
+cookbook_path root + '/cookbooks'
+</code></pre>
+
+<p>``` json chef.json
+{
+  &ldquo;kibana&rdquo;: {
+    &ldquo;webserver_listen&rdquo;: &ldquo;0.0.0.0&rdquo;
+  },
+  &ldquo;run_list&rdquo;: [
+    &ldquo;recipe[kibana::default]&rdquo;
+  ]
+}</p>
+
+<pre><code>
+#### Berkshelf ####
+
+To run `berkshelf` we need to build a Berksfile which contains a list of all the chef cookbooks required for the applocation.   Berkshelf will download these cookbooks to a local directory which will be usable by chef-solo.
+
+``` ruby Berksfile
+site :opscode
+
+cookbook 'build-essential'
+cookbook 'apache2'
+cookbook 'git'
+cookbook 'kibana', github: 'lusis/chef-kibana'
+cookbook 'nginx' , github: 'opscode-cookbooks/nginx'
+</code></pre>
+
+<p><em>You can see some of the cookbooks are being pulled from the opscode repository,  whereas others are being pulled directly from github.</em></p>
+
+<h4 id="toc_2">Dockerfile</h4>
+
+<p>All that&rsquo;s left now is to create a Dockerfile that will bring it all together.</p>
+
+<p>``` ruby Dockerfile</p>
+
+<h1 id="toc_3">DOCKER-VERSION 0.5.3</h1>
+
+<p>FROM paulczar/chef-client
+MAINTAINER Paul Czarkowski &ldquo;paul@paulcz.net&rdquo;</p>
+
+<p>RUN apt-get -y update
+ADD . /chef
+RUN cd /chef &amp;&amp; /opt/chef/embedded/bin/berks install &ndash;path /chef/cookbooks
+RUN chef-solo -c /chef/solo.rb -j /chef/solo.json
+RUN echo &ldquo;daemon off;&rdquo; &gt;&gt; /etc/nginx/nginx.conf</p>
+
+<p>CMD [&ldquo;nginx&rdquo;]
+```</p>
+
+<p>Run <code>$ docker build -t demo/kibana3 .</code> to build your application.</p>
+
+<p>It will add the local files ( <code>solo.rb</code>, <code>solo.json</code>, <code>Berksfile</code> ) to /chef in the server and then call berkshelf to download the cookbooks and chef-solo to install your application.   Finally it will give <code>nginx</code> a directive to run in the foreground so that we don&rsquo;t have to do any sneaky prcess control to get it to work with the way <code>docker.io</code> runs processes.</p>
+
+<p>To run the resultant <code>docker.io</code> container you simply need to run <code>$ docker run -d -p 80 demo/kibana3</code></p>
+
+        </div>
+        <section class="post-comments">
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+
+(function() {
+     
+     
+     if (window.location.hostname == "localhost")
+             return;
+
+	         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+		     var disqus_shortname = '';
+		         dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+			     (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+			     })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+</section>
+
+
+      </div>
+    </div>
+  </body>
+  
+</html>

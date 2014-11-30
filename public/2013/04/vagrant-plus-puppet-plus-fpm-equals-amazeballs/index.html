@@ -1,0 +1,143 @@
+  <!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <title> Vagrant&#43;Puppet&#43;FPM=Amazeballs &middot; Paul Czarkowski </title>
+    
+    <link rel="stylesheet" type="text/css" href="http://tech.paulcz.net/css/uno.min.css" />
+    <link rel="stylesheet" type="text/css" href="http://tech.paulcz.net/css/lightGallery.css" />
+    
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+    <link href="" rel="alternate" type="application/rss+xml" title="Paul Czarkowski" />
+    
+    <script src="http://tech.paulcz.net/js/jquery.min.js"></script>
+    <script src="http://tech.paulcz.net/js/main.min.js">
+    </script>
+</head>
+
+  <body>
+    <span class="mobile btn-mobile-menu">
+        <i class="fa fa-bars btn-mobile-menu__icon"></i>
+        <i class="fa fa-times btn-mobile-close__icon hidden"></i>
+    </span>
+<header class="panel-cover panel-cover--collapsed" >
+    <div class="panel-main">
+        <div class="panel-main__inner panel-inverted">
+            <div class="panel-main__content"> 
+                <h1 class="panel-cover__title panel-title">
+                    <a href="http://tech.paulcz.net" title="link to homepage for Paul Czarkowski">Paul Czarkowski</a>
+                </h1>
+                <hr class="panel-cover__divider" />
+                <p class="panel-cover__description">  Random musings mostly about tech  </p>
+                <hr class="panel-cover__divider panel-cover__divider--secondary" />
+                <div class="navigation-wrapper">
+                    <nav class="cover-navigation cover-navigation--primary">
+                        <ul class="navigation">
+                            <li class="navigation__item"><a href="/#blog" title="link to Paul Czarkowski blog" class="blog-button">Blog</a> </li>
+                            </br>  </ul>
+                    </nav> <nav class="cover-navigation navigation--social">
+    <ul class="navigation"> 
+        
+        <li class="navigation__item">
+            <a href="http://twitter.com/pczarkowski" title="@pczarkowski on Twitter"> <i class='fa fa-tt'></i> <span class="label">Twitter</span> </a>
+        </li>   
+        
+        <li class="navigation__item">
+            <a href="https://github.com/paulczar" title="paulczar on github"> <i class='fa fa-github'></i> <span class="label">Github</span> </a>
+        </li>  </br>   
+        
+        <li class="navigation__item">
+            <a href="mailto:username.taken&#43;tech@gmail.com" title="Email username.taken&#43;tech@gmail.com"> <i class='fa fa-envelope-o'></i> <span class="label">Email</span> </a>
+        </li>  </ul>
+</nav>
+ </div>
+            </div>
+        </div>
+        <div class="panel-cover--overlay"></div>
+    </div>
+</header>
+
+    <div class="content-wrapper">
+      <div class="content-wrapper__inner">
+        <div class="post">
+          <h1>Vagrant&#43;Puppet&#43;FPM=Amazeballs</h1>
+          <span class="post-date">Sun, Apr 7, 2013</span>
+          <p>Lately I&rsquo;ve been doing a lot of prototyping with <a href="http://www.vagrantup.com/">Vagrant</a>, specifically for a couple of distinct activities:-</p>
+
+<ul>
+<li>building puppet modules using <a href="https://github.com/elasticdog/puppet-sandbox">the excellent puppet sandbox</a> project</li>
+<li>and building RPM packages with <a href="https://github.com/jordansissel/fpm">FPM</a>.</li>
+</ul>
+
+<p>I realized I was spending a bunch of time flipping back and forth between Vagrant environments and I had no quick way to utilize RPMs built with FPM inside my puppet modules.</p>
+
+<p>An idea was born.   I forked off the <a href="https://github.com/paulczar/puppet-sandbox">puppet sandbox</a> project and added a Yum repo module <code>repository</code> to the standalone puppet provisioner that vagrant uses when it first brings up a box.   It adds a Yum repo on the puppet server called <code>sandbox</code> and adds a repo file to the client boxes pointing to the repo.   Now I can simply push an RPM to <code>packages/rpm</code> and run <code>vagrant provision puppet</code> which reruns puppet and rebuilds the yum repo.</p>
+
+<p>Given that I often flip back and forth between Ubuntu and CentOS boxes I also created <code>Vagrantfile.centos63</code> and <code>Vagrantfile.precise64</code> so I can swiftly destroy the existing environment and bring up another of a different flavour by simply symlinking <code>Vagrantfile</code> to the appropriate file.</p>
+
+<p>This worked out pretty well for a while until I realized I was still jumping back and forth between vagrant environments and I realized I had another improvement to make.   So I then went on to create a definition in the puppet sandbox <code>Vagrantfile</code> file for a <code>FPM server</code> and a new module in the provisioner to install FPM on it.   Given that this module simply adds a few packages this module works for both CentOS and Ubuntu.</p>
+
+<p>I also created a couple of sample scripts to download source and build RPMs for both Redis and Elasticsearch which get pushed via the provisioner to <code>/tmp/redis-rpm.sh</code> and <code>/tmp/elasticsearch-rpm.sh</code></p>
+
+<p>Now ( For CentOS boxes at least ) I can very quickly iterate on puppet modules and create RPM packages on the fly and have them instantly available.   The process is very simple and looks a little something like this :</p>
+
+<pre><code>$ git clone https://github.com/paulczar/puppet-sandbox
+$ cd puppet-sandbox
+$ vagrant up puppet fpm client1
+$ vagrant ssh fpm
+[vagrant@fpm ~]$ sudo /tmp/redis-rpm.sh
+  ... 
+  ... A bunch of scrolling text while files are downloaded and rpm is built
+  ...
+[vagrant@fpm ~]$ exit
+$ vagrant provision puppet
+$ vagrant ssh client1
+[vagrant@client1 ~]$ sudo yum clean all
+[vagrant@client1 ~]$ sudo yum -y install redis
+[vagrant@client1 ~]$ sudo service redis-server start
+[vagrant@client1 ~]$ redis-cli ping
+PONG
+[vagrant@client1 ~]$
+</code></pre>
+
+<p>If I&rsquo;m building a puppet module that needs redis I can now add the following to it&rsquo;s init.pp ( or more properly create a module for redis and request it from the module I&rsquo;m building )</p>
+
+<pre><code>  package { 'redis':
+    ensure =&gt; 'present';
+  }
+</code></pre>
+
+<p>Of course Debian/Ubuntu doesn&rsquo;t use Yum/RPM for package management.    I&rsquo;d love to accept a pull request from somebody who wants to extend it to also support a local APT repository.   I left breadcrumbs in the <code>repository</code> module for some appropriate classes to be spliced in&hellip;</p>
+
+        </div>
+        <section class="post-comments">
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+
+(function() {
+     
+     
+     if (window.location.hostname == "localhost")
+             return;
+
+	         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+		     var disqus_shortname = '';
+		         dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+			     (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+			     })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+</section>
+
+
+      </div>
+    </div>
+  </body>
+  
+</html>

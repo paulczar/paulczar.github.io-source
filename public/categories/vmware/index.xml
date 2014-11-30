@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+      <title>Vmware on Paul Czarkowski </title>
+      <generator uri="https://hugo.spf13.com">Hugo</generator>
+    <link>http://tech.paulcz.net/categories/vmware/index.xml/</link>
+    <language>en-us</language>
+    
+    
+    <updated>Sun, 09 Dec 2012 00:00:00 UTC</updated>
+    
+    <item>
+      <title>Moving VMs from VMWare to KVM</title>
+      <link>http://tech.paulcz.net/2012/12/moving-vms-from-vmware-to-kvm/</link>
+      <pubDate>Sun, 09 Dec 2012 00:00:00 UTC</pubDate>
+      
+      <guid>http://tech.paulcz.net/2012/12/moving-vms-from-vmware-to-kvm/</guid>
+      <description>&lt;p&gt;I&amp;rsquo;m migrating from my old VMWare ESXi box to a new machine running Ubuntu 12.10 and KVM.    Not wanting to rebuild all of my VMs I set about trying to work out the best way to migrate the VMs.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Steps to make Windows migrate without Bluescreen&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;If you migrate a windows box it&amp;rsquo;ll bluescreen due to the shock of so much hardware changing.   The following .reg hack will prevent this from happening by opening up access to a bunch of random system drivers.   Copy and run the .reg file in your VM before doing any further steps.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://gist.github.com/4247499&#34;&gt;c:\temp\vmdriverhack.reg&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Move your VM to shared storage&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;I mounted an nfs partition to vmware from my freenas box and migrated the data across using the vmware datastore tools.   If you don&amp;rsquo;t have a NAS you could export a directory from your KVM server to achieve the same goal.&lt;/p&gt;
+
+&lt;p&gt;To move VMs in ESXi we click on the ESXi server, pick the Configuration tab,  click on &amp;lsquo;Storage&amp;rsquo; and then right-click on the datastore and select &amp;lsquo;Browse Datastore&amp;rsquo;.   Select the VM folder you wish to move and click the move icon.&lt;/p&gt;
+
+&lt;p&gt;{% img &lt;a href=&#34;https://lh6.googleusercontent.com/-R5x6JyT5x14/UMUkr4qNr4I/AAAAAAAAAHY/CYhOlizOLb8/s640/VMWare-move-1.png&#34;&gt;https://lh6.googleusercontent.com/-R5x6JyT5x14/UMUkr4qNr4I/AAAAAAAAAHY/CYhOlizOLb8/s640/VMWare-move-1.png&lt;/a&gt; %}&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Convert your VM to qcow2 format&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Next we need to make your VM available to the KVM server.   Again I just mounted my nfs volume to it.     You could run the VM from NFS if you want,  but I want to run it locally.&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;
+kvm-img convert -O qcow2 /mnt/freenas/vms/WindowsGuest/WindowsGuest.vmdk \
+  /data-disk/VMs/WindowsGuest.qcow2
+&lt;/code&gt;`&lt;/p&gt;
+
+&lt;p&gt;It&amp;rsquo;ll take a while to convert.   Once it&amp;rsquo;s done you can make it available to KVM.    I used the VirtualMachineManager GUI,  but you could use virsh if you want.   Simply create a new VM like you would usually except check the &amp;lsquo;Import existing disk image&amp;rsquo; option.&lt;/p&gt;
+
+&lt;p&gt;{% img &lt;a href=&#34;https://lh6.googleusercontent.com/-dXfvXbUOE5c/UMUkwnky73I/AAAAAAAAAHg/DDjgO2CAwqI/s800/vmware-2.png&#34;&gt;https://lh6.googleusercontent.com/-dXfvXbUOE5c/UMUkwnky73I/AAAAAAAAAHg/DDjgO2CAwqI/s800/vmware-2.png&lt;/a&gt; %}&lt;/p&gt;
+
+&lt;p&gt;Then choose your VM image and set the OS versions.&lt;/p&gt;
+
+&lt;p&gt;{% img &lt;a href=&#34;https://lh3.googleusercontent.com/-OybiOO1KsGI/UMUk9JbhzpI/AAAAAAAAAHo/zayosuFa5co/s800/vmware-3.png&#34;&gt;https://lh3.googleusercontent.com/-OybiOO1KsGI/UMUk9JbhzpI/AAAAAAAAAHo/zayosuFa5co/s800/vmware-3.png&lt;/a&gt; %}&lt;/p&gt;
+
+&lt;p&gt;If Windows then choose &amp;lsquo;edit VM before starting it and select the realtek network adaptor.&lt;/p&gt;
+
+&lt;p&gt;{% img &lt;a href=&#34;https://lh4.googleusercontent.com/-MHBkRrhkCI4/UMUlQJ_6ZcI/AAAAAAAAAHw/-Dj9UYNszgU/s800/VMWare-4.png&#34;&gt;https://lh4.googleusercontent.com/-MHBkRrhkCI4/UMUlQJ_6ZcI/AAAAAAAAAHw/-Dj9UYNszgU/s800/VMWare-4.png&lt;/a&gt; %}&lt;/p&gt;
+
+&lt;p&gt;Once created the VM should start up fine.   If the VM is running Windows you&amp;rsquo;ll probably need to re-activate it as the hardware change will make it think you&amp;rsquo;ve pirated it.&lt;/p&gt;
+
+&lt;p&gt;{% img &lt;a href=&#34;https://lh5.googleusercontent.com/-iJuM6CXhWVo/UMUlnT4qjHI/AAAAAAAAAH4/mahRyoBn4ZM/s800/vmware-5.png&#34;&gt;https://lh5.googleusercontent.com/-iJuM6CXhWVo/UMUlnT4qjHI/AAAAAAAAAH4/mahRyoBn4ZM/s800/vmware-5.png&lt;/a&gt; %}&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

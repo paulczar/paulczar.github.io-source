@@ -1,0 +1,825 @@
+  <!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <title> Running DEIS.IO on Rackspace Cloud &middot; Paul Czarkowski </title>
+    
+    <link rel="stylesheet" type="text/css" href="http://tech.paulcz.net/css/uno.min.css" />
+    <link rel="stylesheet" type="text/css" href="http://tech.paulcz.net/css/lightGallery.css" />
+    
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+    <link href="" rel="alternate" type="application/rss+xml" title="Paul Czarkowski" />
+    
+    <script src="http://tech.paulcz.net/js/jquery.min.js"></script>
+    <script src="http://tech.paulcz.net/js/main.min.js">
+    </script>
+</head>
+
+  <body>
+    <span class="mobile btn-mobile-menu">
+        <i class="fa fa-bars btn-mobile-menu__icon"></i>
+        <i class="fa fa-times btn-mobile-close__icon hidden"></i>
+    </span>
+<header class="panel-cover panel-cover--collapsed" >
+    <div class="panel-main">
+        <div class="panel-main__inner panel-inverted">
+            <div class="panel-main__content"> 
+                <h1 class="panel-cover__title panel-title">
+                    <a href="http://tech.paulcz.net" title="link to homepage for Paul Czarkowski">Paul Czarkowski</a>
+                </h1>
+                <hr class="panel-cover__divider" />
+                <p class="panel-cover__description">  Random musings mostly about tech  </p>
+                <hr class="panel-cover__divider panel-cover__divider--secondary" />
+                <div class="navigation-wrapper">
+                    <nav class="cover-navigation cover-navigation--primary">
+                        <ul class="navigation">
+                            <li class="navigation__item"><a href="/#blog" title="link to Paul Czarkowski blog" class="blog-button">Blog</a> </li>
+                            </br>  </ul>
+                    </nav> <nav class="cover-navigation navigation--social">
+    <ul class="navigation"> 
+        
+        <li class="navigation__item">
+            <a href="http://twitter.com/pczarkowski" title="@pczarkowski on Twitter"> <i class='fa fa-tt'></i> <span class="label">Twitter</span> </a>
+        </li>   
+        
+        <li class="navigation__item">
+            <a href="https://github.com/paulczar" title="paulczar on github"> <i class='fa fa-github'></i> <span class="label">Github</span> </a>
+        </li>  </br>   
+        
+        <li class="navigation__item">
+            <a href="mailto:username.taken&#43;tech@gmail.com" title="Email username.taken&#43;tech@gmail.com"> <i class='fa fa-envelope-o'></i> <span class="label">Email</span> </a>
+        </li>  </ul>
+</nav>
+ </div>
+            </div>
+        </div>
+        <div class="panel-cover--overlay"></div>
+    </div>
+</header>
+
+    <div class="content-wrapper">
+      <div class="content-wrapper__inner">
+        <div class="post">
+          <h1>Running DEIS.IO on Rackspace Cloud</h1>
+          <span class="post-date">Sun, Feb 23, 2014</span>
+          
+
+<p>I recently did a presentation at the Cloud Austin meetup titled <a href="http://tech.paulcz.net/presentation-cloud-austin-deis/#/">Docking with Unicorns</a> about new PAAS on the block <a href="http://deis.io">DEIS</a>.   Building out DEIS is quite easy,  make more easy by some tight integration they have with Rackspace Cloud.    If you&rsquo;re interested in what deis is go through my slides linked above, and the documentation on their website.    If you want to build out an environment to kick the tires a bit,  then click &lsquo;Read on&rsquo; below and follow me down the rabbit hole.</p>
+
+<h2 id="toc_0">Chef setup</h2>
+
+<p>Chef offers a free hosted service for up to five servers.  That&rsquo;s plenty for this exercise so go to the <a href="https://www.getchef.com/account">registration page</a> and create yourself a user.  At some point it will prompt you to generate and save a key, do that and download it.</p>
+
+<p>Once you have signed up you can download a knife config file and generate a validation key from the <a href="https://manage.opscode.com/organizations">Organizations</a> page.  We can save those down and then move them to a local working directory.</p>
+
+<p><img src="https://lh5.googleusercontent.com/-3R-Z-bRi_s0/UwpipiLhhWI/AAAAAAAAN0Q/W6q_Rb7NFy8/w1240-h663-no/opscode-org-page.png" alt="chef org setup" />
+</p>
+
+<h3 id="toc_1">Prepare Working Environment</h3>
+
+<p>Create a <code>~/paas</code> working directory and configure your local chef tools like this ( change the Download location to match the files you downloaded above ) :</p>
+
+<pre><code>$ mkdir -p ~/paas/.chef
+$ cd ~/paas
+$ mv ~/Downloads/&lt;username&gt;.pem .chef/
+$ mv ~/Downloads/knife.rb .chef/
+$ mv ~/Downloads/&lt;username&gt;-validator.pem .chef/
+
+</code></pre>
+
+<h3 id="toc_2">Clone the Deis Repository</h3>
+
+<p>Clone the deis project into your paas working directory:</p>
+
+<pre><code>$ cd ~/paas
+$ git clone https://github.com/opdemand/deis.git
+Cloning into 'deis'...
+remote: Reusing existing pack: 5651, done.
+Receiving objects: 100% (5651/5651), 2.16 MiB | 1.37 MiB/s, done.
+remote: Total 5651 (delta 0), reused 0 (delta 0)
+Resolving deltas: 100% (3131/3131), done.
+Checking connectivity... done
+
+</code></pre>
+
+<h3 id="toc_3">Install Pre-reqs</h3>
+
+<p>Assuming you have a working <code>Ruby 1.9.3+</code> and the <code>bundler</code> gem installed you should be able to use the <code>Gemfile</code> from the deis project to ensure you have all the necessary tools:</p>
+
+<pre><code>$ cd ~/paas/deis
+$ bundle install
+bundle install
+Fetching gem metadata from https://rubygems.org/.......
+Fetching additional metadata from https://rubygems.org/..
+Using i18n (0.6.9)
+Using multi_json (1.8.4)
+Using activesupport (3.2.16)
+Using addressable (2.3.5)
+...
+Using bundler (1.5.2)
+Your bundle is complete!
+Use `bundle show [gemname]` to see where a bundled gem is installed.
+</code></pre>
+
+<p><em>I had some errors installing the eventmachine gem and had to follow <a href="https://github.com/gitlabhq/gitlabhq/issues/1051#issuecomment-9176547">this fix</a> to get bundle install to work</em></p>
+
+<h3 id="toc_4">Test Chef Connectivity</h3>
+
+<p>To make sure we configured chef correctly and installed knife as part of the bundle we can run a quick knife command:</p>
+
+<pre><code>$ bundle exec knife client list
+&lt;USERNAME&gt;-validator
+</code></pre>
+
+<h3 id="toc_5">Create an Environment for Deis</h3>
+
+<p>Deis is currently hardcoded to use the <code>_default</code> chef environment.    There is a current <a href="https://github.com/opdemand/deis/issues/523">issue</a> on their github to resolve this.   Once that is done I&rsquo;ll update these instructions to create a <code>deis</code> environment.</p>
+
+<h3 id="toc_6">Upload the Deis Cookbooks</h3>
+
+<p>If that went well we can upload our cookbooks:</p>
+
+<pre><code>cd ~/paas/deis
+$ bundle exec berks install
+Installing apt (2.3.8) from site: 'http://cookbooks.opscode.com/api/v1/cookbooks'
+Installing docker (0.31.0) from site: 'http://cookbooks.opscode.com/api/v1/cookbooks'
+Installing rsyslog (1.10.2) from site: 'http://cookbooks.opscode.com/api/v1/cookbooks'
+Installing sudo (2.3.0) from site: 'http://cookbooks.opscode.com/api/v1/cookbooks'
+...
+$ bundle exec berks upload
+Using apt (2.3.8)
+Using docker (0.31.0)
+Using rsyslog (1.10.2)
+Using sudo (2.3.0)
+Installing deis (0.5.1) from git: 'https://github.com/opdemand/deis-cookbook.git' with branch: 'master' at ref: '6361706a1d3245d2a061ed55f5dd4b7cb60d5e5c'
+Using git (2.7.0)
+...
+</code></pre>
+
+<h3 id="toc_7">Create Deis Databags</h3>
+
+<p>Deis uses some databags to help manage application state.  We can create them like this:</p>
+
+<pre><code>$ bundle exec knife data bag create deis-formations
+Created data_bag[deis-formations]
+$ bundle exec knife data bag create deis-apps
+Created data_bag[deis-apps]
+</code></pre>
+
+<h2 id="toc_8">Prepare Infrastructure</h2>
+
+<p>I&rsquo;m using Rackspace cloud servers for this as I have the (<a href="http://developer.rackspace.com/blog/developer-love-welcome-to-the-rackspace-cloud-developer-discount.html)[Rackspace">http://developer.rackspace.com/blog/developer-love-welcome-to-the-rackspace-cloud-developer-discount.html)[Rackspace</a> Developer Discount] which is enough discount to host this for free.</p>
+
+<p>Since Deis will want your rackspace credentials to configure worker nodes I recomment creating a user under (<a href="https://mycloud.rackspace.com/account#users/create)[User">https://mycloud.rackspace.com/account#users/create)[User</a> Management] in your account to use for this.</p>
+
+<h3 id="toc_9">Create a Cloud Load Balancer</h3>
+
+<p>Log into mycloud.rackspace.com and click on the (<a href="https://mycloud.rackspace.com/load_balancers)[Load">https://mycloud.rackspace.com/load_balancers)[Load</a> Balancers] button.  Select the Dallas Region (DFW) and hit <code>Create Load Balancer</code>.</p>
+
+<ul>
+<li>Set the Name to <code>deis</code> and check the region is set to <code>Dallas (DFW)</code> and hit <code>Create Load Balancer</code></li>
+</ul>
+
+<p><img src="https://lh4.googleusercontent.com/-E4cZvoKWlYU/Uwpiqr9xOKI/AAAAAAAAN0o/P3vGqPC8A98/w793-h592-no/rackspace-create-lb.png" alt="creating load balancer" />
+</p>
+
+<ul>
+<li>Take note of the public IP of the Load Balancer, we&rsquo;ll need it later.</li>
+</ul>
+
+<p><img src="https://lh4.googleusercontent.com/-ORvf6nzEduU/Uwpiqk5eP0I/AAAAAAAAN0k/WZ-NaJn3eJg/w770-h567-no/rackspace-lb.png" alt="load balancer created" />
+</p>
+
+<h3 id="toc_10">Wildcard DNS</h3>
+
+<p>Deis&rsquo; proxy layer requires you to set up Wildcard DNS to point to your proxy layer.  There are many ways to achieve this here are two options:</p>
+
+<ol>
+<li><p>Rackspace Cloud DNS can host wildcard DNS entries, if you already have DNS hosted by rackspace using Cloud DNS simply add an A record for <code>*.deis</code> under your domain and point it to the IP of your load balancer.</p></li>
+
+<li><p>The (<a href="http://xip.io)[xip.io">http://xip.io)[xip.io</a>] domain does wildcard DNS based on your IP.  We can use this with our Cloud Load Balancer to load balance our applications.   My Load Balancer has a public IP of <code>50.56.167.26</code> therefore my wildcard domain will be <code>50.56.167.26.xip.io</code>.   Remember this.</p></li>
+</ol>
+
+<h3 id="toc_11">Configure Knife for Rackspace</h3>
+
+<p>The bundle install above already installed the rackspace knife plugin so we just need to add some details to <code>.chef/knife.rb</code>.</p>
+
+<pre><code>$ cat &lt;&lt;'EOF' &gt;&gt; $HOME/.chef/knife.rb
+knife[:rackspace_api_username] = &quot;#{ENV['OS_USERNAME']}&quot;
+knife[:rackspace_api_key]      = &quot;#{ENV['OS_PASSWORD']}&quot;
+knife[:rackspace_version]      = 'v2'
+knife[:rackspace_region]       = :dfw
+EOF
+</code></pre>
+
+<h3 id="toc_12">Install Rackspace Nova Client</h3>
+
+<p>We also need the Nova client:</p>
+
+<pre><code>$ sudo pip install rackspace-novaclient
+$ cat &lt;&lt;'EOF' &gt;&gt; ~/paas/.chef/openrc
+export OS_AUTH_URL=https://identity.api.rackspacecloud.com/v2.0/
+export OS_AUTH_SYSTEM=rackspace
+export OS_REGION_NAME=DFW
+export OS_USERNAME=&lt;RACKSPACE_USERNAME&gt;
+export NOVA_RAX_AUTH=1
+export OS_PASSWORD=&lt;RACKSPACE_API_KEY&gt;
+export OS_NO_CACHE=1
+export OS_TENANT_NAME=&lt;RACKSPACE_USERNAME&gt;
+EOF
+$ source ~/paas/.chef/openrc
+</code></pre>
+
+<h3 id="toc_13">Test Rackspace Connectivity</h3>
+
+<p>Make sure you can connect to Rackspace with Knife:</p>
+
+<pre><code>$ bundle exec knife rackspace server list
+Instance ID  Name  Public IP  Private IP  Flavor  Image  State
+</code></pre>
+
+<p>Make sure you can connect to Rackspace with nova:</p>
+
+<pre><code>$ nova list
++--------------------------------------+-----------------+--------+------------+-------------+----------------------------------------------------------------------------------------+
+| ID                                   | Name            | Status | Task State | Power State | Networks                                                                               |
++--------------------------------------+-----------------+--------+------------+-------------+----------------------------------------------------------------------------------------+
+</code></pre>
+
+<h2 id="toc_14">Build base images for Controller and Nodes.</h2>
+
+<p>This isn&rsquo;t strictly necessary,  but will help build your nodes quicker on subsequent builds.</p>
+
+<h3 id="toc_15">Launce a new instance:</h3>
+
+<p>If we create a base image and pre-install some software we&rsquo;ll get a faster booting system for auto-provisioning:</p>
+
+<pre><code>$ bundle exec knife rackspace server create \
+  --image '80fbcb55-b206-41f9-9bc2-2dd7aac6c061' \
+  --node-name 'deis-base-image' \
+  --flavor 'performance1-1'
+...
+...
+Instance ID: 56760bf1-b977-405e-9348-f70b15a14b87
+Host ID: 97da00a12312a7e455bda70c6dfab8833953e2a03b081aeedfd68152
+Name: deis-base-image
+Flavor: 1 GB Performance
+Image: Ubuntu 12.04 
+Metadata: []
+Public DNS Name: 23-253-69-98.xip.io
+Public IP Address: 23.253.69.98
+Private IP Address: 10.208.101.31
+Password: **************
+</code></pre>
+
+<p>Take note of the <code>Instance ID</code>, <code>Public IP Address</code> and <code>Password</code>.  We&rsquo;ll need them later.</p>
+
+<h3 id="toc_16">Add users / keys to instance</h3>
+
+<p>We&rsquo;re going to add our ssh key as well as a local <code>deis-ops</code> user to the image to make it easier to manage and troubleshoot later:</p>
+
+<pre><code>$ DEIS_IP=&lt;IP_OF_SERVER&gt;
+$ ssh-copy-id root@$DEIS_IP
+root@162.242.144.193's password: 
+Number of key(s) added: 1
+Now try logging into the machine, with:   &quot;ssh 'root@162.242.144.193'&quot;
+and check to make sure that only the key(s) you wanted were added.
+$ ssh root@$DEIS_IP
+Welcome to Ubuntu 12.04.3 LTS (GNU/Linux 3.2.0-55-virtual x86_64)
+
+ * Documentation:  https://help.ubuntu.com/
+
+  System information as of Sun Feb 23 18:34:40 UTC 2014
+
+  System load:  0.08              Processes:           60
+  Usage of /:   5.5% of 19.68GB   Users logged in:     0
+  Memory usage: 6%                IP address for eth0: 162.242.144.193
+  Swap usage:   0%                IP address for eth1: 10.208.135.114
+
+  Graph this data and manage this system at https://landscape.canonical.com/
+
+Last login: Sun Feb 23 18:33:02 2014 from cpe-24-27-47-27.austin.res.rr.com
+root@deis-base-image:~# useradd --comment 'deis ops user' --home-dir '/home/deis-ops' \
+  --shell '/bin/bash' --create-home deis-ops
+root@deis-base-image:~# mkdir -p /home/deis-ops/.ssh &amp;&amp; \
+   cp /root/.ssh/authorized_keys /home/deis-ops/.ssh/authorized_keys &amp;&amp; \
+  chown -R deis-ops:deis-ops /home/deis-ops &amp;&amp; \
+  chmod 0700 /home/deis-ops/.ssh &amp;&amp; \
+  chmod 0600 /home/deis-ops/.ssh/authorized_keys &amp;&amp; \
+  echo 'deis-ops ALL=(ALL) NOPASSWD:ALL' &gt; /etc/sudoers.d/deis-ops &amp;&amp; \
+  chmod 0440 /etc/sudoers.d/deis-ops
+root@deis-base-image:~# exit
+</code></pre>
+
+<p>Check that you can log in with these new creds:</p>
+
+<pre><code>$ ssh deis-ops@$DEIS_IP
+deis$ sudo bash
+root@deis$ exit
+deis$ exit
+</code></pre>
+
+<h3 id="toc_17">Finish preparing node image</h3>
+
+<p>Next we&rsquo;re going to update the kernel and prepare the base node image.</p>
+
+<pre><code>$ ssh deis-ops@$DEIS_IP 'sudo apt-get update'
+$ scp contrib/rackspace/*.sh deis-ops@$DEIS_IP:~/
+$ ssh deis-ops@$DEIS_IP 'sudo ~/prepare-node-image.sh'
+$ ssh deis-ops@$DEIS_IP 'sudo apt-get install -yq linux-image-generic-lts-raring linux-headers-generic-lts-raring'
+</code></pre>
+
+<h3 id="toc_18">Create an image from this server</h3>
+
+<pre><code>$ nova image-create deis-base-image deis-node-image
+</code></pre>
+
+<p>After a few minutes you should see this response to running <code>nova image-list</code>, if you&rsquo;re impatient like me wrap your command with a <code>watch</code>:</p>
+
+<pre><code>$ watch 'nova image-list | grep deis'
+| df958d26-6515-4dd9-a449-920e74ea93a2 | deis-base-image                                              | ACTIVE | 0fc7f68b-176d-49a9-82ff-2d5893d32acd |
+
+</code></pre>
+
+<p>Once the image is active we can move onto the next steps.</p>
+
+<h3 id="toc_19">Prepare controller image</h3>
+
+<p>Next we want to prepare the VM for the controller image:</p>
+
+<pre><code>$ ssh deis-ops@$DEIS_IP 'sudo ~/prepare-controller-image.sh'
+$ ssh deis-ops@$DEIS_IP 'sudo apt-get install -yq linux-image-generic-lts-raring linux-headers-generic-lts-raring'
+</code></pre>
+
+<h3 id="toc_20">Create an image from this server</h3>
+
+<pre><code>$ nova image-create deis-base-image deis-base-image
+</code></pre>
+
+<p>After a few minutes you should see this response to running <code>nova image-list</code>, if you&rsquo;re impatient like me wrap your command with a <code>watch</code>:</p>
+
+<pre><code>$ watch 'nova image-list | grep deis-node'
+| f2236fa6-1e2d-4746-ac87-a3dd6b2de811 | deis-node-image                                              | ACTIVE | 633d5d88-54b3-463c-80fe-c119f4eb33a3 |
+
+</code></pre>
+
+<h3 id="toc_21">Delete the instance</h3>
+
+<p>No need to keep the instance around and keep paying for it once you have the image:</p>
+
+<pre><code>$ bundle exec knife rackspace server list | grep deis  
+42899699-68e7-4785-9f49-e0050f86249a  deis-base-image  162.242.144.193  10.208.135.114  performance1-1  80fbcb55-b206-41f9-9bc2-2dd7aac6c061  active
+$ bundle exec knife rackspace server delete 42899699-68e7-4785-9f49-e0050f86249a --purge
+</code></pre>
+
+<h2 id="toc_22">Create the Deis Controller server</h2>
+
+<h3 id="toc_23">Launch the Server</h3>
+
+<p>Launch the server from the image you created earlier:</p>
+
+<pre><code>$ nova image-list | grep  deis-base-image
+| a58c9895-6349-442a-bba7-99611900209d | deis-base-image
+$ knife rackspace server create \
+  --image a58c9895-6349-442a-bba7-99611900209d \
+  --rackspace-metadata &quot;{\&quot;Name\&quot;: \&quot;deis-controller\&quot;}&quot; \
+  --rackspace-disk-config MANUAL \
+  --server-name deis-controller \
+  --node-name deis-controller \
+  --flavor 'performance1-2'
+Instance ID: bb713170-9322-424a-8837-863a4b396705
+Name: deis-controller
+Flavor: 2 GB Performance
+Image: deis-base-image
+...
+Public IP Address: 23.253.104.13
+Private IP Address: 10.208.132.190
+Password: CQwDU4m97nvF
+</code></pre>
+
+<p>Take note of the <code>Instance ID</code> and <code>Public IP Address</code>.</p>
+
+<p>If you have an easy to manage domain add an A record for <code>deis</code> to it for the Public IP address.  If not
+add an entry to your hosts file ( or do both! I did ):</p>
+
+<pre><code>$ sudo sh -c &quot;echo '&lt;IP_OF_SERVER&gt; deis' &gt;&gt; /etc/hosts&quot;
+</code></pre>
+
+<h3 id="toc_24">Modify Chef Admin Group</h3>
+
+<p>On the Chef management website click (<a href="https://manage.opscode.com/groups/admins/edit)[Groups">https://manage.opscode.com/groups/admins/edit)[Groups</a>] and add the <code>deis-controller</code> client and your validator client to the <code>admins</code> group.</p>
+
+<p><img src="https://lh5.googleusercontent.com/-oSqB1Tdnn4c/UwpioPAXpJI/AAAAAAAANz4/xa8BdmRuTzQ/w579-h580-no/chef-admins.png" alt="chef admins group" />
+</p>
+
+<h3 id="toc_25">Converge the Deis Controller Server</h3>
+
+<p>Edit the <code>deis-controller</code> node via this command:</p>
+
+<pre><code>$ EDITOR=vi knife node edit deis-controller
+</code></pre>
+
+<p>make it look like this:</p>
+
+<pre><code>{
+  &quot;name&quot;: &quot;deis-controller&quot;,
+  &quot;chef_environment&quot;: &quot;_default&quot;,
+  &quot;normal&quot;: {
+    &quot;tags&quot;: [
+
+    ]
+  },
+  &quot;run_list&quot;: [
+    &quot;recipe[deis::controller]&quot;
+  ]
+}
+
+</code></pre>
+
+<p>then converge the node by running chef client on it:</p>
+
+<pre><code>$ ssh deis-ops@deis sudo chef-client
+[2014-02-23T19:25:32+00:00] INFO: Forking chef instance to converge...
+[2014-02-23T19:25:32+00:00] INFO: *** Chef 11.6.2 ***
+[2014-02-23T19:25:33+00:00] INFO: Run List is [recipe[deis::controller]]
+[2014-02-23T19:25:33+00:00] INFO: Run List expands to [deis::controller]
+[2014-02-23T19:25:33+00:00] INFO: Starting Chef Run for deis-controller
+[2014-02-23T19:25:33+00:00] INFO: Running start handlers
+[2014-02-23T19:25:33+00:00] INFO: Start handlers complete.
+...
+$
+</code></pre>
+
+<h2 id="toc_26">Testing Deis</h2>
+
+<h3 id="toc_27">Install the Deis Client with pip</h3>
+
+<p>The Deis client is written in python and can be installed by <code>pip</code>:</p>
+
+<pre><code>$ sudo pip install deis  
+</code></pre>
+
+<h3 id="toc_28">Register Admin User</h3>
+
+<p>First user to register becomes the Admin:</p>
+
+<pre><code>$ deis register http://deis:8000
+username: admin
+password: 
+password (confirm): 
+email: admin@example.com
+Registered admin
+Logged in as admin
+</code></pre>
+
+<p>Push your public key to deis:</p>
+
+<pre><code>$ deis keys:add ~/.ssh/id_rsa.pub 
+Uploading SSH_KEY to Deis...done
+</code></pre>
+
+<p>check the web server is serving content by browsing to (<a href="http://deis)[http://deis">http://deis)[http://deis</a>] and entering your admin credentials.</p>
+
+<h3 id="toc_29">Teach Deis your provider credentials</h3>
+
+<p>Deis will automatically provision worker nodes if you teach it your credentials.</p>
+
+<p>We already have our Rackspace credentials saved to <code>~/paas/.chef/openrc</code> but Deis wants them named differently:</p>
+
+<pre><code>$ export RACKSPACE_USERNAME=$OS_USERNAME
+$ export RACKSPACE_API_KEY=$OS_PASSWORD
+$ deis providers:discover
+No EC2 credentials discovered.
+Discovered Rackspace credentials: ****************
+Import Rackspace credentials? (y/n) : y
+Uploading Rackspace credentials... done
+No DigitalOcean credentials discovered.
+No Vagrant VMs discovered.
+</code></pre>
+
+<h2 id="toc_30">Deploy Formations &amp; Layers</h2>
+
+<h3 id="toc_31">Formation</h3>
+
+<p>Formations are collections of infrastructure for serving applications.   We&rsquo;ll call our first Formation <code>dev</code> for development.</p>
+
+<p>Create formation (using the wildcard domain from our cloud load balancer created earlier in the <code>--domain</code> argument):</p>
+
+<pre><code>$ deis formations:create dev --domain=50.56.167.26.xip.io
+Creating formation... done, created dev
+See `deis help layers:create` to begin building your formation
+</code></pre>
+
+<h3 id="toc_32">Layers</h3>
+
+<p>Layers are a heterogenerous collection of nodes that perform one of two function:</p>
+
+<ol>
+<li>Proxy - Directs traffic to the appropriate container running the application.</li>
+<li>Runtime - Runs the containers that hold the applications.</li>
+</ol>
+
+<p>We&rsquo;re going to create a layer called <code>nodes</code> that will perform both the proxy and runtime functions:</p>
+
+<pre><code>$ deis layers:create dev nodes rackspace-dfw --proxy=y --runtime=y
+Creating nodes layer... done in 4s
+</code></pre>
+
+<p><em>note</em> There&rsquo;s currently a <a href="https://github.com/opdemand/deis/issues/541">bug</a> that causes the first creation of a layer to fail.  if that happens run the following:</p>
+
+<pre><code>deis formations:create dev --domain=50.56.167.26.xip.io
+Creating formation... done, created dev
+
+See `deis help layers:create` to begin building your formation
+$ deis layers:create dev nodes rackspace-dfw --proxy=y --runtime=y
+Creating nodes layer... 500 INTERNAL SERVER ERROR
+&lt;h1&gt;Server Error (500)&lt;/h1&gt;
+$ deis layers:destroy dev nodes
+Destroying nodes layer... done in 0s
+$ deis layers:create dev nodes rackspace-dfw --proxy=y --runtime=y
+Creating nodes layer... done in 2s
+
+</code></pre>
+
+<h3 id="toc_33">Build Nodes</h3>
+
+<p>Next we tell deis to spin up two Cloud Servers which will become members of the <code>nodes</code> layer.</p>
+
+<pre><code>$ deis nodes:scale dev nodes=2
+Scaling nodes... but first, coffee!
+done in 345s
+Use `deis create --formation=dev` to create an application
+</code></pre>
+
+<p>This can sometimes take longer than the <code>deis</code> cli timeout.   Don&rsquo;t fear,  just wait a bit longer, this could be a great time to explore the <code>deis</code> cli by running <code>deis help</code>.</p>
+
+<h2 id="toc_34">Update Cloud Load Balancer</h2>
+
+<p>Add these two nodes to the (<a href="https://mycloud.rackspace.com/load_balancers)[Cloud">https://mycloud.rackspace.com/load_balancers)[Cloud</a> Load Balancer] we created earlier.</p>
+
+<p><img src="https://lh6.googleusercontent.com/-yaJfxoyDk4M/UwpioEndiOI/AAAAAAAANz0/aXannmisdbE/w903-h407-no/cloud-servers-list.png" alt="cloud server list" />
+</p>
+
+<p>This is simple to do through the GUI:</p>
+
+<ul>
+<li>Click on your load balancer and under <code>Nodes</code> click the <code>Add Cloud Servers</code> button.</li>
+<li>Check the box beside the two <code>dev-nodes</code> servers and click <code>Add Selected Servers</code>.</li>
+</ul>
+
+<p><img src="https://lh6.googleusercontent.com/-zm6sB7l7YVk/Uwpin4BNJPI/AAAAAAAANzw/b-_J2ieyIuE/w773-h476-no/cloud-lb-nodes.png" alt="cloud lb servers" />
+</p>
+
+<h2 id="toc_35">Deploy an Application</h2>
+
+<p>So great, you have a PaaS, but what do you do now?  Deploy some apps of course!</p>
+
+<h3 id="toc_36">NodeJS Example App</h3>
+
+<p>Download the NodeJS example application so like:</p>
+
+<pre><code>$ mkdir -p ~/paas/apps
+$ cd ~paas/apps
+$ git clone https://github.com/opdemand/example-nodejs-express.git
+$ cd example-nodejs-express
+</code></pre>
+
+<h3 id="toc_37">Create an Application in Deis</h3>
+
+<p>Use the Deis command line tool to create a new application:</p>
+
+<pre><code>$ deis create      
+Creating application... done, created exotic-sandwich
+Git remote deis added
+</code></pre>
+
+<h3 id="toc_38">Push your Application to Deis</h3>
+
+<p>This will push, deploy and Launch the app.  The first one will take some time as deis has to download some docker images,  subsequent apps will be much faster:</p>
+
+<pre><code>$ git push deis master                     
+git push deis master
+Counting objects: 184, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (89/89), done.
+Writing objects: 100% (184/184), 28.77 KiB | 0 bytes/s, done.
+Total 184 (delta 103), reused 165 (delta 92)
+-----&gt; Node.js app detected
+-----&gt; Requested node range: 0.10.x
+-----&gt; Resolved node version: 0.10.26
+-----&gt; Downloading and installing node
+-----&gt; Installing dependencies
+       npm WARN package.json example-nodejs-express@0.0.1 No repository field.
+       npm http GET https://registry.npmjs.org/express
+       npm http 200 https://registry.npmjs.org/express
+...
+-----&gt; Caching node_modules directory for future builds
+-----&gt; Cleaning up node-gyp and npm artifacts
+-----&gt; Building runtime environment
+-----&gt; Discovering process types
+       Procfile declares types -&gt; web
+-----&gt; Compiled slug size is 5.5M
+-----&gt; Building Docker image
+Uploading context 5.698 MB
+Uploading context 
+Step 0 : FROM deis/slugrunner
+ ---&gt; bb0a27915014
+Step 1 : RUN mkdir -p /app
+ ---&gt; Running in 1ae5cdeaad9a
+ ---&gt; 6e6467466d48
+Step 2 : ADD slug.tgz /app
+ ---&gt; 191a4345b1e4
+Step 3 : ENTRYPOINT [&quot;/runner/init&quot;]
+ ---&gt; Running in d322512d5865
+ ---&gt; 2866cf3e37c9
+Successfully built 2866cf3e37c9
+-----&gt; Pushing image to private registry
+       Launching... done, v2
+
+-----&gt; exotic-sandwich deployed to Deis
+       http://exotic-sandwich.50.56.167.26.xip.io
+
+       To learn more, use `deis help` or visit http://deis.io
+
+To ssh://git@deis:2222/exotic-sandwich.git
+ * [new branch]      master -&gt; master
+
+</code></pre>
+
+<h2 id="toc_39">Did it work ?</h2>
+
+<p>Open your web browser to the URL in the output of the previous command.  In my case this was <code>http://exotic-sandwich.50.56.167.26.xip.io</code>.</p>
+
+<p>If everything worked the text in the browser window should read <code>Powered by Deis</code>.</p>
+
+<p><img src="https://lh6.googleusercontent.com/-cxuysxM_oM8/UwpipfiKFMI/AAAAAAAAN0U/M7T9dC6xJ-E/w446-h171-no/deis-app-1.png" alt="deis app" />
+</p>
+
+<h2 id="toc_40">Configure and Scale your application</h2>
+
+<p>We can set config parameters for our apps by running <code>deis config</code>.   The example app we&rsquo;re using has a config paramater &lsquo;POWERED_BY&rsquo; so we can set that by running:</p>
+
+<pre><code>$ deis config:set POWERED_BY='DEIS and Rackspace'
+=== exotic-sandwich
+POWERED_BY: DEIS and Rackspace
+</code></pre>
+
+<p><img src="https://lh6.googleusercontent.com/-J5AcNytZLOQ/UwpipEdpeBI/AAAAAAAAN0E/WXWC08rxsBU/w507-h157-no/deis-app-2.png" alt="deis app2" />
+</p>
+
+<p>Expecting visitors?  Let&rsquo;s scale your app to 5 nodes:</p>
+
+<pre><code>$ deis scale web=5
+Scaling containers... but first, coffee!
+done in 54s
+
+=== exotic-sandwich Containers
+
+--- web: `node server.js`
+web.1 up 2014-02-23T20:22:07.241Z (dev-nodes-2)
+web.2 up 2014-02-23T20:28:21.778Z (dev-nodes-1)
+web.3 up 2014-02-23T20:28:21.788Z (dev-nodes-2)
+web.4 up 2014-02-23T20:28:21.799Z (dev-nodes-1)
+web.5 up 2014-02-23T20:28:21.810Z (dev-nodes-2)
+</code></pre>
+
+<p>You can see what your app is doing by running <code>deis info</code> and <code>deis logs</code>:</p>
+
+<pre><code>$ deis info
+=== exotic-sandwich Application
+{
+  &quot;updated&quot;: &quot;2014-02-23T20:28:21.812Z&quot;, 
+  &quot;uuid&quot;: &quot;ef618db6-f5a8-4cab-a7d9-d01e78036e3a&quot;, 
+  &quot;created&quot;: &quot;2014-02-23T20:16:51.931Z&quot;, 
+  &quot;formation&quot;: &quot;dev&quot;, 
+  &quot;owner&quot;: &quot;admin&quot;, 
+  &quot;id&quot;: &quot;exotic-sandwich&quot;, 
+  &quot;containers&quot;: &quot;{\&quot;web\&quot;: 5}&quot;
+}
+
+=== exotic-sandwich Containers
+
+--- web: `node server.js`
+web.1 up 2014-02-23T20:22:07.241Z (dev-nodes-2)
+web.2 up 2014-02-23T20:28:21.778Z (dev-nodes-1)
+web.3 up 2014-02-23T20:28:21.788Z (dev-nodes-2)
+web.4 up 2014-02-23T20:28:21.799Z (dev-nodes-1)
+web.5 up 2014-02-23T20:28:21.810Z (dev-nodes-2)
+</code></pre>
+
+<pre><code>$ deis logs
+Feb 23 20:22:57 dev-nodes exotic-sandwich[web.1]: Server listening on port 10001 in development mode
+Feb 23 20:25:38 dev-nodes exotic-sandwich[web.1]: Server listening on port 10001 in development mode
+Feb 23 20:26:49 dev-nodes exotic-sandwich[web.1]: Server listening on port 10001 in development mode
+Feb 23 20:28:28 dev-nodes exotic-sandwich[web.3]: Server listening on port 10003 in development mode
+Feb 23 20:28:29 dev-nodes exotic-sandwich[web.5]: Server listening on port 10005 in development mode
+Feb 23 20:29:11 dev-nodes exotic-sandwich[web.2]: Server listening on port 10002 in development mode
+Feb 23 20:29:12 dev-nodes exotic-sandwich[web.4]: Server listening on port 10004 in development mode
+</code></pre>
+
+<p>Congratulations!  You&rsquo;ve successfully built out your own cost effective PAAS and deployed your first application to it.</p>
+
+<p>Speaking of costs &hellip;  How much would this cost to run per month ?</p>
+
+<ul>
+<li>Cloud Load Balancer - $10.95 / month</li>
+<li>Deis Controller - $57.60 / month</li>
+<li>Deis Nodes (x2) - $115.20 / month</li>
+</ul>
+
+<p>Total:  $183.75 / month.</p>
+
+<p>You could run all of this on a single server without a load balancer,  which means it would be just $57.60/month, which with the <a href="http://developer.rackspace.com/devtrial/">Rackspace Developer Discount</a> would reduce down to just $7.60/month.</p>
+
+<h1 id="toc_41">Epilogue</h1>
+
+<h2 id="toc_42">Cleanup</h2>
+
+<p>Destroy your app:</p>
+
+<pre><code>$ deis destroy
+
+ !    WARNING: Potentially Destructive Action
+ !    This command will destroy the application: exotic-sandwich
+ !    To proceed, type &quot;exotic-sandwich&quot; or re-run this command with --confirm=exotic-sandwich
+
+&gt; exotic-sandwich
+Destroying exotic-sandwich... done in 21s
+Git remote deis removed
+</code></pre>
+
+<p>list your servers:</p>
+
+<pre><code>$ bundle exec knife rackspace server list
+Instance ID                           Name             Public IP       Private IP      Flavor          Image                                 State 
+7c43ecb9-1ba3-454c-a5f4-637b56961d68  dev-nodes        23.253.102.184  10.208.135.137  performance1-2  2d59cbce-92fa-412b-8a5e-6eb426ce7dc9  active
+f89c4b25-6486-422a-907a-16b3b3223a5e  dev-nodes        23.253.102.158  10.208.137.18   performance1-2  2d59cbce-92fa-412b-8a5e-6eb426ce7dc9  active
+bb713170-9322-424a-8837-863a4b396705  deis-controller  23.253.104.13   10.208.132.190  performance1-2  a58c9895-6349-442a-bba7-99611900209d  active
+</code></pre>
+
+<p>Delete your servers by running the following command for each:</p>
+
+<pre><code>$ bundle exec knife rackspace server delete 7c43ecb9-1ba3-454c-a5f4-637b56961d68 --purge
+Instance ID: 7c43ecb9-1ba3-454c-a5f4-637b56961d68
+Host ID: e0da0172f321babe99aec9686c7b99ac7fa5ff8fa1ada934f5fae842
+Name: dev-nodes
+Flavor: 2 GB Performance
+Image: deis-node-image
+Public IP Address: 23.253.102.184
+Private IP Address: 10.208.135.137
+
+Do you really want to delete this server? (Y/N) y
+[WARNING] Error Parsing response json - Yajl::ParseError
+WARNING: Deleted server 7c43ecb9-1ba3-454c-a5f4-637b56961d68
+</code></pre>
+
+<p>Clean up your chef:</p>
+
+<pre><code>$ bundle exec knife data bag delete deis-apps
+$ bundle exec knife data bag delete deis-formations
+$ bundle exec knife client delete dev-nodes-1
+$ bundle exec knife client delete dev-nodes-2
+$ bundle exec knife node delete dev-nodes-1
+$ bundle exec knife node delete dev-nodes-2
+</code></pre>
+
+<p>Delete your glance images:</p>
+
+<pre><code>$ nova image-delete deis-base-image
+$ nova image-delete deis-node-image
+</code></pre>
+
+<p>Finally delete your Cloud Load Balancer from the <a href="https://mycloud.rackspace.com/load_balancers">Rackspace UI</a></p>
+
+        </div>
+        <section class="post-comments">
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+
+(function() {
+     
+     
+     if (window.location.hostname == "localhost")
+             return;
+
+	         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+		     var disqus_shortname = '';
+		         dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+			     (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+			     })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+</section>
+
+
+      </div>
+    </div>
+  </body>
+  
+</html>
