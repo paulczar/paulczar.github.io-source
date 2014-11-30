@@ -1,0 +1,19 @@
+---
+baseurl: "http://tech.paulcz.net"
+languageCode: "en-us"
+title: "Paul Czarkowski"
+author: "Paul Czarkowski"
+disqusShortname: "tech-paulcz"
+permalinks:
+  post: /:year/:month/:filename/
+
+indexes:
+  category: "categories"
+  tag: "tags"
+
+Params:
+  AuthorName: "Paul"
+  github: "paulczar"
+  twitter: "pczarkowski"
+  email: "username.taken+tech@gmail.com"
+  description: "Random musings mostly about tech"

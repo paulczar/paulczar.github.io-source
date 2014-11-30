@@ -1,0 +1,210 @@
+<!doctype html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> &mdash; </title>
+    
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="/images/"/>
+    <link href="http://localhost:1313/index.xml" rel="alternate" type="application/rss+xml" title="" />
+    <meta name="title" content="http://localhost:1313">
+    <link rel="canonical" href="http://localhost:1313">
+    <meta property="og:title" content=""/>
+    <meta property="og:url" content="http://localhost:1313"/>
+    <meta property="og:image" content="http://localhost:1313/images/"/>   
+    <meta property="og:site_name" content="">
+</head>
+<body>
+    
+<section class="site-nav">
+    <header>
+        <nav id="navigation">
+            <a class="brand" href="/">
+                <img src="/images/" alt="Inc">
+            </a>
+            <a href="/" class="home">Blog</a>
+            
+            
+        </nav>
+        <nav class="tagline">
+            
+            
+        </nav>
+    </header>
+</section>
+
+
+<article class="container">
+  <header><h1>404</h1></header>
+  <section>
+    <p>That doesn't seem to exist! Recent articles are below or search the <a href="/post/">archives</a>.</p>
+  </section>
+  <hr>
+  
+    
+  
+        <section class="index">
+        
+        <div>
+            <h2 class="title"><a href="/post/running-deis-io-on-rackspace-cloud/" rel="prefetch">Running DEIS.IO on Rackspace Cloud</a></h2>
+            
+            
+            <p><p>I recently did a presentation at the Cloud Austin meetup titled <a href="http://tech.paulcz.net/presentation-cloud-austin-deis/#/">Docking with Unicorns</a> about new PAAS on the block <a href="http://deis.io">DEIS</a>.   Building out DEIS is quite easy,  make more easy by some tight integration they have with Rackspace Cloud.    If you&rsquo;re interested in what deis is go through my slides linked above, and the documentation on their website.    If you want to build out an environment to kick the tires a bit,  then click &lsquo;Read on&rsquo; below and follow me down the rabbit hole.</p>
+</p>
+            
+            <div class="meta">
+                Written By <address></address> &mdash;
+                <time pubdate datetime="2014-02-23" title="2014-02-23">February 2, 2014</time>
+            </div>
+        </div>
+        <hr>
+    </section>
+
+  
+        <section class="index">
+        
+        <div>
+            <h2 class="title"><a href="/post/managing-docker-services-with-this-one-easy-trick/" rel="prefetch">Managing docker services with this one easy trick</a></h2>
+            
+            
+            <p><p>I have been having a lot of internal debate about the idea of running more than one service in a docker container.   A Docker container is built to run a single process in the foreground and to live for only as long as that process is running.  This is great in a utopian world where servers are immutable and sysadmins drink tiki drinks on the beach,  however it doesn&rsquo;t always translate well to the real world.</p>
+
+<p>Examples where you might want to be able to run multiple servers span from the simple use case of running <code>sshd</code> as well as your application to running a web app such as <code>wordpress</code> where you might want both <code>apache</code> and <code>mysql</code> running in the same container.</p>
+
+<p>Wrapping your applications in a supervisor daemon such as <code>runit</code> seems like a perfect fit for this.  All you need to do is install <code>runit</code> as part of your <code>dockerfile</code> and then create appropriate service directories for the apps you want to run in the container.    I was doing some testing of this when I realized a quirk of <code>runit</code> which I could exploit for evil.</p>
+
+<p>To start or stop a service with <code>runit</code> is simply a matter of creating or deleting a symlink in a service directory,   so in theory if you could expose that directory to the server hosting the container you could exploit that to start and stop services from outside of the container.  <code>Docker</code> volume mapping allows exactly this!</p>
+
+<p>Below you will find examples of running three services (logstash,elasticsearch,kibana) that make up the <code>logstash</code> suite.</p>
+</p>
+            
+            <div class="meta">
+                Written By <address></address> &mdash;
+                <time pubdate datetime="2013-10-20" title="2013-10-20">October 10, 2013</time>
+            </div>
+        </div>
+        <hr>
+    </section>
+
+  
+        <section class="index">
+        
+        <div>
+            <h2 class="title"><a href="/post/creating-immutable-servers-with-chef-and-docker-dot-io/" rel="prefetch">Creating immutable servers with chef and docker.io</a></h2>
+            
+            
+            <p><p>Building applications in a <a href="http://docker.io">docker.io</a> Dockerfile is relatively simple,  but sometimes you want to just install the application exactly as you would normally via already built chef cookbooks.   Turns out this is actually pretty simple.</p>
+
+<p>The first thing you&rsquo;ll need to do is build a container with chef-client and berkshelf installed.   You can grab the one I&rsquo;ve built by running <code>docker pull paulczar/chef-solo</code> or build one youself from a <code>Dockerfile</code> that looks a little something like the following&hellip;</p>
+</p>
+            
+            <div class="meta">
+                Written By <address></address> &mdash;
+                <time pubdate datetime="2013-09-07" title="2013-09-07">September 9, 2013</time>
+            </div>
+        </div>
+        <hr>
+    </section>
+
+  
+        <section class="index">
+        
+        <div>
+            <h2 class="title"><a href="/post/logstash-plus-opscode-omnibus/" rel="prefetch">Logstash &#43; Opscode Omnibus</a></h2>
+            
+            
+            <p><p>At <a href="http://devopsdays.org/events/2013-austin/">DevOps Days Austin</a> <a href="http://twitter.com/mattray">@mattray</a> did an Openspace session on <a href="https://github.com/opscode/omnibus-ruby">Omnibus</a> which is a toolset based around the concept of installing an app and all of it&rsquo;s prerequisites from source into a directory and then building a package ( either .deb or .rpm ) of that using <a href="https://github.com/jordansissel/fpm">fpm</a>.</p>
+
+<p>Having battled many times with OS Packages trying to get newer versions of Ruby, or Redis or other software installed and having to hunt down some random package repo or manually build from source this seems like an excellent idea.</p>
+
+<p>To learn the basics I decided to build an <a href="https://github.com/paulczar/omnibus-fpm">omnibus package for fpm</a> which helped me work out the kinks and learn the basics.</p>
+</p>
+            
+            <div class="meta">
+                Written By <address></address> &mdash;
+                <time pubdate datetime="2013-05-06" title="2013-05-06">May 5, 2013</time>
+            </div>
+        </div>
+        <hr>
+    </section>
+
+  
+        <section class="index">
+        
+        <div>
+            <h2 class="title"><a href="/post/creating-a-github-pages-blog-with-octopress/" rel="prefetch">Creating a Github Pages Blog With Octopress</a></h2>
+            
+            
+            <p><p>A lot of tech bloggers will write their blog posts in <a href="http://daringfireball.net/projects/markdown/">Markdown</a>, convert it to HTML and paste that HTML into their blog of choice and then in the blog&rsquo;s editor clean it up to suit their blog.   This is an excellent way to create easy to read portable documents that can easily be published in multiple formats.</p>
+
+<p>However what if there was a way to skip the second part of that and just create a markdown page, submit it into your source control ( you <em>do</em> use source control right? ) and your blog would automagically update.</p>
+
+<p>In comes <a href="http://octopress.org/">Octopress</a>,  it&rsquo;s a framework that wraps around <a href="https://help.github.com/articles/using-jekyll-with-pages">Jekyll</a> which is <a href="https://github.com/">Github&rsquo;s</a> blogging engine that powers <a href="http://pages.github.com/">Github Pages</a>.   Essentially you edit Markdown files and <a href="http://octopress.org/">Octopress</a> will compile it into a static-html <a href="https://help.github.com/articles/using-jekyll-with-pages">Jekyll</a> blog.     This means that your blog will be lightning fast ( no need to run an interpreted language in your web server ) and ultra portable.</p>
+
+<p>Another side benefit is that you can host it for free on <a href="https://github.com/">Github</a> ( as long as you&rsquo;re okay with sharing your source &hellip; and you should be! ) or for free on <a href="http://www.heroku.com/">Heroku</a> ( don&rsquo;t have to share your source ) or host it on any simple no frills Apache, LightHTTP, nginx, node.js, etc server.</p>
+
+<p>Here is how I&rsquo;m porting my blogger site to Octopress hosted on Github Pages.   I&rsquo;m not using any of the fancy <a href="https://github.com/mojombo/jekyll/wiki/blog-migrations">Jekyll migration tools</a> as I only have a few posts and it will help me get used to the extended syntax that Octopress uses in Markdown.</p>
+</p>
+            
+            <div class="meta">
+                Written By <address></address> &mdash;
+                <time pubdate datetime="2012-12-15" title="2012-12-15">December 12, 2012</time>
+            </div>
+        </div>
+        <hr>
+    </section>
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</article>
+<section class="pagination" style="text-align:center">
+  <a href="/post/" class="btn btn-outline">Archives</a>
+</section>
+<footer class="site-footer">
+    <div class="container">
+        <nav>
+            <a href=""></a> &middot;
+            <a href="/">Blog</a> &middot;
+            
+            
+        </nav>
+        
+        <nav class="social">
+            
+            
+                
+            <a href="/index.xml" title="RSS Feed">
+                <i class="icon icon-rss black"></i>
+            </a>
+        </nav>
+    </div>
+</footer>
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script type="text/javascript" src="/js/main.js"></script>
+
+
+
+
+
+
+
+
+
+
+  
+
+<script>document.write('<script src="http://'
+        + (location.host || 'localhost').split(':')[0]
+		+ ':1313/livereload.js?mindelay=10"></'
+        + 'script>')</script></body>
+</html>
+

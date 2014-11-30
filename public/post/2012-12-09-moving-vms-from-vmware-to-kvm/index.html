@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title> Moving VMs from VMWare to KVM &middot; my new hugo site </title>
+
+  
+  <link rel="stylesheet" href="http://localhost:1313/css/poole.css">
+  <link rel="stylesheet" href="http://localhost:1313/css/syntax.css">
+  <link rel="stylesheet" href="http://localhost:1313/css/hyde.css">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  
+  <link href="" rel="alternate" type="application/rss+xml" title="my new hugo site" />
+</head>
+
+<body>
+
+<div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>my new hugo site</h1>
+      <p class="lead">
+      An elegant open source and mobile first theme for <a href="http://hugo.spf13.com">hugo</a> made by <a href="http://twitter.com/mdo">@mdo</a>. Originally made for Jekyll.
+      </p>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="/">Home</a> </li>
+      
+    </ul>
+
+    <p>&copy; 2014. All rights reserved. </p>
+  </div>
+</div>
+
+
+    <div class="content container">
+<div class="post">
+  <h1>Moving VMs from VMWare to KVM</h1>
+  <span class="post-date">Mon, Jan 1, 0001</span>
+      <p>I&rsquo;m migrating from my old VMWare ESXi box to a new machine running Ubuntu 12.10 and KVM.    Not wanting to rebuild all of my VMs I set about trying to work out the best way to migrate the VMs.</p>
+
+<p><strong>Steps to make Windows migrate without Bluescreen</strong></p>
+
+<p>If you migrate a windows box it&rsquo;ll bluescreen due to the shock of so much hardware changing.   The following .reg hack will prevent this from happening by opening up access to a bunch of random system drivers.   Copy and run the .reg file in your VM before doing any further steps.</p>
+
+<p><a href="https://gist.github.com/4247499">c:\temp\vmdriverhack.reg</a></p>
+
+<p><strong>Move your VM to shared storage</strong></p>
+
+<p>I mounted an nfs partition to vmware from my freenas box and migrated the data across using the vmware datastore tools.   If you don&rsquo;t have a NAS you could export a directory from your KVM server to achieve the same goal.</p>
+
+<p>To move VMs in ESXi we click on the ESXi server, pick the Configuration tab,  click on &lsquo;Storage&rsquo; and then right-click on the datastore and select &lsquo;Browse Datastore&rsquo;.   Select the VM folder you wish to move and click the move icon.</p>
+
+<p>{% img <a href="https://lh6.googleusercontent.com/-R5x6JyT5x14/UMUkr4qNr4I/AAAAAAAAAHY/CYhOlizOLb8/s640/VMWare-move-1.png">https://lh6.googleusercontent.com/-R5x6JyT5x14/UMUkr4qNr4I/AAAAAAAAAHY/CYhOlizOLb8/s640/VMWare-move-1.png</a> %}</p>
+
+<p><strong>Convert your VM to qcow2 format</strong></p>
+
+<p>Next we need to make your VM available to the KVM server.   Again I just mounted my nfs volume to it.     You could run the VM from NFS if you want,  but I want to run it locally.</p>
+
+<p><code>
+kvm-img convert -O qcow2 /mnt/freenas/vms/WindowsGuest/WindowsGuest.vmdk \
+  /data-disk/VMs/WindowsGuest.qcow2
+</code>`</p>
+
+<p>It&rsquo;ll take a while to convert.   Once it&rsquo;s done you can make it available to KVM.    I used the VirtualMachineManager GUI,  but you could use virsh if you want.   Simply create a new VM like you would usually except check the &lsquo;Import existing disk image&rsquo; option.</p>
+
+<p>{% img <a href="https://lh6.googleusercontent.com/-dXfvXbUOE5c/UMUkwnky73I/AAAAAAAAAHg/DDjgO2CAwqI/s800/vmware-2.png">https://lh6.googleusercontent.com/-dXfvXbUOE5c/UMUkwnky73I/AAAAAAAAAHg/DDjgO2CAwqI/s800/vmware-2.png</a> %}</p>
+
+<p>Then choose your VM image and set the OS versions.</p>
+
+<p>{% img <a href="https://lh3.googleusercontent.com/-OybiOO1KsGI/UMUk9JbhzpI/AAAAAAAAAHo/zayosuFa5co/s800/vmware-3.png">https://lh3.googleusercontent.com/-OybiOO1KsGI/UMUk9JbhzpI/AAAAAAAAAHo/zayosuFa5co/s800/vmware-3.png</a> %}</p>
+
+<p>If Windows then choose &lsquo;edit VM before starting it and select the realtek network adaptor.</p>
+
+<p>{% img <a href="https://lh4.googleusercontent.com/-MHBkRrhkCI4/UMUlQJ_6ZcI/AAAAAAAAAHw/-Dj9UYNszgU/s800/VMWare-4.png">https://lh4.googleusercontent.com/-MHBkRrhkCI4/UMUlQJ_6ZcI/AAAAAAAAAHw/-Dj9UYNszgU/s800/VMWare-4.png</a> %}</p>
+
+<p>Once created the VM should start up fine.   If the VM is running Windows you&rsquo;ll probably need to re-activate it as the hardware change will make it think you&rsquo;ve pirated it.</p>
+
+<p>{% img <a href="https://lh5.googleusercontent.com/-iJuM6CXhWVo/UMUlnT4qjHI/AAAAAAAAAH4/mahRyoBn4ZM/s800/vmware-5.png">https://lh5.googleusercontent.com/-iJuM6CXhWVo/UMUlnT4qjHI/AAAAAAAAAH4/mahRyoBn4ZM/s800/vmware-5.png</a> %}</p>
+
+</div>
+</div>
+
+  <script>document.write('<script src="http://'
+        + (location.host || 'localhost').split(':')[0]
+		+ ':1313/livereload.js?mindelay=10"></'
+        + 'script>')</script></body>
+</html>
