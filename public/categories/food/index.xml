@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+      <title>Food on Paul Czarkowski </title>
+      <generator uri="https://hugo.spf13.com">Hugo</generator>
+    <link>http://localhost:1313/categories/food/index.xml/</link>
+    <language>en-us</language>
+    
+    
+    <updated>Sun, 30 Nov 2014 11:14:45 CST</updated>
+    
+    <item>
+      <title>BreadOps - Continuous Delivery of Fresh Baked Bread</title>
+      <link>http://localhost:1313/2014/11/breadops-continous-delivery-of-fresh-baked-bread/</link>
+      <pubDate>Sun, 30 Nov 2014 11:14:45 CST</pubDate>
+      
+      <guid>http://localhost:1313/2014/11/breadops-continous-delivery-of-fresh-baked-bread/</guid>
+      <description>
+
+&lt;p&gt;&lt;img src=&#34;https://lh6.googleusercontent.com/-_AuYSwAc_8A/VHtTnddC1CI/AAAAAAAAOZc/9cgRejB_s4g/w1122-h631-no/20141129_181010.jpg&#34; alt=&#34;the best way to eat fresh bread&#34; /&gt;
+ &lt;strong&gt;&amp;ldquo;See how this sparkly devop princess bakes bread every day with almost no effort at all with this one weird trick&amp;rdquo;&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Store bought bread is shit.  Even the  &amp;ldquo;artisanal&amp;rdquo; bread at most supermarkets is little better than cake baked in a bread shaped mold ( seriously check next time you&amp;rsquo;re at a supermarket ).  You might be lucky and have a really good bread baker near you,  but like butchers and other important crafts they have all but disappeared.  My solution to this was to start baking bread myself.  I did a ton of research, started my own sourdough starter ( 5 years and going strong! ) and started baking bread regularly.&lt;/p&gt;
+
+&lt;!--more --&gt;
+
+&lt;p&gt;For a while it was tough going making bread all the time,  starters and doughs are fickle beasts and required constant care and feeding ( literally, you have to feed a sourdough starter at least twice a day ).   After almost giving up several times I started to apply what I now know as &lt;em&gt;devops techniques&lt;/em&gt;. Over that time I&amp;rsquo;ve iterated constantly over my processes to come up with a process that is optimized for my time.  I can even apply CAMS across it:&lt;/p&gt;
+
+&lt;h2 id=&#34;toc_0&#34;&gt;Culture&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Lactobacillus &amp;hellip; HAHAHAHA Bakers joke!&lt;/li&gt;
+&lt;li&gt;A long fermentation time which converts more of the sugars into gas and makes the proteins more digestible.&lt;/li&gt;
+&lt;li&gt;Minimal human interaction ( approx 5 minutes per loaf ) reduces impact on normal life.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;toc_1&#34;&gt;Automation&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Slow ferment reduces requirement to knead to almost zero.&lt;/li&gt;
+&lt;li&gt;Refrigerating the dough allows me to take control of the timetable.&lt;/li&gt;
+&lt;li&gt;Usable for 5-7 days from the fridge.  &lt;strong&gt;Multiple loaves from the one batch.&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;toc_2&#34;&gt;Measurement&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;How much active time did I spend on it ?&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;How long did it take to ferment?&lt;/li&gt;
+&lt;li&gt;How is the crust?  How is the crumb ?&lt;/li&gt;
+&lt;li&gt;Is it better or worse than the previous iteration ?&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;toc_3&#34;&gt;Sharing&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;A &lt;em&gt;lot&lt;/em&gt; of people have received loaves of bread from me during experimentation.&lt;/li&gt;
+&lt;li&gt;Ensure this process is approachable by others.&lt;/li&gt;
+&lt;li&gt;This blog post.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The final technique that I came up with is not unique and is similar to a number several hundred page $30+ books aimed and making baking bread more accessible to the home cook, except its just a short blog post and is free as in beer.  It&amp;rsquo;s fairly descriptive and may seem like a lot of work, but I tend to average a little over 5 minutes of active time per loaf of bread.   Without further shenanigans here is my process.&lt;/p&gt;
+
+&lt;h2 id=&#34;toc_4&#34;&gt;Ingredients and Tools&lt;/h2&gt;
+
+&lt;p&gt;I worked hard to ensure that you don&amp;rsquo;t need to use any specialized tools.   No need for a standmixer or other expensive tools.  There are only two things (listed first) that you might not have in your kitchen, and they&amp;rsquo;re both so versatile that you &lt;em&gt;should&lt;/em&gt; have them.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://lh4.googleusercontent.com/v_kKOKFKupOdtI2_44MImjl5L8GYzq7QYMs1BxRyGgc=w1229-h692-no&#34; alt=&#34;things what you need to make bread&#34; /&gt;
+&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Kitchen Scale
+
+&lt;ul&gt;
+&lt;li&gt;capable of measuring to the gram&lt;/li&gt;
+&lt;li&gt;measuring by volume is a mugs game.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Baking Stone
+
+&lt;ul&gt;
+&lt;li&gt;large square one, the biggest that will fit in your oven&lt;/li&gt;
+&lt;li&gt;A cast iron pan or dutch oven will do in a pinch.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;One large and one small mixing bowl&lt;/li&gt;
+&lt;li&gt;Plastic Wrap
+
+&lt;ul&gt;
+&lt;li&gt;always cover your dough.&lt;/li&gt;
+&lt;li&gt;a showercap makes a great reusable cover.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Flour
+
+&lt;ul&gt;
+&lt;li&gt;almost any flour will work, even All Purpose&lt;/li&gt;
+&lt;li&gt;I recomend you start with King Arthur Bread Flour.&lt;/li&gt;
+&lt;li&gt;I usually do a mix of KABF and stone ground whole wheat.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Salt
+
+&lt;ul&gt;
+&lt;li&gt;any salt as long as its not iodized.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Water
+
+&lt;ul&gt;
+&lt;li&gt;tap water is fine.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Yeast ( if using )
+
+&lt;ul&gt;
+&lt;li&gt;I used Fleischmansn&amp;rsquo;s Active Dry.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Olive Oil
+
+&lt;ul&gt;
+&lt;li&gt;For oiling the bowls used in the final shaping.&lt;/li&gt;
+&lt;li&gt;I usually line the bowl with floured cheesecloth instead.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;toc_5&#34;&gt;The Starter&lt;/h2&gt;
+
+&lt;p&gt;I use a &lt;a href=&#34;http://www.sourdoughhome.com/index.php?content=startermyway2&#34;&gt;sourdough starter&lt;/a&gt;, and I would recommend that you do the same &amp;hellip; but not until you&amp;rsquo;ve mastered this with regular yeast.  Which is what I&amp;rsquo;ll describe below.  If you have a sourdough starter then skip this step.&lt;/p&gt;
+
+&lt;p&gt;Mix 50g Flour, 50g Water, 2g yeast until it forms a paste and then cover with plastic wrap:
+&lt;img src=&#34;https://lh3.googleusercontent.com/-IKFdhJcTr7c/VHtUZeGewaI/AAAAAAAAObE/NQpFh4jQiCs/w1228-h691-no/20141124_123134.jpg&#34; alt=&#34;Starter&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;After 4-6 hours it should be all bubby and smell yeasty and ready for The Mix:
+&lt;img src=&#34;https://lh6.googleusercontent.com/-SMJSvqAzQhQ/VHtUX-Gj7qI/AAAAAAAAOa8/9Aig_NSR2rc/w1228-h691-no/20141124_140654.jpg&#34; alt=&#34;fermented starter&#34; /&gt;
+&lt;/p&gt;
+
+&lt;h2 id=&#34;toc_6&#34;&gt;The Mix&lt;/h2&gt;
+
+&lt;p&gt;Add the Starter and 375g of water to the large bowl and mix with a fork until it looks like milk:
+&lt;img src=&#34;https://lh4.googleusercontent.com/-0Se5tsoJoH4/VHtUWeoTVdI/AAAAAAAAOa0/57hyMA0sBPk/w1228-h691-no/20141124_140942.jpg&#34; alt=&#34;don&#39;t drink it silly!&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;Add 500g of flour and 15g salt.  Mix it until fully incorporated ( we&amp;rsquo;re not kneading here, just making sure there is no dry flour left ):
+&lt;img src=&#34;https://lh6.googleusercontent.com/-jJo3GtezCdM/VHtUVO9mCHI/AAAAAAAAOas/7Mlz3AyR2oQ/w1228-h691-no/20141124_141131.jpg&#34; alt=&#34;mixed&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;These quantities form a ratio that can be used to make batches as big or as small as your want.  I usually double it which gives me a decent sized loaf every two days.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;toc_7&#34;&gt;The Warm Ferment&lt;/h2&gt;
+
+&lt;p&gt;Cover the bowl and leave it at room temperature for 4 to 8 hours.  The timing doesn&amp;rsquo;t have to be precise,  you&amp;rsquo;re just looking for sings of the yeast to start fermenting the flour and creating air bubbles:&lt;/p&gt;
+
+&lt;p&gt;NEED PHOTO!
+![fermentation activated]()&lt;/p&gt;
+
+&lt;h2 id=&#34;toc_8&#34;&gt;The Cold Ferment&lt;/h2&gt;
+
+&lt;p&gt;Place the bowl in the refrigerator for at least 24 hours, up to 5 days:&lt;/p&gt;
+
+&lt;p&gt;NEED PHOTO!&lt;/p&gt;
+
+&lt;h2 id=&#34;toc_9&#34;&gt;The Shaping&lt;/h2&gt;
+
+&lt;p&gt;&lt;em&gt;Whenever you are working with the dough, it is important to try to lose as little air as possible.  Do not punch it down.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://lh6.googleusercontent.com/-bXb_SAwYxSY/VHtUTmXk2SI/AAAAAAAAOak/ME5g9N5mkpM/w1228-h691-no/20141129_143244.jpg&#34; alt=&#34;ready for shaping&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;Lightly flour the bench and turn out your dough.   Cut off a piece to use and put the rest back in the bowl and back into the fridge:
+&lt;img src=&#34;https://lh6.googleusercontent.com/-B3N3OIQFnsA/VHtUSAIq2OI/AAAAAAAAOac/GsZeRXf4yjk/w1228-h691-no/20141129_143342.jpg&#34; alt=&#34;fresh from the cold ferment&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Protip: You can use the final piece of dough as the starter for the next batch and skip a step.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Gently stretch the piece dough out into a squaring shape and then fold each edge into the middle:
+&lt;img src=&#34;https://lh3.googleusercontent.com/-jU4S-UI5kvw/VHtUQoyLJYI/AAAAAAAAOaU/VyQFf1qb06Y/w1228-h691-no/20141129_143427.jpg&#34; alt=&#34;folding&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;Turn the dough over and shape it into a ball:
+&lt;img src=&#34;https://lh3.googleusercontent.com/-wHWpKg-1IVM/VHtUPA1T5QI/AAAAAAAAOaM/ANaEWZyDuJ0/w1228-h691-no/20141129_143521.jpg&#34; alt=&#34;dough balls&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;Watch this &lt;a href=&#34;https://www.youtube.com/watch?feature=player_detailpage&amp;amp;v=4VdVrib2PQo#t=20&#34;&gt;video&lt;/a&gt; (not mine) for the technique used to shape the dough into balls.
+&lt;div class=&#34;embed video-player&#34;&gt;
+&lt;iframe class=&#34;youtube-player&#34; type=&#34;text/html&#34; width=&#34;640&#34; height=&#34;385&#34; src=&#34;http://www.youtube.com/embed/4VdVrib2PQo&#34; allowfullscreen frameborder=&#34;0&#34;&gt;
+&lt;/iframe&gt;
+&lt;/div&gt;&lt;/p&gt;
+
+&lt;p&gt;Oil your shaping bowl and flip your ball over so that the top of the dough is facing down in the bowl and cover it:
+&lt;img src=&#34;https://lh5.googleusercontent.com/-xbzq6cwYJis/VHtUNHuDbiI/AAAAAAAAOaE/8EdixPbGN1k/w1228-h691-no/20141129_144021.jpg&#34; alt=&#34;final shaping&#34; /&gt;
+&lt;/p&gt;
+
+&lt;h2 id=&#34;toc_10&#34;&gt;The Final Ferment&lt;/h2&gt;
+
+&lt;p&gt;Let the dough warm back up to room temperature and the yeasts to wake up and get active again.   This will probably take about two hours.  Crank the oven on to 450F after about an hour.  This gives the oven a good solid hour to get up to temperature and stabilize.&lt;/p&gt;
+
+&lt;h2 id=&#34;toc_11&#34;&gt;The Bake&lt;/h2&gt;
+
+&lt;p&gt;Turn the oven up to 500F, open the door, and slide the rack with the pizza stone out so that you can get to it without burning yourself.   upend the bowl onto the stone and run a knife quickly over the top to create a shallow cut:
+&lt;img src=&#34;https://lh3.googleusercontent.com/-Pzk8zAWIWt0/VHtULim3WvI/AAAAAAAAOZ8/NTrxiDnOXmk/w1228-h691-no/20141129_155656.jpg&#34; alt=&#34;ready for baking&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;Bake for 5 minutes, then turn the oven back down to 450F and bake for another 20 minutes:
+&lt;img src=&#34;https://lh4.googleusercontent.com/-hX_Gpo4YIOE/VHtTrWwzT8I/AAAAAAAAOZ0/EY1snf5ymew/w1228-h691-no/20141129_180734.jpg&#34; alt=&#34;baked&#34; /&gt;
+&lt;/p&gt;
+
+&lt;h2 id=&#34;toc_12&#34;&gt;The Cooldown&lt;/h2&gt;
+
+&lt;p&gt;Avoid the tempation to cut into the bread while its still hot.  Bread continues to cook as it cools down and its important to not allow steam and heat to escape.&lt;/p&gt;
+
+&lt;h2 id=&#34;toc_13&#34;&gt;The Eatening&lt;/h2&gt;
+
+&lt;p&gt;Fresh bread is best enjoyed simply with some high quality extra virgin olive oil and balsamic vinegar:
+&lt;img src=&#34;https://lh3.googleusercontent.com/-_AuYSwAc_8A/VHtTnddC1CI/AAAAAAAAOZc/9cgRejB_s4g/w1228-h691-no/20141129_181010.jpg&#34; alt=&#34;ready to eat&#34; /&gt;
+&lt;/p&gt;
+
+&lt;h2 id=&#34;toc_14&#34;&gt;Tips and Tricks&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Make your starter from Ikea&amp;rsquo;s &lt;a href=&#34;http://www.ikea.com/us/en/catalog/products/00229031/&#34;&gt;BRÖDMIX FLERKORN&lt;/a&gt; which contains all sorts of interesting grains as well as Yeast and &amp;ldquo;Sourdough Powder&amp;rdquo; whatever that is.&lt;/li&gt;
+&lt;li&gt;Make &lt;a href=&#34;http://food.paulcz.net/2010/05/sourdough-pancakes.html&#34;&gt;sourdough pancakes&lt;/a&gt; from your leftover starter.&lt;/li&gt;
+&lt;li&gt;Shape your dough into a &lt;a href=&#34;http://food.paulcz.net/2013/02/austin-style-pizza.html&#34;&gt;pizza dough&lt;/a&gt; and bake it in a cast iron skillet.&lt;/li&gt;
+&lt;li&gt;You don&amp;rsquo;t have to make round loafs. use a sandwhich loaf tin, or make ciabatta or baguettes.  It&amp;rsquo;s all it the shaping.&lt;/li&gt;
+&lt;li&gt;If you&amp;rsquo;re brave make your dough wetter and ferment for longer.   you&amp;rsquo;ll get cazy large holes in your crumb.&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
