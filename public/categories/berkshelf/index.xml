@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+      <title>Berkshelf on Paul Czarkowski </title>
+      <generator uri="https://hugo.spf13.com">Hugo</generator>
+    <link>http://tech.paulcz.net/categories/berkshelf/index.xml/</link>
+    <language>en-us</language>
+    
+    
+    <updated>Sat, 07 Sep 2013 00:00:00 UTC</updated>
+    
+    <item>
+      <title>Creating immutable servers with chef and docker.io</title>
+      <link>http://tech.paulcz.net/2013/09/creating-immutable-servers-with-chef-and-docker-dot-io/</link>
+      <pubDate>Sat, 07 Sep 2013 00:00:00 UTC</pubDate>
+      
+      <guid>http://tech.paulcz.net/2013/09/creating-immutable-servers-with-chef-and-docker-dot-io/</guid>
+      <description>
+
+&lt;p&gt;Building applications in a &lt;a href=&#34;http://docker.io&#34;&gt;docker.io&lt;/a&gt; Dockerfile is relatively simple,  but sometimes you want to just install the application exactly as you would normally via already built chef cookbooks.   Turns out this is actually pretty simple.&lt;/p&gt;
+
+&lt;p&gt;The first thing you&amp;rsquo;ll need to do is build a container with chef-client and berkshelf installed.   You can grab the one I&amp;rsquo;ve built by running &lt;code&gt;docker pull paulczar/chef-solo&lt;/code&gt; or build one youself from a &lt;code&gt;Dockerfile&lt;/code&gt; that looks a little something like the following&amp;hellip;&lt;/p&gt;
+
+&lt;h3 id=&#34;toc_0&#34;&gt;Creating a docker.io container with chef and berkshelf&lt;/h3&gt;
+
+&lt;p&gt;``` ruby Dockerfile&lt;/p&gt;
+
+&lt;h1 id=&#34;toc_1&#34;&gt;DOCKER-VERSION 0.5.3&lt;/h1&gt;
+
+&lt;p&gt;FROM ubuntu:12.10
+MAINTAINER Paul Czarkowski &amp;ldquo;paul@paulcz.net&amp;rdquo;&lt;/p&gt;
+
+&lt;p&gt;RUN apt-get -y update
+RUN apt-get -y install curl build-essential libxml2-dev libxslt-dev git
+RUN curl -L &lt;a href=&#34;https://www.opscode.com/chef/install.sh&#34;&gt;https://www.opscode.com/chef/install.sh&lt;/a&gt; | bash
+RUN echo &amp;ldquo;gem: &amp;ndash;no-ri &amp;ndash;no-rdoc&amp;rdquo; &amp;gt; ~/.gemrc
+RUN /opt/chef/embedded/bin/gem install berkshelf&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;
+_you&#39;ll notice I&#39;m using the embedded chef ruby to install the berkshelf gem,  this is a handy shortcut to avoid messing around with random ruby versions from your distributions packaging._
+
+run `$ docker build -t paulczar/chef-solo .` to build a usable docker container from the above `Dockerfile`.
+
+### Using chef-solo and berkshelf to build an application in a docker.io container ###
+
+My [example application](https://github.com/paulczar/docker-chef-solo) will install `Kibana3` to your docker container.   I&#39;ll step through how it works below.
+
+#### Chef-Solo ####
+
+To run `chef-solo` successfully we require two files.   `solo.rb` to set up file locations, and `solo.json&#39; to set up the json / run list required for your application.
+
+``` ruby chef.rb
+root = File.absolute_path(File.dirname(__FILE__))
+
+file_cache_path root
+cookbook_path root + &#39;/cookbooks&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;``` json chef.json
+{
+  &amp;ldquo;kibana&amp;rdquo;: {
+    &amp;ldquo;webserver_listen&amp;rdquo;: &amp;ldquo;0.0.0.0&amp;rdquo;
+  },
+  &amp;ldquo;run_list&amp;rdquo;: [
+    &amp;ldquo;recipe[kibana::default]&amp;rdquo;
+  ]
+}&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;
+#### Berkshelf ####
+
+To run `berkshelf` we need to build a Berksfile which contains a list of all the chef cookbooks required for the applocation.   Berkshelf will download these cookbooks to a local directory which will be usable by chef-solo.
+
+``` ruby Berksfile
+site :opscode
+
+cookbook &#39;build-essential&#39;
+cookbook &#39;apache2&#39;
+cookbook &#39;git&#39;
+cookbook &#39;kibana&#39;, github: &#39;lusis/chef-kibana&#39;
+cookbook &#39;nginx&#39; , github: &#39;opscode-cookbooks/nginx&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;em&gt;You can see some of the cookbooks are being pulled from the opscode repository,  whereas others are being pulled directly from github.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;toc_2&#34;&gt;Dockerfile&lt;/h4&gt;
+
+&lt;p&gt;All that&amp;rsquo;s left now is to create a Dockerfile that will bring it all together.&lt;/p&gt;
+
+&lt;p&gt;``` ruby Dockerfile&lt;/p&gt;
+
+&lt;h1 id=&#34;toc_3&#34;&gt;DOCKER-VERSION 0.5.3&lt;/h1&gt;
+
+&lt;p&gt;FROM paulczar/chef-client
+MAINTAINER Paul Czarkowski &amp;ldquo;paul@paulcz.net&amp;rdquo;&lt;/p&gt;
+
+&lt;p&gt;RUN apt-get -y update
+ADD . /chef
+RUN cd /chef &amp;amp;&amp;amp; /opt/chef/embedded/bin/berks install &amp;ndash;path /chef/cookbooks
+RUN chef-solo -c /chef/solo.rb -j /chef/solo.json
+RUN echo &amp;ldquo;daemon off;&amp;rdquo; &amp;gt;&amp;gt; /etc/nginx/nginx.conf&lt;/p&gt;
+
+&lt;p&gt;CMD [&amp;ldquo;nginx&amp;rdquo;]
+```&lt;/p&gt;
+
+&lt;p&gt;Run &lt;code&gt;$ docker build -t demo/kibana3 .&lt;/code&gt; to build your application.&lt;/p&gt;
+
+&lt;p&gt;It will add the local files ( &lt;code&gt;solo.rb&lt;/code&gt;, &lt;code&gt;solo.json&lt;/code&gt;, &lt;code&gt;Berksfile&lt;/code&gt; ) to /chef in the server and then call berkshelf to download the cookbooks and chef-solo to install your application.   Finally it will give &lt;code&gt;nginx&lt;/code&gt; a directive to run in the foreground so that we don&amp;rsquo;t have to do any sneaky prcess control to get it to work with the way &lt;code&gt;docker.io&lt;/code&gt; runs processes.&lt;/p&gt;
+
+&lt;p&gt;To run the resultant &lt;code&gt;docker.io&lt;/code&gt; container you simply need to run &lt;code&gt;$ docker run -d -p 80 demo/kibana3&lt;/code&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

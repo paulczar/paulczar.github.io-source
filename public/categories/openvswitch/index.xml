@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+      <title>Openvswitch on Paul Czarkowski </title>
+      <generator uri="https://hugo.spf13.com">Hugo</generator>
+    <link>http://tech.paulcz.net/categories/openvswitch/index.xml/</link>
+    <language>en-us</language>
+    
+    
+    <updated>Thu, 13 Dec 2012 00:00:00 UTC</updated>
+    
+    <item>
+      <title>Running KVM and Openvswitch on Ubuntu 12.10</title>
+      <link>http://tech.paulcz.net/2012/12/running-kvm-and-openvswitch-on-ubuntu-12-dot-10/</link>
+      <pubDate>Thu, 13 Dec 2012 00:00:00 UTC</pubDate>
+      
+      <guid>http://tech.paulcz.net/2012/12/running-kvm-and-openvswitch-on-ubuntu-12-dot-10/</guid>
+      <description>
+
+&lt;p&gt;I&amp;rsquo;ve got an aging VMWare ESXi 4.0 server that needs to be replaced with something a little more modern and flexing.   Obviously at home I don&amp;rsquo;t need all the cool features that licensed VMWare comes with,  but I do want more than just the basic free version.&lt;/p&gt;
+
+&lt;p&gt;After a few weeks of installing and testing alternatives  ( I&amp;rsquo;d really love to run openstack,  but it&amp;rsquo;s just not worth it at home for a single box ) I&amp;rsquo;ve settled on Ubuntu 12.10 server running KVM and Openvswitch.&lt;/p&gt;
+
+&lt;p&gt;After installing Ubuntu 12.10 I did the following to get KVM up and running&amp;hellip;   I cribbed this mostly from &lt;a href=&#34;http://blog.allanglesit.com/2012/10/linux-kvm-ubuntu-12-10-with-openvswitch/&#34;&gt;blog.allanglesit.com&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Install updates and Pre-requisites&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;First of all, make sure Ubuntu is fully up to date:
+&lt;em&gt;sudo to root as pretty much every command here needs to be run as root&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;{% codeblock lang:bash %}
+sudo bash
+apt-get update
+apt-get upgrade
+{% endcodeblock %}&lt;/p&gt;
+
+&lt;p&gt;Now we can go ahead and install the necessary packages:&lt;/p&gt;
+
+&lt;p&gt;{% codeblock lang:bash %}
+apt-get -y install aptitude apt-show-versions ntp ntpdate vim kvm \
+ libvirt-bin vlan virtinst virt-manager virt-viewer openssh-server \
+ iperf pv openvswitch-controller openvswitch-brcompat \
+ openvswitch-switch nfs-common
+{% endcodeblock %}&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Kill off the default libvirt bridge and nuke ebtables&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;We want to delete the default libvirt interface and we don&amp;rsquo;t need ebtables so we&amp;rsquo;ll get rid of that.&lt;/p&gt;
+
+&lt;p&gt;{% codeblock lang:bash %}
+virsh net-destroy default
+virsh net-autostart &amp;ndash;disable default
+service libvirt-bin stop
+service qemu-kvm stop
+aptitude purge -y ebtables
+service openvswitch-switch restart
+service openvswitch-controller restart
+{% endcodeblock %}&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Configure network interfaces&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;We&amp;rsquo;ll be using just a single interface which will be used for both the bridge and the host itself.    We will also be bridging that network into the the vswitch and then configuring an interface for the host OS.    The network configuration will look something like this:&lt;/p&gt;
+
+&lt;p&gt;{% codeblock /etc/network/interfaces %}&lt;/p&gt;
+
+&lt;h1 id=&#34;toc_0&#34;&gt;The loopback network interface&lt;/h1&gt;
+
+&lt;p&gt;auto lo
+iface lo inet loopback&lt;/p&gt;
+
+&lt;h1 id=&#34;toc_1&#34;&gt;The primary network interface - bridge!&lt;/h1&gt;
+
+&lt;p&gt;auto eth0
+iface eth0 inet manual
+up ifconfig $IFACE 0.0.0.0 up
+down ifconfig $IFACE down&lt;/p&gt;
+
+&lt;h1 id=&#34;toc_2&#34;&gt;The host OS network interface&lt;/h1&gt;
+
+&lt;h1 id=&#34;toc_3&#34;&gt;DNS settings here,  12.10 resets resolv.conf on reboot.&lt;/h1&gt;
+
+&lt;p&gt;auto ovsbr0p1
+iface ovsbr0p1 inet static
+address 192.168.50.10
+netmask 255.255.255.0
+gateway 192.168.50.1
+dns-nameservers 192.168.50.1
+dns-search example.com
+{% endcodeblock %}&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Configure the openvswitch network&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Now we need to configure the network on the openvswitch.     We need to define the bridge, connect it to the uplink interface and create a port for the host OS.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;note: if you&amp;rsquo;re doing this via SSH it will probably break your session&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;{% codeblock lang:bash %}
+ovs-vsctl add-br ovsbr0
+ovs-vsctl add-port ovsbr0 eth0
+ovs-vsctl add-port ovsbr0 ovsbr0p1 &amp;ndash; set interface ovsbr0p1 type=internal
+reboot
+{% endcodeblock %}&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Modify network service sleep times&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;That took forever to boot.    We can fix that by modifying sleeps in /etc/init/failsafe.conf and reboot again to make sure it helped.&lt;/p&gt;
+
+&lt;p&gt;Change :&lt;/p&gt;
+
+&lt;p&gt;{% codeblock %}
+$PLYMOUTH message &amp;ndash;text=&amp;ldquo;Waiting for network configuration&amp;hellip;&amp;rdquo; || :
+sleep 40
+$PLYMOUTH message &amp;ndash;text=&amp;ldquo;Waiting up to 60 more seconds for network configuration&amp;hellip;&amp;rdquo; || :
+sleep 59
+$PLYMOUTH message &amp;ndash;text=&amp;ldquo;Booting system without full network configuration&amp;hellip;&amp;rdquo; || :
+{% endcodeblock %}&lt;/p&gt;
+
+&lt;p&gt;To :&lt;/p&gt;
+
+&lt;p&gt;{% codeblock %}
+$PLYMOUTH message &amp;ndash;text=&amp;ldquo;Waiting for network configuration&amp;hellip;&amp;rdquo; || :
+sleep 1
+$PLYMOUTH message &amp;ndash;text=&amp;ldquo;Waiting up to 60 more seconds for network configuration&amp;hellip;&amp;rdquo; || :
+sleep 1
+$PLYMOUTH message &amp;ndash;text=&amp;ldquo;Booting system without full network configuration&amp;hellip;&amp;rdquo; || :
+{% endcodeblock %}&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;LVM configure&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;We&amp;rsquo;re going to also use LVM to for the KVM virtual machines to use as storage.    I have a pair of 500g disks in a software raid1 which I&amp;rsquo;ll use for this.&lt;/p&gt;
+
+&lt;p&gt;{% codeblock lang:bash %}
+pvcreate /dev/md0
+vgcreate data-disk /dev/md0
+lvcreate -L 10G -n ISO data-disk
+mkfs.ext4 /dev/data-disk/ISO
+mkdir -p /data-disk/ISO
+echo &amp;ldquo;/dev/data-disk/ISO /data-disk/ISO defaults    ext4    0 0&amp;rdquo; &amp;gt;&amp;gt; /etc/fstab
+mount -a
+{% endcodeblock %}&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Create VM&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Now we can go ahead and create our first VM.   I&amp;rsquo;ve already downloaded the Ubuntu ISO to /data-disk/ISO&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;note: virt-install does not support setting a virtualport type of openvswitch yet .. so we have to trick it&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;{% codeblock lang:bash %}
+lvcreate -L 8G -n VM-UbuntuTest data-disk
+virt-install &amp;ndash;name UbuntuTest &amp;ndash;hvm &amp;ndash;noautoconsole &amp;ndash;ram 1024 \
+&amp;ndash;disk path=/dev/data-disk/VM-UbuntuTest &amp;ndash;nonetworks &amp;ndash;vnc \
+&amp;ndash;os-type=linux &amp;ndash;os-variant=ubuntuquantal \
+&amp;ndash;cdrom /data-disk/ISO/ubuntu-12.10-server-amd64.iso
+{% endcodeblock %}&lt;/p&gt;
+
+&lt;p&gt;set up the networking by editing the VM&amp;rsquo;s XML and adding a network interface stanza just before the &amp;lt;/devices&amp;gt;.&lt;/p&gt;
+
+&lt;p&gt;{% codeblock lang:bash %}
+virsh edit UbuntuTest
+{% endcodeblock %}&lt;/p&gt;
+
+&lt;p&gt;{% codeblock lang:xml %}
+&lt;interface type=&#39;bridge&#39;&gt;
+ &lt;source bridge=&#39;ovsbr0&#39;/&gt;
+ &lt;virtualport type=&#39;openvswitch&#39; /&gt;
+ &lt;model type=&#39;virtio&#39;/&gt;
+&lt;/interface&gt;
+{% endcodeblock %}&lt;/p&gt;
+
+&lt;p&gt;The VM will need to be reset to pick up the network change,  however that will cause it to drop the ISO mount.  We can either continue through with the OS install without networking or reset the VM and then re-attach the ISO as a CD.    I connected to it from my desktop using the VirtualMachineManager GUI to do that but you could use virsh commands if you want to stick to CLI.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+      <title>Octopress on Paul Czarkowski </title>
+      <generator uri="https://hugo.spf13.com">Hugo</generator>
+    <link>http://tech.paulcz.net/categories/octopress/index.xml/</link>
+    <language>en-us</language>
+    
+    
+    <updated>Sat, 15 Dec 2012 00:00:00 UTC</updated>
+    
+    <item>
+      <title>Creating a Github Pages Blog With Octopress</title>
+      <link>http://tech.paulcz.net/2012/12/creating-a-github-pages-blog-with-octopress/</link>
+      <pubDate>Sat, 15 Dec 2012 00:00:00 UTC</pubDate>
+      
+      <guid>http://tech.paulcz.net/2012/12/creating-a-github-pages-blog-with-octopress/</guid>
+      <description>
+
+&lt;p&gt;A lot of tech bloggers will write their blog posts in &lt;a href=&#34;http://daringfireball.net/projects/markdown/&#34;&gt;Markdown&lt;/a&gt;, convert it to HTML and paste that HTML into their blog of choice and then in the blog&amp;rsquo;s editor clean it up to suit their blog.   This is an excellent way to create easy to read portable documents that can easily be published in multiple formats.&lt;/p&gt;
+
+&lt;p&gt;However what if there was a way to skip the second part of that and just create a markdown page, submit it into your source control ( you &lt;em&gt;do&lt;/em&gt; use source control right? ) and your blog would automagically update.&lt;/p&gt;
+
+&lt;p&gt;In comes &lt;a href=&#34;http://octopress.org/&#34;&gt;Octopress&lt;/a&gt;,  it&amp;rsquo;s a framework that wraps around &lt;a href=&#34;https://help.github.com/articles/using-jekyll-with-pages&#34;&gt;Jekyll&lt;/a&gt; which is &lt;a href=&#34;https://github.com/&#34;&gt;Github&amp;rsquo;s&lt;/a&gt; blogging engine that powers &lt;a href=&#34;http://pages.github.com/&#34;&gt;Github Pages&lt;/a&gt;.   Essentially you edit Markdown files and &lt;a href=&#34;http://octopress.org/&#34;&gt;Octopress&lt;/a&gt; will compile it into a static-html &lt;a href=&#34;https://help.github.com/articles/using-jekyll-with-pages&#34;&gt;Jekyll&lt;/a&gt; blog.     This means that your blog will be lightning fast ( no need to run an interpreted language in your web server ) and ultra portable.&lt;/p&gt;
+
+&lt;p&gt;Another side benefit is that you can host it for free on &lt;a href=&#34;https://github.com/&#34;&gt;Github&lt;/a&gt; ( as long as you&amp;rsquo;re okay with sharing your source &amp;hellip; and you should be! ) or for free on &lt;a href=&#34;http://www.heroku.com/&#34;&gt;Heroku&lt;/a&gt; ( don&amp;rsquo;t have to share your source ) or host it on any simple no frills Apache, LightHTTP, nginx, node.js, etc server.&lt;/p&gt;
+
+&lt;p&gt;Here is how I&amp;rsquo;m porting my blogger site to Octopress hosted on Github Pages.   I&amp;rsquo;m not using any of the fancy &lt;a href=&#34;https://github.com/mojombo/jekyll/wiki/blog-migrations&#34;&gt;Jekyll migration tools&lt;/a&gt; as I only have a few posts and it will help me get used to the extended syntax that Octopress uses in Markdown.&lt;/p&gt;
+
+&lt;p&gt;As usual the first step is to install any dependencies.   These instructions are for &lt;a href=&#34;http://www.ubuntu.com/&#34;&gt;Ubuntu 12.10&lt;/a&gt; &amp;hellip; modify to suit your OS of choice.&lt;/p&gt;
+
+&lt;p&gt;Most of these steps are taken directly from the &lt;a href=&#34;http://octopress.org/docs/&#34;&gt;Octopress Documentation&lt;/a&gt;,   I&amp;rsquo;m just condensing them into a single document to suit the exact scenario being described in this post.&lt;/p&gt;
+
+&lt;h2 id=&#34;toc_0&#34;&gt;Before You Begin&lt;/h2&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Install Git&lt;/li&gt;
+&lt;li&gt;Install Ruby 1.9.3 via your OS package management or &lt;a href=&#34;http://octopress.org/docs/setup/rbenv/&#34;&gt;rbenv&lt;/a&gt; or &lt;a href=&#34;http://octopress.org/docs/setup/rvm/&#34;&gt;RVM&lt;/a&gt;.&lt;br /&gt;
+&lt;em&gt;If using package management may need to install ruby-dev&lt;/em&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Check your Ruby version is at least 1.9.3 and install bundler:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ruby --version 
+sudo gem install bundler
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;toc_1&#34;&gt;Initial Setup&lt;/h2&gt;
+
+&lt;p&gt;Clone the octopress repository and set it up&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;git clone git://github.com/imathis/octopress.git octopress
+cd octopress
+bundle install
+
+rake install
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We&amp;rsquo;re going to use Github pages.   Octopress has some rake tasks to make this easier for you.    Your blog will be hosted at &lt;code&gt;http://username.github.com&lt;/code&gt; and you need to create a &lt;a href=&#34;https://github.com/repositories/new&#34;&gt;new Github repository&lt;/a&gt; called &lt;code&gt;username.github.com&lt;/code&gt; that github pages will use the master branch as the html source for your blog.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;rake setup_github_pages
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This rake points our clone to the new repistory we just set up, configures your blog&amp;rsquo;s URL and sets up a master branch in the &lt;code&gt;_deploy&lt;/code&gt; directory for deployment.&lt;/p&gt;
+
+&lt;p&gt;edit &lt;code&gt;_config.yml&lt;/code&gt; and fill in your blog name and other details.   There&amp;rsquo;s also some configs for twitter/G+/etc plugins that are worth configuring.&lt;/p&gt;
+
+&lt;h2 id=&#34;toc_2&#34;&gt;Write some blog content&lt;/h2&gt;
+
+&lt;p&gt;&lt;em&gt;Great time to read &lt;a href=&#34;http://octopress.org/docs/blogging&#34;&gt;Blogging Basics&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Create an &lt;code&gt;About&lt;/code&gt; page and a &lt;code&gt;First Post!&lt;/code&gt; blog post:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;rake new_page[&amp;quot;About&amp;quot;]
+rake new_post[&amp;quot;First Post!&amp;quot;]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Edit the Markdown pages that it creates for you with your preferred &lt;a href=&#34;http://sourceforge.net/p/retext/home/ReText/&#34;&gt;Markdown editor&lt;/a&gt;.   The output of the rake commands should provide appropriate hints as to the location of the created files.&lt;/p&gt;
+
+&lt;p&gt;Generate and preview the blog:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;rake generate
+rake preview
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This will generate the contents of your blog and allow you to preview it at [&lt;a href=&#34;http://localhost:4000&#34;&gt;http://localhost:4000&lt;/a&gt;].&lt;/p&gt;
+
+&lt;p&gt;Once you&amp;rsquo;re happy with the contents we can deploy your blog for the first time.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;rake deploy
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This will copy the generated files into &lt;code&gt;_deploy/&lt;/code&gt;, add them to git, commit and push them up to the master branch. In a few seconds you should get an email from Github telling you that your commit has been received and will be published on your site.   Being your first commit it could take 10 minutes for the blog to be available at [&lt;a href=&#34;http://username.github.com&#34;&gt;http://username.github.com&lt;/a&gt;]&lt;/p&gt;
+
+&lt;p&gt;Don&amp;rsquo;t forget to commit your changes to the source branch:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;git add .
+git commit -m &#39;Added About page and first post!&#39;
+git push origin source
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;toc_3&#34;&gt;Want to edit your blog from another machine,  or edit an existing octopress blog?&lt;/h2&gt;
+
+&lt;p&gt;This is pretty simple ( assuming you have the prerequisites already install ).&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;If you run Dropbox you can do this inside of your dropbox folders to make this instantly avaiable on any system you use.&lt;/em&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;git clone git@github.com:username/username.github.com.git
+cd username.github.com
+git checkout source
+mkdir _deploy
+cd _deploy
+git init
+git remote add origin git@github.com:username/username.github.com.git
+git pull origin master
+cd ..
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;once this is done you can run &lt;code&gt;rake new_post[&amp;quot;title&amp;quot;]&lt;/code&gt; and all the other rake commands needed to edit/preview/publish your blog.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
