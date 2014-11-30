@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+      <title>Pages on Paul Czarkowski </title>
+      <generator uri="https://hugo.spf13.com">Hugo</generator>
+    <link>http://localhost:1313/page/index.xml/</link>
+    <language>en-us</language>
+    
+    
+    <updated>Sun, 30 Nov 2014 09:04:08 CST</updated>
+    
+    <item>
+      <title>about</title>
+      <link>http://localhost:1313/page/about/</link>
+      <pubDate>Sun, 30 Nov 2014 09:04:08 CST</pubDate>
+      
+      <guid>http://localhost:1313/page/about/</guid>
+      <description>&lt;p&gt;Hi.  My name is Paul.  I like stuff.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
