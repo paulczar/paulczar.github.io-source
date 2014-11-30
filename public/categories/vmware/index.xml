@@ -3,7 +3,7 @@
   <channel>
       <title>Vmware on Paul Czarkowski </title>
       <generator uri="https://hugo.spf13.com">Hugo</generator>
-    <link>http://localhost:1313/categories/vmware/index.xml/</link>
+    <link>http://tech.paulcz.net/categories/vmware/index.xml/</link>
     <language>en-us</language>
     
     
@@ -11,10 +11,10 @@
     
     <item>
       <title>Moving VMs from VMWare to KVM</title>
-      <link>http://localhost:1313/2012/12/moving-vms-from-vmware-to-kvm/</link>
+      <link>http://tech.paulcz.net/2012/12/moving-vms-from-vmware-to-kvm/</link>
       <pubDate>Sun, 09 Dec 2012 00:00:00 UTC</pubDate>
       
-      <guid>http://localhost:1313/2012/12/moving-vms-from-vmware-to-kvm/</guid>
+      <guid>http://tech.paulcz.net/2012/12/moving-vms-from-vmware-to-kvm/</guid>
       <description>&lt;p&gt;I&amp;rsquo;m migrating from my old VMWare ESXi box to a new machine running Ubuntu 12.10 and KVM.    Not wanting to rebuild all of my VMs I set about trying to work out the best way to migrate the VMs.&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;Steps to make Windows migrate without Bluescreen&lt;/strong&gt;&lt;/p&gt;

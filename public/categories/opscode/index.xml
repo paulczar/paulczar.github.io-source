@@ -3,7 +3,7 @@
   <channel>
       <title>Opscode on Paul Czarkowski </title>
       <generator uri="https://hugo.spf13.com">Hugo</generator>
-    <link>http://localhost:1313/categories/opscode/index.xml/</link>
+    <link>http://tech.paulcz.net/categories/opscode/index.xml/</link>
     <language>en-us</language>
     
     
@@ -11,10 +11,10 @@
     
     <item>
       <title>Logstash &#43; Opscode Omnibus</title>
-      <link>http://localhost:1313/2013/05/logstash-plus-opscode-omnibus/</link>
+      <link>http://tech.paulcz.net/2013/05/logstash-plus-opscode-omnibus/</link>
       <pubDate>Mon, 06 May 2013 00:00:00 UTC</pubDate>
       
-      <guid>http://localhost:1313/2013/05/logstash-plus-opscode-omnibus/</guid>
+      <guid>http://tech.paulcz.net/2013/05/logstash-plus-opscode-omnibus/</guid>
       <description>&lt;p&gt;At &lt;a href=&#34;http://devopsdays.org/events/2013-austin/&#34;&gt;DevOps Days Austin&lt;/a&gt; &lt;a href=&#34;http://twitter.com/mattray&#34;&gt;@mattray&lt;/a&gt; did an Openspace session on &lt;a href=&#34;https://github.com/opscode/omnibus-ruby&#34;&gt;Omnibus&lt;/a&gt; which is a toolset based around the concept of installing an app and all of it&amp;rsquo;s prerequisites from source into a directory and then building a package ( either .deb or .rpm ) of that using &lt;a href=&#34;https://github.com/jordansissel/fpm&#34;&gt;fpm&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;Having battled many times with OS Packages trying to get newer versions of Ruby, or Redis or other software installed and having to hunt down some random package repo or manually build from source this seems like an excellent idea.&lt;/p&gt;
