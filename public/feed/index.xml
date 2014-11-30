@@ -1,0 +1,2242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[tech.paulcz.net]]></title>
+  <link href="http://paulczar.github.com/feed" rel="self"/>
+  <link href="http://paulczar.github.com/"/>
+  <updated>2014-05-13T15:39:12-05:00</updated>
+  <id>http://paulczar.github.com/</id>
+  <author>
+    <name><![CDATA[Paul Czarkowski]]></name>
+    <email><![CDATA[username.taken@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[EZBake - A new way to converge docker containers with chef]]></title>
+    <link href="http://paulczar.github.com/2014/05/ezbake-a-new-way-to-converge-docker-containers-with-chef.html"/>
+    <updated>2014-05-13T15:05:00-05:00</updated>
+    <id>http://paulczar.github.com/2014/05/ezbake-a-new-way-to-converge-docker-containers-with-chef</id>
+    <content type="html"><![CDATA[<p><code>EZ Bake</code> came from an idea I had while watching the <a href="https://twitter.com/hangops">HangOps</a> <a href="https://www.youtube.com/watch?v=clLFKIeSADo&amp;feature=youtu.be">episode 2014-04-11</a> in which they were talking about <code>Docker</code> and Config Management being complementary rather than adversary.</p>
+
+<p>I have expermented with using <code>Chef</code> and <code>Docker</code> together in the <a href="http://paulczar.github.com/2013/09/creating-immutable-servers-with-chef-and-docker-dot-io.html">past</a> but wanted to tackle the problem from a slightly different angle.  I&#8217;ve recently been working on some PAAS stuff, both <a href="http://deis.io">Deis</a> and <a href="http://solum.io">Solum</a> these both utilize the tooling from <a href="https://github.com/flynn/flynn">Flynn</a> which builds heroku style <code>buildpacks</code> in <code>Docker</code>.</p>
+
+<!--more-->
+
+
+<p>EZ Bake takes chef recipes designed for <code>chef-solo</code> ( but could easily be extended to do the same for <code>chef-zero</code>, or <code>chef-client</code> with a server) in a tarball via <code>stdin</code> and converges a docker node using that recipe.</p>
+
+<p>This methodology seems a little weird at first,  but it gives you the ability to ship your Chef cookbooks as self-contained tarballs, or even more interestingly use the <code>git archive</code> command from your git repository to do this automatically and then pipe that directly to the <code>docker run</code> command.</p>
+
+<p>In order to recognize and run your cookbook ( or repo ) it needs to contain the following files: <code>Berksfile</code>, <code>solo.json</code>, <code>solo.rb</code> in the root of your cookbook.   There is some provision for providing different locations for these via environment variables.   This is pre-ChefDK and will probably become easier with ChefDK.</p>
+
+<p>I have provided an example in the ezbake repo that will install Java7 in the container.</p>
+
+<p>This example shows:</p>
+
+<ul>
+<li>Converging a container using a local chef recipe</li>
+<li>Committing the container to an image on completion</li>
+<li>Removing the build container</li>
+<li>Running the new image</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ git clone paulczar/ezbake
+</span><span class='line'>$ cd ezbake/examples
+</span><span class='line'>$ ID=$(tar cf - . | sudo docker run -i -a stdin paulczar/ezbake) \
+</span><span class='line'>  && sudo docker attach $ID \
+</span><span class='line'>  && sudo docker commit $ID java7 
+</span><span class='line'>  && sudo docker rm $ID
+</span><span class='line'>
+</span><span class='line'>Running Berkshelf to collect your cookbooks:
+</span><span class='line'>Installing java (1.22.0) from site: 'http://cookbooks.opscode.com/api/v1/cookbooks'
+</span><span class='line'>Converging your container:
+</span><span class='line'>[2014-04-12T22:10:24+00:00] INFO: Forking chef instance to converge...
+</span><span class='line'>....
+</span><span class='line'>[2014-04-12T22:16:52+00:00] INFO: Chef Run complete in 154.563192281 seconds
+</span><span class='line'>[2014-04-12T22:16:52+00:00] INFO: Running report handlers
+</span><span class='line'>[2014-04-12T22:16:52+00:00] INFO: Report handlers complete
+</span><span class='line'>
+</span><span class='line'>$ sudo docker run -t java7 java -version
+</span><span class='line'>java version "1.7.0_51"
+</span><span class='line'>Java(TM) SE Runtime Environment (build 1.7.0_51-b13)
+</span><span class='line'>Java HotSpot(TM) 64-Bit Server VM (build 24.51-b03, mixed mode)
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This could easily be built into a CI pipeline.   a git webhook could call jenkins which would clone the repo and then use a command like  <code>git archive master | docker run -i -a stdin paulczar/ezbake</code> to converge a container from it.</p>
+
+<p>It could also very easily be used in <code>Deis</code> or <code>Solum</code> as an alternative to a Heroku buildpack.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Running DEIS.IO on Rackspace Cloud]]></title>
+    <link href="http://paulczar.github.com/2014/02/running-deis-io-on-rackspace-cloud.html"/>
+    <updated>2014-02-23T11:45:00-06:00</updated>
+    <id>http://paulczar.github.com/2014/02/running-deis-io-on-rackspace-cloud</id>
+    <content type="html"><![CDATA[<p>I recently did a presentation at the Cloud Austin meetup titled <a href="http://tech.paulcz.net/presentation-cloud-austin-deis/#/">Docking with Unicorns</a> about new PAAS on the block <a href="http://deis.io">DEIS</a>.   Building out DEIS is quite easy,  make more easy by some tight integration they have with Rackspace Cloud.    If you&#8217;re interested in what deis is go through my slides linked above, and the documentation on their website.    If you want to build out an environment to kick the tires a bit,  then click &#8216;Read on&#8217; below and follow me down the rabbit hole.</p>
+
+<!--more-->
+
+
+<h2>Chef setup</h2>
+
+<p>Chef offers a free hosted service for up to five servers.  That&#8217;s plenty for this exercise so go to the <a href="https://www.getchef.com/account">registration page</a> and create yourself a user.  At some point it will prompt you to generate and save a key, do that and download it.</p>
+
+<p>Once you have signed up you can download a knife config file and generate a validation key from the <a href="https://manage.opscode.com/organizations">Organizations</a> page.  We can save those down and then move them to a local working directory.</p>
+
+<p><img src="https://lh5.googleusercontent.com/-3R-Z-bRi_s0/UwpipiLhhWI/AAAAAAAAN0Q/W6q_Rb7NFy8/w1240-h663-no/opscode-org-page.png" alt="chef org setup" /></p>
+
+<h3>Prepare Working Environment</h3>
+
+<p>Create a <code>~/paas</code> working directory and configure your local chef tools like this ( change the Download location to match the files you downloaded above ) :</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ mkdir -p ~/paas/.chef
+</span><span class='line'>$ cd ~/paas
+</span><span class='line'>$ mv ~/Downloads/&lt;username&gt;.pem .chef/
+</span><span class='line'>$ mv ~/Downloads/knife.rb .chef/
+</span><span class='line'>$ mv ~/Downloads/&lt;username&gt;-validator.pem .chef/
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Clone the Deis Repository</h3>
+
+<p>Clone the deis project into your paas working directory:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ cd ~/paas
+</span><span class='line'>$ git clone https://github.com/opdemand/deis.git
+</span><span class='line'>Cloning into 'deis'...
+</span><span class='line'>remote: Reusing existing pack: 5651, done.
+</span><span class='line'>Receiving objects: 100% (5651/5651), 2.16 MiB | 1.37 MiB/s, done.
+</span><span class='line'>remote: Total 5651 (delta 0), reused 0 (delta 0)
+</span><span class='line'>Resolving deltas: 100% (3131/3131), done.
+</span><span class='line'>Checking connectivity... done
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Install Pre-reqs</h3>
+
+<p>Assuming you have a working <code>Ruby 1.9.3+</code> and the <code>bundler</code> gem installed you should be able to use the <code>Gemfile</code> from the deis project to ensure you have all the necessary tools:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ cd ~/paas/deis
+</span><span class='line'>$ bundle install
+</span><span class='line'>bundle install
+</span><span class='line'>Fetching gem metadata from https://rubygems.org/.......
+</span><span class='line'>Fetching additional metadata from https://rubygems.org/..
+</span><span class='line'>Using i18n (0.6.9)
+</span><span class='line'>Using multi_json (1.8.4)
+</span><span class='line'>Using activesupport (3.2.16)
+</span><span class='line'>Using addressable (2.3.5)
+</span><span class='line'>...
+</span><span class='line'>Using bundler (1.5.2)
+</span><span class='line'>Your bundle is complete!
+</span><span class='line'>Use `bundle show [gemname]` to see where a bundled gem is installed.</span></code></pre></td></tr></table></div></figure>
+
+
+<p><em>I had some errors installing the eventmachine gem and had to follow <a href="https://github.com/gitlabhq/gitlabhq/issues/1051#issuecomment-9176547">this fix</a> to get bundle install to work</em></p>
+
+<h3>Test Chef Connectivity</h3>
+
+<p>To make sure we configured chef correctly and installed knife as part of the bundle we can run a quick knife command:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ bundle exec knife client list
+</span><span class='line'>&lt;USERNAME&gt;-validator</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Create an Environment for Deis</h3>
+
+<p>Deis is currently hardcoded to use the <code>_default</code> chef environment.    There is a current <a href="https://github.com/opdemand/deis/issues/523">issue</a> on their github to resolve this.   Once that is done I&#8217;ll update these instructions to create a <code>deis</code> environment.</p>
+
+<h3>Upload the Deis Cookbooks</h3>
+
+<p>If that went well we can upload our cookbooks:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>cd ~/paas/deis
+</span><span class='line'>$ bundle exec berks install
+</span><span class='line'>Installing apt (2.3.8) from site: 'http://cookbooks.opscode.com/api/v1/cookbooks'
+</span><span class='line'>Installing docker (0.31.0) from site: 'http://cookbooks.opscode.com/api/v1/cookbooks'
+</span><span class='line'>Installing rsyslog (1.10.2) from site: 'http://cookbooks.opscode.com/api/v1/cookbooks'
+</span><span class='line'>Installing sudo (2.3.0) from site: 'http://cookbooks.opscode.com/api/v1/cookbooks'
+</span><span class='line'>...
+</span><span class='line'>$ bundle exec berks upload
+</span><span class='line'>Using apt (2.3.8)
+</span><span class='line'>Using docker (0.31.0)
+</span><span class='line'>Using rsyslog (1.10.2)
+</span><span class='line'>Using sudo (2.3.0)
+</span><span class='line'>Installing deis (0.5.1) from git: 'https://github.com/opdemand/deis-cookbook.git' with branch: 'master' at ref: '6361706a1d3245d2a061ed55f5dd4b7cb60d5e5c'
+</span><span class='line'>Using git (2.7.0)
+</span><span class='line'>...</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Create Deis Databags</h3>
+
+<p>Deis uses some databags to help manage application state.  We can create them like this:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ bundle exec knife data bag create deis-formations
+</span><span class='line'>Created data_bag[deis-formations]
+</span><span class='line'>$ bundle exec knife data bag create deis-apps
+</span><span class='line'>Created data_bag[deis-apps]</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Prepare Infrastructure</h2>
+
+<p>I&#8217;m using Rackspace cloud servers for this as I have the (http://developer.rackspace.com/blog/developer-love-welcome-to-the-rackspace-cloud-developer-discount.html)[Rackspace Developer Discount] which is enough discount to host this for free.</p>
+
+<p>Since Deis will want your rackspace credentials to configure worker nodes I recomment creating a user under (https://mycloud.rackspace.com/account#users/create)[User Management] in your account to use for this.</p>
+
+<h3>Create a Cloud Load Balancer</h3>
+
+<p>Log into mycloud.rackspace.com and click on the (https://mycloud.rackspace.com/load_balancers)[Load Balancers] button.  Select the Dallas Region (DFW) and hit <code>Create Load Balancer</code>.</p>
+
+<ul>
+<li>Set the Name to <code>deis</code> and check the region is set to <code>Dallas (DFW)</code> and hit <code>Create Load Balancer</code></li>
+</ul>
+
+
+<p><img src="https://lh4.googleusercontent.com/-E4cZvoKWlYU/Uwpiqr9xOKI/AAAAAAAAN0o/P3vGqPC8A98/w793-h592-no/rackspace-create-lb.png" alt="creating load balancer" /></p>
+
+<ul>
+<li>Take note of the public IP of the Load Balancer, we&#8217;ll need it later.</li>
+</ul>
+
+
+<p><img src="https://lh4.googleusercontent.com/-ORvf6nzEduU/Uwpiqk5eP0I/AAAAAAAAN0k/WZ-NaJn3eJg/w770-h567-no/rackspace-lb.png" alt="load balancer created" /></p>
+
+<h3>Wildcard DNS</h3>
+
+<p>Deis&#8217; proxy layer requires you to set up Wildcard DNS to point to your proxy layer.  There are many ways to achieve this here are two options:</p>
+
+<ol>
+<li><p>Rackspace Cloud DNS can host wildcard DNS entries, if you already have DNS hosted by rackspace using Cloud DNS simply add an A record for <code>*.deis</code> under your domain and point it to the IP of your load balancer.</p></li>
+<li><p>The (http://xip.io)[xip.io] domain does wildcard DNS based on your IP.  We can use this with our Cloud Load Balancer to load balance our applications.   My Load Balancer has a public IP of <code>50.56.167.26</code> therefore my wildcard domain will be <code>50.56.167.26.xip.io</code>.   Remember this.</p></li>
+</ol>
+
+
+<h3>Configure Knife for Rackspace</h3>
+
+<p>The bundle install above already installed the rackspace knife plugin so we just need to add some details to <code>.chef/knife.rb</code>.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ cat &lt;&lt;'EOF' &gt;&gt; $HOME/.chef/knife.rb
+</span><span class='line'>knife[:rackspace_api_username] = "#{ENV['OS_USERNAME']}"
+</span><span class='line'>knife[:rackspace_api_key]      = "#{ENV['OS_PASSWORD']}"
+</span><span class='line'>knife[:rackspace_version]      = 'v2'
+</span><span class='line'>knife[:rackspace_region]       = :dfw
+</span><span class='line'>EOF</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Install Rackspace Nova Client</h3>
+
+<p>We also need the Nova client:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ sudo pip install rackspace-novaclient
+</span><span class='line'>$ cat &lt;&lt;'EOF' &gt;&gt; ~/paas/.chef/openrc
+</span><span class='line'>export OS_AUTH_URL=https://identity.api.rackspacecloud.com/v2.0/
+</span><span class='line'>export OS_AUTH_SYSTEM=rackspace
+</span><span class='line'>export OS_REGION_NAME=DFW
+</span><span class='line'>export OS_USERNAME=&lt;RACKSPACE_USERNAME&gt;
+</span><span class='line'>export NOVA_RAX_AUTH=1
+</span><span class='line'>export OS_PASSWORD=&lt;RACKSPACE_API_KEY&gt;
+</span><span class='line'>export OS_NO_CACHE=1
+</span><span class='line'>export OS_TENANT_NAME=&lt;RACKSPACE_USERNAME&gt;
+</span><span class='line'>EOF
+</span><span class='line'>$ source ~/paas/.chef/openrc</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Test Rackspace Connectivity</h3>
+
+<p>Make sure you can connect to Rackspace with Knife:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ bundle exec knife rackspace server list
+</span><span class='line'>Instance ID  Name  Public IP  Private IP  Flavor  Image  State</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Make sure you can connect to Rackspace with nova:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ nova list
+</span><span class='line'>+--------------------------------------+-----------------+--------+------------+-------------+----------------------------------------------------------------------------------------+
+</span><span class='line'>| ID                                   | Name            | Status | Task State | Power State | Networks                                                                               |
+</span><span class='line'>+--------------------------------------+-----------------+--------+------------+-------------+----------------------------------------------------------------------------------------+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Build base images for Controller and Nodes.</h2>
+
+<p>This isn&#8217;t strictly necessary,  but will help build your nodes quicker on subsequent builds.</p>
+
+<h3>Launce a new instance:</h3>
+
+<p>If we create a base image and pre-install some software we&#8217;ll get a faster booting system for auto-provisioning:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ bundle exec knife rackspace server create \
+</span><span class='line'>  --image '80fbcb55-b206-41f9-9bc2-2dd7aac6c061' \
+</span><span class='line'>  --node-name 'deis-base-image' \
+</span><span class='line'>  --flavor 'performance1-1'
+</span><span class='line'>...
+</span><span class='line'>...
+</span><span class='line'>Instance ID: 56760bf1-b977-405e-9348-f70b15a14b87
+</span><span class='line'>Host ID: 97da00a12312a7e455bda70c6dfab8833953e2a03b081aeedfd68152
+</span><span class='line'>Name: deis-base-image
+</span><span class='line'>Flavor: 1 GB Performance
+</span><span class='line'>Image: Ubuntu 12.04 
+</span><span class='line'>Metadata: []
+</span><span class='line'>Public DNS Name: 23-253-69-98.xip.io
+</span><span class='line'>Public IP Address: 23.253.69.98
+</span><span class='line'>Private IP Address: 10.208.101.31
+</span><span class='line'>Password: **************</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Take note of the <code>Instance ID</code>, <code>Public IP Address</code> and <code>Password</code>.  We&#8217;ll need them later.</p>
+
+<h3>Add users / keys to instance</h3>
+
+<p>We&#8217;re going to add our ssh key as well as a local <code>deis-ops</code> user to the image to make it easier to manage and troubleshoot later:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ DEIS_IP=&lt;IP_OF_SERVER&gt;
+</span><span class='line'>$ ssh-copy-id root@$DEIS_IP
+</span><span class='line'>root@162.242.144.193's password: 
+</span><span class='line'>Number of key(s) added: 1
+</span><span class='line'>Now try logging into the machine, with:   "ssh 'root@162.242.144.193'"
+</span><span class='line'>and check to make sure that only the key(s) you wanted were added.
+</span><span class='line'>$ ssh root@$DEIS_IP
+</span><span class='line'>Welcome to Ubuntu 12.04.3 LTS (GNU/Linux 3.2.0-55-virtual x86_64)
+</span><span class='line'>
+</span><span class='line'> * Documentation:  https://help.ubuntu.com/
+</span><span class='line'>
+</span><span class='line'>  System information as of Sun Feb 23 18:34:40 UTC 2014
+</span><span class='line'>
+</span><span class='line'>  System load:  0.08              Processes:           60
+</span><span class='line'>  Usage of /:   5.5% of 19.68GB   Users logged in:     0
+</span><span class='line'>  Memory usage: 6%                IP address for eth0: 162.242.144.193
+</span><span class='line'>  Swap usage:   0%                IP address for eth1: 10.208.135.114
+</span><span class='line'>
+</span><span class='line'>  Graph this data and manage this system at https://landscape.canonical.com/
+</span><span class='line'>
+</span><span class='line'>Last login: Sun Feb 23 18:33:02 2014 from cpe-24-27-47-27.austin.res.rr.com
+</span><span class='line'>root@deis-base-image:~# useradd --comment 'deis ops user' --home-dir '/home/deis-ops' \
+</span><span class='line'>  --shell '/bin/bash' --create-home deis-ops
+</span><span class='line'>root@deis-base-image:~# mkdir -p /home/deis-ops/.ssh && \
+</span><span class='line'>   cp /root/.ssh/authorized_keys /home/deis-ops/.ssh/authorized_keys && \
+</span><span class='line'>  chown -R deis-ops:deis-ops /home/deis-ops && \
+</span><span class='line'>  chmod 0700 /home/deis-ops/.ssh && \
+</span><span class='line'>  chmod 0600 /home/deis-ops/.ssh/authorized_keys && \
+</span><span class='line'>  echo 'deis-ops ALL=(ALL) NOPASSWD:ALL' &gt; /etc/sudoers.d/deis-ops && \
+</span><span class='line'>  chmod 0440 /etc/sudoers.d/deis-ops
+</span><span class='line'>root@deis-base-image:~# exit</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Check that you can log in with these new creds:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ ssh deis-ops@$DEIS_IP
+</span><span class='line'>deis$ sudo bash
+</span><span class='line'>root@deis$ exit
+</span><span class='line'>deis$ exit</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Finish preparing node image</h3>
+
+<p>Next we&#8217;re going to update the kernel and prepare the base node image.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ ssh deis-ops@$DEIS_IP 'sudo apt-get update'
+</span><span class='line'>$ scp contrib/rackspace/*.sh deis-ops@$DEIS_IP:~/
+</span><span class='line'>$ ssh deis-ops@$DEIS_IP 'sudo ~/prepare-node-image.sh'
+</span><span class='line'>$ ssh deis-ops@$DEIS_IP 'sudo apt-get install -yq linux-image-generic-lts-raring linux-headers-generic-lts-raring'</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Create an image from this server</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ nova image-create deis-base-image deis-node-image</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After a few minutes you should see this response to running <code>nova image-list</code>, if you&#8217;re impatient like me wrap your command with a <code>watch</code>:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ watch 'nova image-list | grep deis'
+</span><span class='line'>| df958d26-6515-4dd9-a449-920e74ea93a2 | deis-base-image                                              | ACTIVE | 0fc7f68b-176d-49a9-82ff-2d5893d32acd |
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once the image is active we can move onto the next steps.</p>
+
+<h3>Prepare controller image</h3>
+
+<p>Next we want to prepare the VM for the controller image:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ ssh deis-ops@$DEIS_IP 'sudo ~/prepare-controller-image.sh'
+</span><span class='line'>$ ssh deis-ops@$DEIS_IP 'sudo apt-get install -yq linux-image-generic-lts-raring linux-headers-generic-lts-raring'</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Create an image from this server</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ nova image-create deis-base-image deis-base-image</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After a few minutes you should see this response to running <code>nova image-list</code>, if you&#8217;re impatient like me wrap your command with a <code>watch</code>:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ watch 'nova image-list | grep deis-node'
+</span><span class='line'>| f2236fa6-1e2d-4746-ac87-a3dd6b2de811 | deis-node-image                                              | ACTIVE | 633d5d88-54b3-463c-80fe-c119f4eb33a3 |
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Delete the instance</h3>
+
+<p>No need to keep the instance around and keep paying for it once you have the image:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ bundle exec knife rackspace server list | grep deis  
+</span><span class='line'>42899699-68e7-4785-9f49-e0050f86249a  deis-base-image  162.242.144.193  10.208.135.114  performance1-1  80fbcb55-b206-41f9-9bc2-2dd7aac6c061  active
+</span><span class='line'>$ bundle exec knife rackspace server delete 42899699-68e7-4785-9f49-e0050f86249a --purge</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Create the Deis Controller server</h2>
+
+<h3>Launch the Server</h3>
+
+<p>Launch the server from the image you created earlier:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ nova image-list | grep  deis-base-image
+</span><span class='line'>| a58c9895-6349-442a-bba7-99611900209d | deis-base-image
+</span><span class='line'>$ knife rackspace server create \
+</span><span class='line'>  --image a58c9895-6349-442a-bba7-99611900209d \
+</span><span class='line'>  --rackspace-metadata "{\"Name\": \"deis-controller\"}" \
+</span><span class='line'>  --rackspace-disk-config MANUAL \
+</span><span class='line'>  --server-name deis-controller \
+</span><span class='line'>  --node-name deis-controller \
+</span><span class='line'>  --flavor 'performance1-2'
+</span><span class='line'>Instance ID: bb713170-9322-424a-8837-863a4b396705
+</span><span class='line'>Name: deis-controller
+</span><span class='line'>Flavor: 2 GB Performance
+</span><span class='line'>Image: deis-base-image
+</span><span class='line'>...
+</span><span class='line'>Public IP Address: 23.253.104.13
+</span><span class='line'>Private IP Address: 10.208.132.190
+</span><span class='line'>Password: CQwDU4m97nvF</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Take note of the <code>Instance ID</code> and <code>Public IP Address</code>.</p>
+
+<p>If you have an easy to manage domain add an A record for <code>deis</code> to it for the Public IP address.  If not
+add an entry to your hosts file ( or do both! I did ):</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ sudo sh -c "echo '&lt;IP_OF_SERVER&gt; deis' &gt;&gt; /etc/hosts"</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Modify Chef Admin Group</h3>
+
+<p>On the Chef management website click (https://manage.opscode.com/groups/admins/edit)[Groups] and add the <code>deis-controller</code> client and your validator client to the <code>admins</code> group.</p>
+
+<p><img src="https://lh5.googleusercontent.com/-oSqB1Tdnn4c/UwpioPAXpJI/AAAAAAAANz4/xa8BdmRuTzQ/w579-h580-no/chef-admins.png" alt="chef admins group" /></p>
+
+<h3>Converge the Deis Controller Server</h3>
+
+<p>Edit the <code>deis-controller</code> node via this command:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ EDITOR=vi knife node edit deis-controller</span></code></pre></td></tr></table></div></figure>
+
+
+<p>make it look like this:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>{
+</span><span class='line'>  "name": "deis-controller",
+</span><span class='line'>  "chef_environment": "_default",
+</span><span class='line'>  "normal": {
+</span><span class='line'>    "tags": [
+</span><span class='line'>
+</span><span class='line'>    ]
+</span><span class='line'>  },
+</span><span class='line'>  "run_list": [
+</span><span class='line'>    "recipe[deis::controller]"
+</span><span class='line'>  ]
+</span><span class='line'>}
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>then converge the node by running chef client on it:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ ssh deis-ops@deis sudo chef-client
+</span><span class='line'>[2014-02-23T19:25:32+00:00] INFO: Forking chef instance to converge...
+</span><span class='line'>[2014-02-23T19:25:32+00:00] INFO: *** Chef 11.6.2 ***
+</span><span class='line'>[2014-02-23T19:25:33+00:00] INFO: Run List is [recipe[deis::controller]]
+</span><span class='line'>[2014-02-23T19:25:33+00:00] INFO: Run List expands to [deis::controller]
+</span><span class='line'>[2014-02-23T19:25:33+00:00] INFO: Starting Chef Run for deis-controller
+</span><span class='line'>[2014-02-23T19:25:33+00:00] INFO: Running start handlers
+</span><span class='line'>[2014-02-23T19:25:33+00:00] INFO: Start handlers complete.
+</span><span class='line'>...
+</span><span class='line'>$</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Testing Deis</h2>
+
+<h3>Install the Deis Client with pip</h3>
+
+<p>The Deis client is written in python and can be installed by <code>pip</code>:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ sudo pip install deis  </span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Register Admin User</h3>
+
+<p>First user to register becomes the Admin:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ deis register http://deis:8000
+</span><span class='line'>username: admin
+</span><span class='line'>password: 
+</span><span class='line'>password (confirm): 
+</span><span class='line'>email: admin@example.com
+</span><span class='line'>Registered admin
+</span><span class='line'>Logged in as admin</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Push your public key to deis:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ deis keys:add ~/.ssh/id_rsa.pub 
+</span><span class='line'>Uploading SSH_KEY to Deis...done</span></code></pre></td></tr></table></div></figure>
+
+
+<p>check the web server is serving content by browsing to (http://deis)[http://deis] and entering your admin credentials.</p>
+
+<h3>Teach Deis your provider credentials</h3>
+
+<p>Deis will automatically provision worker nodes if you teach it your credentials.</p>
+
+<p>We already have our Rackspace credentials saved to <code>~/paas/.chef/openrc</code> but Deis wants them named differently:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ export RACKSPACE_USERNAME=$OS_USERNAME
+</span><span class='line'>$ export RACKSPACE_API_KEY=$OS_PASSWORD
+</span><span class='line'>$ deis providers:discover
+</span><span class='line'>No EC2 credentials discovered.
+</span><span class='line'>Discovered Rackspace credentials: ****************
+</span><span class='line'>Import Rackspace credentials? (y/n) : y
+</span><span class='line'>Uploading Rackspace credentials... done
+</span><span class='line'>No DigitalOcean credentials discovered.
+</span><span class='line'>No Vagrant VMs discovered.</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Deploy Formations &amp; Layers</h2>
+
+<h3>Formation</h3>
+
+<p>Formations are collections of infrastructure for serving applications.   We&#8217;ll call our first Formation <code>dev</code> for development.</p>
+
+<p>Create formation (using the wildcard domain from our cloud load balancer created earlier in the <code>--domain</code> argument):</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ deis formations:create dev --domain=50.56.167.26.xip.io
+</span><span class='line'>Creating formation... done, created dev
+</span><span class='line'>See `deis help layers:create` to begin building your formation</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Layers</h3>
+
+<p>Layers are a heterogenerous collection of nodes that perform one of two function:</p>
+
+<ol>
+<li>Proxy - Directs traffic to the appropriate container running the application.</li>
+<li>Runtime - Runs the containers that hold the applications.</li>
+</ol>
+
+
+<p>We&#8217;re going to create a layer called <code>nodes</code> that will perform both the proxy and runtime functions:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ deis layers:create dev nodes rackspace-dfw --proxy=y --runtime=y
+</span><span class='line'>Creating nodes layer... done in 4s</span></code></pre></td></tr></table></div></figure>
+
+
+<p><em>note</em> There&#8217;s currently a <a href="https://github.com/opdemand/deis/issues/541">bug</a> that causes the first creation of a layer to fail.  if that happens run the following:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>deis formations:create dev --domain=50.56.167.26.xip.io
+</span><span class='line'>Creating formation... done, created dev
+</span><span class='line'>
+</span><span class='line'>See `deis help layers:create` to begin building your formation
+</span><span class='line'>$ deis layers:create dev nodes rackspace-dfw --proxy=y --runtime=y
+</span><span class='line'>Creating nodes layer... 500 INTERNAL SERVER ERROR
+</span><span class='line'>&lt;h1&gt;Server Error (500)&lt;/h1&gt;
+</span><span class='line'>$ deis layers:destroy dev nodes
+</span><span class='line'>Destroying nodes layer... done in 0s
+</span><span class='line'>$ deis layers:create dev nodes rackspace-dfw --proxy=y --runtime=y
+</span><span class='line'>Creating nodes layer... done in 2s
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Build Nodes</h3>
+
+<p>Next we tell deis to spin up two Cloud Servers which will become members of the <code>nodes</code> layer.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ deis nodes:scale dev nodes=2
+</span><span class='line'>Scaling nodes... but first, coffee!
+</span><span class='line'>done in 345s
+</span><span class='line'>Use `deis create --formation=dev` to create an application</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This can sometimes take longer than the <code>deis</code> cli timeout.   Don&#8217;t fear,  just wait a bit longer, this could be a great time to explore the <code>deis</code> cli by running <code>deis help</code>.</p>
+
+<h2>Update Cloud Load Balancer</h2>
+
+<p>Add these two nodes to the (https://mycloud.rackspace.com/load_balancers)[Cloud Load Balancer] we created earlier.</p>
+
+<p><img src="https://lh6.googleusercontent.com/-yaJfxoyDk4M/UwpioEndiOI/AAAAAAAANz0/aXannmisdbE/w903-h407-no/cloud-servers-list.png" alt="cloud server list" /></p>
+
+<p>This is simple to do through the GUI:</p>
+
+<ul>
+<li>Click on your load balancer and under <code>Nodes</code> click the <code>Add Cloud Servers</code> button.</li>
+<li>Check the box beside the two <code>dev-nodes</code> servers and click <code>Add Selected Servers</code>.</li>
+</ul>
+
+
+<p><img src="https://lh6.googleusercontent.com/-zm6sB7l7YVk/Uwpin4BNJPI/AAAAAAAANzw/b-_J2ieyIuE/w773-h476-no/cloud-lb-nodes.png" alt="cloud lb servers" /></p>
+
+<h2>Deploy an Application</h2>
+
+<p>So great, you have a PaaS, but what do you do now?  Deploy some apps of course!</p>
+
+<h3>NodeJS Example App</h3>
+
+<p>Download the NodeJS example application so like:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ mkdir -p ~/paas/apps
+</span><span class='line'>$ cd ~paas/apps
+</span><span class='line'>$ git clone https://github.com/opdemand/example-nodejs-express.git
+</span><span class='line'>$ cd example-nodejs-express</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Create an Application in Deis</h3>
+
+<p>Use the Deis command line tool to create a new application:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ deis create      
+</span><span class='line'>Creating application... done, created exotic-sandwich
+</span><span class='line'>Git remote deis added</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Push your Application to Deis</h3>
+
+<p>This will push, deploy and Launch the app.  The first one will take some time as deis has to download some docker images,  subsequent apps will be much faster:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ git push deis master                     
+</span><span class='line'>git push deis master
+</span><span class='line'>Counting objects: 184, done.
+</span><span class='line'>Delta compression using up to 4 threads.
+</span><span class='line'>Compressing objects: 100% (89/89), done.
+</span><span class='line'>Writing objects: 100% (184/184), 28.77 KiB | 0 bytes/s, done.
+</span><span class='line'>Total 184 (delta 103), reused 165 (delta 92)
+</span><span class='line'>-----&gt; Node.js app detected
+</span><span class='line'>-----&gt; Requested node range: 0.10.x
+</span><span class='line'>-----&gt; Resolved node version: 0.10.26
+</span><span class='line'>-----&gt; Downloading and installing node
+</span><span class='line'>-----&gt; Installing dependencies
+</span><span class='line'>       npm WARN package.json example-nodejs-express@0.0.1 No repository field.
+</span><span class='line'>       npm http GET https://registry.npmjs.org/express
+</span><span class='line'>       npm http 200 https://registry.npmjs.org/express
+</span><span class='line'>...
+</span><span class='line'>-----&gt; Caching node_modules directory for future builds
+</span><span class='line'>-----&gt; Cleaning up node-gyp and npm artifacts
+</span><span class='line'>-----&gt; Building runtime environment
+</span><span class='line'>-----&gt; Discovering process types
+</span><span class='line'>       Procfile declares types -&gt; web
+</span><span class='line'>-----&gt; Compiled slug size is 5.5M
+</span><span class='line'>-----&gt; Building Docker image
+</span><span class='line'>Uploading context 5.698 MB
+</span><span class='line'>Uploading context 
+</span><span class='line'>Step 0 : FROM deis/slugrunner
+</span><span class='line'> ---&gt; bb0a27915014
+</span><span class='line'>Step 1 : RUN mkdir -p /app
+</span><span class='line'> ---&gt; Running in 1ae5cdeaad9a
+</span><span class='line'> ---&gt; 6e6467466d48
+</span><span class='line'>Step 2 : ADD slug.tgz /app
+</span><span class='line'> ---&gt; 191a4345b1e4
+</span><span class='line'>Step 3 : ENTRYPOINT ["/runner/init"]
+</span><span class='line'> ---&gt; Running in d322512d5865
+</span><span class='line'> ---&gt; 2866cf3e37c9
+</span><span class='line'>Successfully built 2866cf3e37c9
+</span><span class='line'>-----&gt; Pushing image to private registry
+</span><span class='line'>       Launching... done, v2
+</span><span class='line'>
+</span><span class='line'>-----&gt; exotic-sandwich deployed to Deis
+</span><span class='line'>       http://exotic-sandwich.50.56.167.26.xip.io
+</span><span class='line'>
+</span><span class='line'>       To learn more, use `deis help` or visit http://deis.io
+</span><span class='line'>
+</span><span class='line'>To ssh://git@deis:2222/exotic-sandwich.git
+</span><span class='line'> * [new branch]      master -&gt; master
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Did it work ?</h2>
+
+<p>Open your web browser to the URL in the output of the previous command.  In my case this was <code>http://exotic-sandwich.50.56.167.26.xip.io</code>.</p>
+
+<p>If everything worked the text in the browser window should read <code>Powered by Deis</code>.</p>
+
+<p><img src="https://lh6.googleusercontent.com/-cxuysxM_oM8/UwpipfiKFMI/AAAAAAAAN0U/M7T9dC6xJ-E/w446-h171-no/deis-app-1.png" alt="deis app" /></p>
+
+<h2>Configure and Scale your application</h2>
+
+<p>We can set config parameters for our apps by running <code>deis config</code>.   The example app we&#8217;re using has a config paramater &#8216;POWERED_BY&#8217; so we can set that by running:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ deis config:set POWERED_BY='DEIS and Rackspace'
+</span><span class='line'>=== exotic-sandwich
+</span><span class='line'>POWERED_BY: DEIS and Rackspace</span></code></pre></td></tr></table></div></figure>
+
+
+<p><img src="https://lh6.googleusercontent.com/-J5AcNytZLOQ/UwpipEdpeBI/AAAAAAAAN0E/WXWC08rxsBU/w507-h157-no/deis-app-2.png" alt="deis app2" /></p>
+
+<p>Expecting visitors?  Let&#8217;s scale your app to 5 nodes:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ deis scale web=5
+</span><span class='line'>Scaling containers... but first, coffee!
+</span><span class='line'>done in 54s
+</span><span class='line'>
+</span><span class='line'>=== exotic-sandwich Containers
+</span><span class='line'>
+</span><span class='line'>--- web: `node server.js`
+</span><span class='line'>web.1 up 2014-02-23T20:22:07.241Z (dev-nodes-2)
+</span><span class='line'>web.2 up 2014-02-23T20:28:21.778Z (dev-nodes-1)
+</span><span class='line'>web.3 up 2014-02-23T20:28:21.788Z (dev-nodes-2)
+</span><span class='line'>web.4 up 2014-02-23T20:28:21.799Z (dev-nodes-1)
+</span><span class='line'>web.5 up 2014-02-23T20:28:21.810Z (dev-nodes-2)</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can see what your app is doing by running <code>deis info</code> and <code>deis logs</code>:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ deis info
+</span><span class='line'>=== exotic-sandwich Application
+</span><span class='line'>{
+</span><span class='line'>  "updated": "2014-02-23T20:28:21.812Z", 
+</span><span class='line'>  "uuid": "ef618db6-f5a8-4cab-a7d9-d01e78036e3a", 
+</span><span class='line'>  "created": "2014-02-23T20:16:51.931Z", 
+</span><span class='line'>  "formation": "dev", 
+</span><span class='line'>  "owner": "admin", 
+</span><span class='line'>  "id": "exotic-sandwich", 
+</span><span class='line'>  "containers": "{\"web\": 5}"
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>=== exotic-sandwich Containers
+</span><span class='line'>
+</span><span class='line'>--- web: `node server.js`
+</span><span class='line'>web.1 up 2014-02-23T20:22:07.241Z (dev-nodes-2)
+</span><span class='line'>web.2 up 2014-02-23T20:28:21.778Z (dev-nodes-1)
+</span><span class='line'>web.3 up 2014-02-23T20:28:21.788Z (dev-nodes-2)
+</span><span class='line'>web.4 up 2014-02-23T20:28:21.799Z (dev-nodes-1)
+</span><span class='line'>web.5 up 2014-02-23T20:28:21.810Z (dev-nodes-2)</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ deis logs
+</span><span class='line'>Feb 23 20:22:57 dev-nodes exotic-sandwich[web.1]: Server listening on port 10001 in development mode
+</span><span class='line'>Feb 23 20:25:38 dev-nodes exotic-sandwich[web.1]: Server listening on port 10001 in development mode
+</span><span class='line'>Feb 23 20:26:49 dev-nodes exotic-sandwich[web.1]: Server listening on port 10001 in development mode
+</span><span class='line'>Feb 23 20:28:28 dev-nodes exotic-sandwich[web.3]: Server listening on port 10003 in development mode
+</span><span class='line'>Feb 23 20:28:29 dev-nodes exotic-sandwich[web.5]: Server listening on port 10005 in development mode
+</span><span class='line'>Feb 23 20:29:11 dev-nodes exotic-sandwich[web.2]: Server listening on port 10002 in development mode
+</span><span class='line'>Feb 23 20:29:12 dev-nodes exotic-sandwich[web.4]: Server listening on port 10004 in development mode</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Congratulations!  You&#8217;ve successfully built out your own cost effective PAAS and deployed your first application to it.</p>
+
+<p>Speaking of costs &#8230;  How much would this cost to run per month ?</p>
+
+<ul>
+<li>Cloud Load Balancer - $10.95 / month</li>
+<li>Deis Controller - $57.60 / month</li>
+<li>Deis Nodes (x2) - $115.20 / month</li>
+</ul>
+
+
+<p>Total:  $183.75 / month.</p>
+
+<p>You could run all of this on a single server without a load balancer,  which means it would be just $57.60/month, which with the <a href="http://developer.rackspace.com/devtrial/">Rackspace Developer Discount</a> would reduce down to just $7.60/month.</p>
+
+<h1>Epilogue</h1>
+
+<h2>Cleanup</h2>
+
+<p>Destroy your app:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ deis destroy
+</span><span class='line'>
+</span><span class='line'> !    WARNING: Potentially Destructive Action
+</span><span class='line'> !    This command will destroy the application: exotic-sandwich
+</span><span class='line'> !    To proceed, type "exotic-sandwich" or re-run this command with --confirm=exotic-sandwich
+</span><span class='line'>
+</span><span class='line'>&gt; exotic-sandwich
+</span><span class='line'>Destroying exotic-sandwich... done in 21s
+</span><span class='line'>Git remote deis removed</span></code></pre></td></tr></table></div></figure>
+
+
+<p>list your servers:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ bundle exec knife rackspace server list
+</span><span class='line'>Instance ID                           Name             Public IP       Private IP      Flavor          Image                                 State 
+</span><span class='line'>7c43ecb9-1ba3-454c-a5f4-637b56961d68  dev-nodes        23.253.102.184  10.208.135.137  performance1-2  2d59cbce-92fa-412b-8a5e-6eb426ce7dc9  active
+</span><span class='line'>f89c4b25-6486-422a-907a-16b3b3223a5e  dev-nodes        23.253.102.158  10.208.137.18   performance1-2  2d59cbce-92fa-412b-8a5e-6eb426ce7dc9  active
+</span><span class='line'>bb713170-9322-424a-8837-863a4b396705  deis-controller  23.253.104.13   10.208.132.190  performance1-2  a58c9895-6349-442a-bba7-99611900209d  active</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Delete your servers by running the following command for each:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ bundle exec knife rackspace server delete 7c43ecb9-1ba3-454c-a5f4-637b56961d68 --purge
+</span><span class='line'>Instance ID: 7c43ecb9-1ba3-454c-a5f4-637b56961d68
+</span><span class='line'>Host ID: e0da0172f321babe99aec9686c7b99ac7fa5ff8fa1ada934f5fae842
+</span><span class='line'>Name: dev-nodes
+</span><span class='line'>Flavor: 2 GB Performance
+</span><span class='line'>Image: deis-node-image
+</span><span class='line'>Public IP Address: 23.253.102.184
+</span><span class='line'>Private IP Address: 10.208.135.137
+</span><span class='line'>
+</span><span class='line'>Do you really want to delete this server? (Y/N) y
+</span><span class='line'>[WARNING] Error Parsing response json - Yajl::ParseError
+</span><span class='line'>WARNING: Deleted server 7c43ecb9-1ba3-454c-a5f4-637b56961d68</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Clean up your chef:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ bundle exec knife data bag delete deis-apps
+</span><span class='line'>$ bundle exec knife data bag delete deis-formations
+</span><span class='line'>$ bundle exec knife client delete dev-nodes-1
+</span><span class='line'>$ bundle exec knife client delete dev-nodes-2
+</span><span class='line'>$ bundle exec knife node delete dev-nodes-1
+</span><span class='line'>$ bundle exec knife node delete dev-nodes-2</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Delete your glance images:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ nova image-delete deis-base-image
+</span><span class='line'>$ nova image-delete deis-node-image</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Finally delete your Cloud Load Balancer from the <a href="https://mycloud.rackspace.com/load_balancers">Rackspace UI</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Managing docker services with this one easy trick]]></title>
+    <link href="http://paulczar.github.com/2013/10/managing-docker-services-with-this-one-easy-trick.html"/>
+    <updated>2013-10-20T15:46:00-05:00</updated>
+    <id>http://paulczar.github.com/2013/10/managing-docker-services-with-this-one-easy-trick</id>
+    <content type="html"><![CDATA[<p>I have been having a lot of internal debate about the idea of running more than one service in a docker container.   A Docker container is built to run a single process in the foreground and to live for only as long as that process is running.  This is great in a utopian world where servers are immutable and sysadmins drink tiki drinks on the beach,  however it doesn&#8217;t always translate well to the real world.</p>
+
+<p>Examples where you might want to be able to run multiple servers span from the simple use case of running <code>sshd</code> as well as your application to running a web app such as <code>wordpress</code> where you might want both <code>apache</code> and <code>mysql</code> running in the same container.</p>
+
+<p>Wrapping your applications in a supervisor daemon such as <code>runit</code> seems like a perfect fit for this.  All you need to do is install <code>runit</code> as part of your <code>dockerfile</code> and then create appropriate service directories for the apps you want to run in the container.    I was doing some testing of this when I realized a quirk of <code>runit</code> which I could exploit for evil.</p>
+
+<p>To start or stop a service with <code>runit</code> is simply a matter of creating or deleting a symlink in a service directory,   so in theory if you could expose that directory to the server hosting the container you could exploit that to start and stop services from outside of the container.  <code>Docker</code> volume mapping allows exactly this!</p>
+
+<p>Below you will find examples of running three services (logstash,elasticsearch,kibana) that make up the <code>logstash</code> suite.</p>
+
+<!--more-->
+
+
+<h2>Start by cloning the demo git repository and run demo.sh</h2>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ git clone https://github.com/paulczar/docker-runit-demo.git
+</span><span class='line'>$ cd docker-runit-demo
+</span><span class='line'>$ ./demo.sh</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>demo.sh script</h3>
+
+<h4>Step 1:  Build the container</h4>
+
+<p>The script uses the below <code>Dockerfile</code> to build the base container that we&#8217;ll be running.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># Installs runit for service management
+</span><span class='line'>#
+</span><span class='line'># Author: Paul Czarkowski
+</span><span class='line'># Date: 10/20/2013
+</span><span class='line'>
+</span><span class='line'>FROM paulczar/jre7
+</span><span class='line'>MAINTAINER Paul Czarkowski "paul@paulcz.net"
+</span><span class='line'>
+</span><span class='line'>RUN apt-get update
+</span><span class='line'>
+</span><span class='line'>RUN apt-get -y install curl wget git nginx
+</span><span class='line'>RUN apt-get -y install runit || echo
+</span><span class='line'>
+</span><span class='line'>CMD ["/usr/sbin/runsvdir-start"]
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>Step 2: Install the applications</h4>
+
+<p>This will take a few minutes the first time as it needs to download <code>logstash</code>, <code>kibana</code>, and <code>elasticsearch</code> and stage them in a local <code>./opt</code>directory.</p>
+
+<h4>Step 3: Start the Docker container</h4>
+
+<p>Starts the <code>Docker</code> container with the following command:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>docker run -d -p 8080:80 -p 5014:514 -p 9200:9200 \
+</span><span class='line'>  -v $BASE/opt:/opt \
+</span><span class='line'>  -v $BASE/sv:/etc/sv \
+</span><span class='line'>  -v $BASE/init:/etc/init \
+</span><span class='line'>  -v $BASE/service:/etc/service \
+</span><span class='line'>  demo/runit</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The container should be up and running</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ docker ps
+</span><span class='line'>ID                  IMAGE               COMMAND                CREATED             STATUS              PORTS
+</span><span class='line'>eb495ad92ba0        demo/runit:latest   /usr/sbin/runsvdir-s   4 seconds ago       Up 3 seconds        5014-&gt;514, 8080-&gt;80, 9200-&gt;9200   </span></code></pre></td></tr></table></div></figure>
+
+
+<p>However there aren&#8217;t any services running!</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ curl localhost:8080
+</span><span class='line'>curl: (56) Recv failure: Connection reset by peer
+</span><span class='line'>$ curl localhost:9200
+</span><span class='line'>curl: (56) Recv failure: Connection reset by peer</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We can start the services with the following commands</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ cd service
+</span><span class='line'>$ ln -s ../sv/elasticsearch
+</span><span class='line'>$ ln -s ../sv/logstash
+</span><span class='line'>$ ln -s ../sv/kibana
+</span><span class='line'>cd ..</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We can now see the services are running, test the ports and send some data to logstash.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ curl localhost:8080      
+</span><span class='line'>&lt;!DOCTYPE html&gt;&lt;!--[if IE 8]&gt;&lt;html class="no-js lt-ie9" lang="en"&gt;&lt;![endif]--&gt;&lt;!--[if gt IE 8]&gt;&lt;!--&gt;&lt;html class="no-js" lang="en"&gt;
+</span><span class='line'>...
+</span><span class='line'>curl localhost:9200
+</span><span class='line'>{
+</span><span class='line'>  "ok" : true,
+</span><span class='line'>  "status" : 200,
+</span><span class='line'>...
+</span><span class='line'>$tail -100 /var/log/syslog | nc localhost 5014</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Stop a service ?</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ rm service/elasticsearch
+</span><span class='line'>$ rm service/logstash
+</span><span class='line'>$ rm service/kibana</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Bonus Round: Logs!</h2>
+
+<p>The beautify of doing this is that we&#8217;re actually logging the application output to a mounted volume.   This means we now have access to their logs from the host machine.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ tail opt/logstash/logs/current
+</span><span class='line'>$ tail opt/elasticsearch-0.90.5/logs/current
+</span><span class='line'>$ tail opt/kibana/logs/access.log</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Cleanup</h2>
+
+<p>Unfortunately any files created inside the docker instance are owned by root ( an artifact of docker daemon running as root ).   If you&#8217;re in The following script will clean out any such files after you&#8217;ve stopped the docker container.</p>
+
+<p>It will delete any files/dirs inside your current directory that are owned by root.  Obviously it can be very dangerous to run &#8230; so be careful where you run it from!</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ sudo find . -uid 0   -exec rm -rfv {} \;</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Creating immutable servers with chef and docker.io]]></title>
+    <link href="http://paulczar.github.com/2013/09/creating-immutable-servers-with-chef-and-docker-dot-io.html"/>
+    <updated>2013-09-07T18:18:00-05:00</updated>
+    <id>http://paulczar.github.com/2013/09/creating-immutable-servers-with-chef-and-docker-dot-io</id>
+    <content type="html"><![CDATA[<p>Building applications in a <a href="http://docker.io">docker.io</a> Dockerfile is relatively simple,  but sometimes you want to just install the application exactly as you would normally via already built chef cookbooks.   Turns out this is actually pretty simple.</p>
+
+<p>The first thing you&#8217;ll need to do is build a container with chef-client and berkshelf installed.   You can grab the one I&#8217;ve built by running <code>docker pull paulczar/chef-solo</code> or build one youself from a <code>Dockerfile</code> that looks a little something like the following&#8230;</p>
+
+<!--more-->
+
+
+<h3>Creating a docker.io container with chef and berkshelf</h3>
+
+<figure class='code'><figcaption><span>Dockerfile</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># DOCKER-VERSION 0.5.3</span>
+</span><span class='line'><span class="no">FROM</span> <span class="ss">ubuntu</span><span class="p">:</span><span class="mi">12</span><span class="o">.</span><span class="mi">10</span>
+</span><span class='line'><span class="no">MAINTAINER</span> <span class="no">Paul</span> <span class="no">Czarkowski</span> <span class="s2">&quot;paul@paulcz.net&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">RUN</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="o">-</span><span class="n">y</span> <span class="n">update</span>
+</span><span class='line'><span class="no">RUN</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="o">-</span><span class="n">y</span> <span class="n">install</span> <span class="n">curl</span> <span class="n">build</span><span class="o">-</span><span class="n">essential</span> <span class="n">libxml2</span><span class="o">-</span><span class="n">dev</span> <span class="n">libxslt</span><span class="o">-</span><span class="n">dev</span> <span class="n">git</span>
+</span><span class='line'><span class="no">RUN</span> <span class="n">curl</span> <span class="o">-</span><span class="n">L</span> <span class="ss">https</span><span class="p">:</span><span class="sr">//</span><span class="n">www</span><span class="o">.</span><span class="n">opscode</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">chef</span><span class="o">/</span><span class="n">install</span><span class="o">.</span><span class="n">sh</span> <span class="o">|</span> <span class="n">bash</span>
+</span><span class='line'><span class="no">RUN</span> <span class="n">echo</span> <span class="s2">&quot;gem: --no-ri --no-rdoc&quot;</span> <span class="o">&gt;</span> <span class="o">~</span><span class="sr">/.gemrc</span>
+</span><span class='line'><span class="sr">RUN /o</span><span class="n">pt</span><span class="o">/</span><span class="n">chef</span><span class="o">/</span><span class="n">embedded</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">gem</span> <span class="n">install</span> <span class="n">berkshelf</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><em>you&#8217;ll notice I&#8217;m using the embedded chef ruby to install the berkshelf gem,  this is a handy shortcut to avoid messing around with random ruby versions from your distributions packaging.</em></p>
+
+<p>run <code>$ docker build -t paulczar/chef-solo .</code> to build a usable docker container from the above <code>Dockerfile</code>.</p>
+
+<h3>Using chef-solo and berkshelf to build an application in a docker.io container</h3>
+
+<p>My <a href="https://github.com/paulczar/docker-chef-solo">example application</a> will install <code>Kibana3</code> to your docker container.   I&#8217;ll step through how it works below.</p>
+
+<h4>Chef-Solo</h4>
+
+<p>To run <code>chef-solo</code> successfully we require two files.   <code>solo.rb</code> to set up file locations, and `solo.json&#8217; to set up the json / run list required for your application.</p>
+
+<figure class='code'><figcaption><span>chef.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">root</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">absolute_path</span><span class="p">(</span><span class="no">File</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">__FILE__</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">file_cache_path</span> <span class="n">root</span>
+</span><span class='line'><span class="n">cookbook_path</span> <span class="n">root</span> <span class="o">+</span> <span class="s1">&#39;/cookbooks&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>chef.json</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nt">&quot;kibana&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nt">&quot;webserver_listen&quot;</span><span class="p">:</span> <span class="s2">&quot;0.0.0.0&quot;</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="nt">&quot;run_list&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span class='line'>    <span class="s2">&quot;recipe[kibana::default]&quot;</span>
+</span><span class='line'>  <span class="p">]</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>Berkshelf</h4>
+
+<p>To run <code>berkshelf</code> we need to build a Berksfile which contains a list of all the chef cookbooks required for the applocation.   Berkshelf will download these cookbooks to a local directory which will be usable by chef-solo.</p>
+
+<figure class='code'><figcaption><span>Berksfile</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">site</span> <span class="ss">:opscode</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">cookbook</span> <span class="s1">&#39;build-essential&#39;</span>
+</span><span class='line'><span class="n">cookbook</span> <span class="s1">&#39;apache2&#39;</span>
+</span><span class='line'><span class="n">cookbook</span> <span class="s1">&#39;git&#39;</span>
+</span><span class='line'><span class="n">cookbook</span> <span class="s1">&#39;kibana&#39;</span><span class="p">,</span> <span class="ss">github</span><span class="p">:</span> <span class="s1">&#39;lusis/chef-kibana&#39;</span>
+</span><span class='line'><span class="n">cookbook</span> <span class="s1">&#39;nginx&#39;</span> <span class="p">,</span> <span class="ss">github</span><span class="p">:</span> <span class="s1">&#39;opscode-cookbooks/nginx&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><em>You can see some of the cookbooks are being pulled from the opscode repository,  whereas others are being pulled directly from github.</em></p>
+
+<h4>Dockerfile</h4>
+
+<p>All that&#8217;s left now is to create a Dockerfile that will bring it all together.</p>
+
+<figure class='code'><figcaption><span>Dockerfile</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># DOCKER-VERSION 0.5.3</span>
+</span><span class='line'><span class="no">FROM</span> <span class="n">paulczar</span><span class="o">/</span><span class="n">chef</span><span class="o">-</span><span class="n">client</span>
+</span><span class='line'><span class="no">MAINTAINER</span> <span class="no">Paul</span> <span class="no">Czarkowski</span> <span class="s2">&quot;paul@paulcz.net&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">RUN</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="o">-</span><span class="n">y</span> <span class="n">update</span>
+</span><span class='line'><span class="no">ADD</span> <span class="o">.</span> <span class="sr">/chef</span>
+</span><span class='line'><span class="sr">RUN cd /</span><span class="n">chef</span> <span class="o">&amp;&amp;</span> <span class="sr">/opt/</span><span class="n">chef</span><span class="o">/</span><span class="n">embedded</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">berks</span> <span class="n">install</span> <span class="o">--</span><span class="n">path</span> <span class="sr">/chef/</span><span class="n">cookbooks</span>
+</span><span class='line'><span class="no">RUN</span> <span class="n">chef</span><span class="o">-</span><span class="n">solo</span> <span class="o">-</span><span class="n">c</span> <span class="sr">/chef/so</span><span class="n">lo</span><span class="o">.</span><span class="n">rb</span> <span class="o">-</span><span class="n">j</span> <span class="sr">/chef/so</span><span class="n">lo</span><span class="o">.</span><span class="n">json</span>
+</span><span class='line'><span class="no">RUN</span> <span class="n">echo</span> <span class="s2">&quot;daemon off;&quot;</span> <span class="o">&gt;&gt;</span> <span class="sr">/etc/n</span><span class="n">ginx</span><span class="o">/</span><span class="n">nginx</span><span class="o">.</span><span class="n">conf</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">CMD</span> <span class="o">[</span><span class="s2">&quot;nginx&quot;</span><span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Run <code>$ docker build -t demo/kibana3 .</code> to build your application.</p>
+
+<p>It will add the local files ( <code>solo.rb</code>, <code>solo.json</code>, <code>Berksfile</code> ) to /chef in the server and then call berkshelf to download the cookbooks and chef-solo to install your application.   Finally it will give <code>nginx</code> a directive to run in the foreground so that we don&#8217;t have to do any sneaky prcess control to get it to work with the way <code>docker.io</code> runs processes.</p>
+
+<p>To run the resultant <code>docker.io</code> container you simply need to run <code>$ docker run -d -p 80 demo/kibana3</code></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Logstash + Opscode Omnibus]]></title>
+    <link href="http://paulczar.github.com/2013/05/logstash-plus-opscode-omnibus.html"/>
+    <updated>2013-05-06T19:03:00-05:00</updated>
+    <id>http://paulczar.github.com/2013/05/logstash-plus-opscode-omnibus</id>
+    <content type="html"><![CDATA[<p>At <a href="http://devopsdays.org/events/2013-austin/">DevOps Days Austin</a> <a href="http://twitter.com/mattray">@mattray</a> did an Openspace session on <a href="https://github.com/opscode/omnibus-ruby">Omnibus</a> which is a toolset based around the concept of installing an app and all of it&#8217;s prerequisites from source into a directory and then building a package ( either .deb or .rpm ) of that using <a href="https://github.com/jordansissel/fpm">fpm</a>.</p>
+
+<p>Having battled many times with OS Packages trying to get newer versions of Ruby, or Redis or other software installed and having to hunt down some random package repo or manually build from source this seems like an excellent idea.</p>
+
+<p>To learn the basics I decided to build an <a href="https://github.com/paulczar/omnibus-fpm">omnibus package for fpm</a> which helped me work out the kinks and learn the basics.</p>
+
+<!--more-->
+
+
+<p>From there I moved onto something a little more ambitious&#8230; <a href="http://logstash.net/">logstash</a>, which is an awesome opensource project for log aggregation and searching.</p>
+
+<p>Using Omnibus I took the Logstash .jar file and bundled in Redis, Kibana, Kibana3(+NodeJS), RabbitMQ, Elasticsearch along with all of their depedencies into a big fat package which installs to /opt/logstash and includes init scripts and default configs for each.</p>
+
+<p>The Logstash Omnibus project can be found <a href="https://github.com/paulczar/omnibus-logstash">here</a>.  I also uploaded the resultant packages for <a href="https://s3-us-west-2.amazonaws.com/paulcz-packages/logstash-omnibus-1.1.10_amd64.deb">Ubuntu 12.04</a> and <a href="https://s3-us-west-2.amazonaws.com/paulcz-packages/logstash-omnibus-1.1.10.el6.x86_64.rpm">RHEL 6</a>.</p>
+
+<p>This gives us a really powerful platform to deploy logstash and all of its prequisites in a completely repeatable manner and not have to worry about the existing versions of Ruby, Java, etc.    It also gives a super simple testing platform where a new user to logstash can install logstash with a single <code>dpkg</code> or <code>rpm</code> command and immediately be able to push logs to it via syslog or redis.</p>
+
+<p>Read more about using and building the <a href="https://github.com/paulczar/omnibus-logstash/blob/master/README.md">Logstash Omnibus package here</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Vagrant+Puppet+FPM=Amazeballs]]></title>
+    <link href="http://paulczar.github.com/2013/04/vagrant-plus-puppet-plus-fpm-equals-amazeballs.html"/>
+    <updated>2013-04-07T18:23:00-05:00</updated>
+    <id>http://paulczar.github.com/2013/04/vagrant-plus-puppet-plus-fpm-equals-amazeballs</id>
+    <content type="html"><![CDATA[<p>Lately I&#8217;ve been doing a lot of prototyping with <a href="http://www.vagrantup.com/">Vagrant</a>, specifically for a couple of distinct activities:-</p>
+
+<ul>
+<li>building puppet modules using <a href="https://github.com/elasticdog/puppet-sandbox">the excellent puppet sandbox</a> project</li>
+<li>and building RPM packages with <a href="https://github.com/jordansissel/fpm">FPM</a>.</li>
+</ul>
+
+
+<p>I realized I was spending a bunch of time flipping back and forth between Vagrant environments and I had no quick way to utilize RPMs built with FPM inside my puppet modules.</p>
+
+<!--more-->
+
+
+<p>An idea was born.   I forked off the <a href="https://github.com/paulczar/puppet-sandbox">puppet sandbox</a> project and added a Yum repo module <code>repository</code> to the standalone puppet provisioner that vagrant uses when it first brings up a box.   It adds a Yum repo on the puppet server called <code>sandbox</code> and adds a repo file to the client boxes pointing to the repo.   Now I can simply push an RPM to <code>packages/rpm</code> and run <code>vagrant provision puppet</code> which reruns puppet and rebuilds the yum repo.</p>
+
+<p>Given that I often flip back and forth between Ubuntu and CentOS boxes I also created <code>Vagrantfile.centos63</code> and <code>Vagrantfile.precise64</code> so I can swiftly destroy the existing environment and bring up another of a different flavour by simply symlinking <code>Vagrantfile</code> to the appropriate file.</p>
+
+<p>This worked out pretty well for a while until I realized I was still jumping back and forth between vagrant environments and I realized I had another improvement to make.   So I then went on to create a definition in the puppet sandbox <code>Vagrantfile</code> file for a <code>FPM server</code> and a new module in the provisioner to install FPM on it.   Given that this module simply adds a few packages this module works for both CentOS and Ubuntu.</p>
+
+<p>I also created a couple of sample scripts to download source and build RPMs for both Redis and Elasticsearch which get pushed via the provisioner to <code>/tmp/redis-rpm.sh</code> and <code>/tmp/elasticsearch-rpm.sh</code></p>
+
+<p>Now ( For CentOS boxes at least ) I can very quickly iterate on puppet modules and create RPM packages on the fly and have them instantly available.   The process is very simple and looks a little something like this :</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ git clone https://github.com/paulczar/puppet-sandbox
+</span><span class='line'>$ cd puppet-sandbox
+</span><span class='line'>$ vagrant up puppet fpm client1
+</span><span class='line'>$ vagrant ssh fpm
+</span><span class='line'>[vagrant@fpm ~]$ sudo /tmp/redis-rpm.sh
+</span><span class='line'>  ... 
+</span><span class='line'>  ... A bunch of scrolling text while files are downloaded and rpm is built
+</span><span class='line'>  ...
+</span><span class='line'>[vagrant@fpm ~]$ exit
+</span><span class='line'>$ vagrant provision puppet
+</span><span class='line'>$ vagrant ssh client1
+</span><span class='line'>[vagrant@client1 ~]$ sudo yum clean all
+</span><span class='line'>[vagrant@client1 ~]$ sudo yum -y install redis
+</span><span class='line'>[vagrant@client1 ~]$ sudo service redis-server start
+</span><span class='line'>[vagrant@client1 ~]$ redis-cli ping
+</span><span class='line'>PONG
+</span><span class='line'>[vagrant@client1 ~]$</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If I&#8217;m building a puppet module that needs redis I can now add the following to it&#8217;s init.pp ( or more properly create a module for redis and request it from the module I&#8217;m building )</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>  package { 'redis':
+</span><span class='line'>    ensure =&gt; 'present';
+</span><span class='line'>  }</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Of course Debian/Ubuntu doesn&#8217;t use Yum/RPM for package management.    I&#8217;d love to accept a pull request from somebody who wants to extend it to also support a local APT repository.   I left breadcrumbs in the <code>repository</code> module for some appropriate classes to be spliced in&#8230;</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Creating a Github Pages Blog With Octopress]]></title>
+    <link href="http://paulczar.github.com/2012/12/creating-a-github-pages-blog-with-octopress.html"/>
+    <updated>2012-12-15T11:10:00-06:00</updated>
+    <id>http://paulczar.github.com/2012/12/creating-a-github-pages-blog-with-octopress</id>
+    <content type="html"><![CDATA[<p>A lot of tech bloggers will write their blog posts in <a href="http://daringfireball.net/projects/markdown/">Markdown</a>, convert it to HTML and paste that HTML into their blog of choice and then in the blog&#8217;s editor clean it up to suit their blog.   This is an excellent way to create easy to read portable documents that can easily be published in multiple formats.</p>
+
+<p>However what if there was a way to skip the second part of that and just create a markdown page, submit it into your source control ( you <em>do</em> use source control right? ) and your blog would automagically update.</p>
+
+<p>In comes <a href="http://octopress.org/">Octopress</a>,  it&#8217;s a framework that wraps around <a href="https://help.github.com/articles/using-jekyll-with-pages">Jekyll</a> which is <a href="https://github.com/">Github&#8217;s</a> blogging engine that powers <a href="http://pages.github.com/">Github Pages</a>.   Essentially you edit Markdown files and <a href="http://octopress.org/">Octopress</a> will compile it into a static-html <a href="https://help.github.com/articles/using-jekyll-with-pages">Jekyll</a> blog.     This means that your blog will be lightning fast ( no need to run an interpreted language in your web server ) and ultra portable.</p>
+
+<p>Another side benefit is that you can host it for free on <a href="https://github.com/">Github</a> ( as long as you&#8217;re okay with sharing your source &#8230; and you should be! ) or for free on <a href="http://www.heroku.com/">Heroku</a> ( don&#8217;t have to share your source ) or host it on any simple no frills Apache, LightHTTP, nginx, node.js, etc server.</p>
+
+<p>Here is how I&#8217;m porting my blogger site to Octopress hosted on Github Pages.   I&#8217;m not using any of the fancy <a href="https://github.com/mojombo/jekyll/wiki/blog-migrations">Jekyll migration tools</a> as I only have a few posts and it will help me get used to the extended syntax that Octopress uses in Markdown.</p>
+
+<!--more-->
+
+
+<p>As usual the first step is to install any dependencies.   These instructions are for <a href="http://www.ubuntu.com/">Ubuntu 12.10</a> &#8230; modify to suit your OS of choice.</p>
+
+<p>Most of these steps are taken directly from the <a href="http://octopress.org/docs/">Octopress Documentation</a>,   I&#8217;m just condensing them into a single document to suit the exact scenario being described in this post.</p>
+
+<h2>Before You Begin</h2>
+
+<ol>
+<li>Install Git</li>
+<li>Install Ruby 1.9.3 via your OS package management or <a href="http://octopress.org/docs/setup/rbenv/">rbenv</a> or <a href="http://octopress.org/docs/setup/rvm/">RVM</a>.  <br/>
+<em>If using package management may need to install ruby-dev</em></li>
+</ol>
+
+
+<p>Check your Ruby version is at least 1.9.3 and install bundler:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>ruby --version 
+</span><span class='line'>sudo gem install bundler</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Initial Setup</h2>
+
+<p>Clone the octopress repository and set it up</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git clone git://github.com/imathis/octopress.git octopress
+</span><span class='line'>cd octopress
+</span><span class='line'>bundle install
+</span><span class='line'>
+</span><span class='line'>rake install</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We&#8217;re going to use Github pages.   Octopress has some rake tasks to make this easier for you.    Your blog will be hosted at <code>http://username.github.com</code> and you need to create a <a href="https://github.com/repositories/new">new Github repository</a> called <code>username.github.com</code> that github pages will use the master branch as the html source for your blog.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>rake setup_github_pages</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This rake points our clone to the new repistory we just set up, configures your blog&#8217;s URL and sets up a master branch in the <code>_deploy</code> directory for deployment.</p>
+
+<p>edit <code>_config.yml</code> and fill in your blog name and other details.   There&#8217;s also some configs for twitter/G+/etc plugins that are worth configuring.</p>
+
+<h2>Write some blog content</h2>
+
+<p><em>Great time to read <a href="http://octopress.org/docs/blogging">Blogging Basics</a></em></p>
+
+<p>Create an <code>About</code> page and a <code>First Post!</code> blog post:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>rake new_page["About"]
+</span><span class='line'>rake new_post["First Post!"]</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Edit the Markdown pages that it creates for you with your preferred <a href="http://sourceforge.net/p/retext/home/ReText/">Markdown editor</a>.   The output of the rake commands should provide appropriate hints as to the location of the created files.</p>
+
+<p>Generate and preview the blog:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>rake generate
+</span><span class='line'>rake preview</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This will generate the contents of your blog and allow you to preview it at [http://localhost:4000].</p>
+
+<p>Once you&#8217;re happy with the contents we can deploy your blog for the first time.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>rake deploy</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This will copy the generated files into <code>_deploy/</code>, add them to git, commit and push them up to the master branch. In a few seconds you should get an email from Github telling you that your commit has been received and will be published on your site.   Being your first commit it could take 10 minutes for the blog to be available at [http://username.github.com]</p>
+
+<p>Don&#8217;t forget to commit your changes to the source branch:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git add .
+</span><span class='line'>git commit -m 'Added About page and first post!'
+</span><span class='line'>git push origin source</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Want to edit your blog from another machine,  or edit an existing octopress blog?</h2>
+
+<p>This is pretty simple ( assuming you have the prerequisites already install ).</p>
+
+<p><em>If you run Dropbox you can do this inside of your dropbox folders to make this instantly avaiable on any system you use.</em></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>git clone git@github.com:username/username.github.com.git
+</span><span class='line'>cd username.github.com
+</span><span class='line'>git checkout source
+</span><span class='line'>mkdir _deploy
+</span><span class='line'>cd _deploy
+</span><span class='line'>git init
+</span><span class='line'>git remote add origin git@github.com:username/username.github.com.git
+</span><span class='line'>git pull origin master
+</span><span class='line'>cd ..</span></code></pre></td></tr></table></div></figure>
+
+
+<p>once this is done you can run <code>rake new_post["title"]</code> and all the other rake commands needed to edit/preview/publish your blog.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Running KVM and Openvswitch on Ubuntu 12.10]]></title>
+    <link href="http://paulczar.github.com/2012/12/running-kvm-and-openvswitch-on-ubuntu-12-dot-10.html"/>
+    <updated>2012-12-13T22:40:00-06:00</updated>
+    <id>http://paulczar.github.com/2012/12/running-kvm-and-openvswitch-on-ubuntu-12-dot-10</id>
+    <content type="html"><![CDATA[<p>I&#8217;ve got an aging VMWare ESXi 4.0 server that needs to be replaced with something a little more modern and flexing.   Obviously at home I don&#8217;t need all the cool features that licensed VMWare comes with,  but I do want more than just the basic free version.</p>
+
+<p>After a few weeks of installing and testing alternatives  ( I&#8217;d really love to run openstack,  but it&#8217;s just not worth it at home for a single box ) I&#8217;ve settled on Ubuntu 12.10 server running KVM and Openvswitch.</p>
+
+<p>After installing Ubuntu 12.10 I did the following to get KVM up and running&#8230;   I cribbed this mostly from <a href="http://blog.allanglesit.com/2012/10/linux-kvm-ubuntu-12-10-with-openvswitch/">blog.allanglesit.com</a>.</p>
+
+<!--more-->
+
+
+<p><strong>Install updates and Pre-requisites</strong></p>
+
+<p>First of all, make sure Ubuntu is fully up to date:
+<em>sudo to root as pretty much every command here needs to be run as root</em></p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo bash
+</span><span class='line'>apt-get update
+</span><span class='line'>apt-get upgrade
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now we can go ahead and install the necessary packages:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>apt-get -y install aptitude apt-show-versions ntp ntpdate vim kvm <span class="se">\</span>
+</span><span class='line'> libvirt-bin vlan virtinst virt-manager virt-viewer openssh-server <span class="se">\</span>
+</span><span class='line'> iperf pv openvswitch-controller openvswitch-brcompat <span class="se">\</span>
+</span><span class='line'> openvswitch-switch nfs-common
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>Kill off the default libvirt bridge and nuke ebtables</strong></p>
+
+<p>We want to delete the default libvirt interface and we don&#8217;t need ebtables so we&#8217;ll get rid of that.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>virsh net-destroy default
+</span><span class='line'>virsh net-autostart --disable default
+</span><span class='line'>service libvirt-bin stop
+</span><span class='line'>service qemu-kvm stop
+</span><span class='line'>aptitude purge -y ebtables
+</span><span class='line'>service openvswitch-switch restart
+</span><span class='line'>service openvswitch-controller restart
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>Configure network interfaces</strong></p>
+
+<p>We&#8217;ll be using just a single interface which will be used for both the bridge and the host itself.    We will also be bridging that network into the the vswitch and then configuring an interface for the host OS.    The network configuration will look something like this:</p>
+
+<figure class='code'><figcaption><span>/etc/network/interfaces </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># The loopback network interface
+</span><span class='line'>auto lo
+</span><span class='line'>iface lo inet loopback
+</span><span class='line'>
+</span><span class='line'># The primary network interface - bridge!
+</span><span class='line'>auto eth0
+</span><span class='line'>iface eth0 inet manual
+</span><span class='line'>up ifconfig $IFACE 0.0.0.0 up
+</span><span class='line'>down ifconfig $IFACE down
+</span><span class='line'>    
+</span><span class='line'># The host OS network interface
+</span><span class='line'># DNS settings here,  12.10 resets resolv.conf on reboot.
+</span><span class='line'>auto ovsbr0p1
+</span><span class='line'>iface ovsbr0p1 inet static
+</span><span class='line'>address 192.168.50.10
+</span><span class='line'>netmask 255.255.255.0
+</span><span class='line'>gateway 192.168.50.1
+</span><span class='line'>dns-nameservers 192.168.50.1
+</span><span class='line'>dns-search example.com</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>Configure the openvswitch network</strong></p>
+
+<p>Now we need to configure the network on the openvswitch.     We need to define the bridge, connect it to the uplink interface and create a port for the host OS.</p>
+
+<p><em>note: if you&#8217;re doing this via SSH it will probably break your session</em></p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>ovs-vsctl add-br ovsbr0
+</span><span class='line'>ovs-vsctl add-port ovsbr0 eth0
+</span><span class='line'>ovs-vsctl add-port ovsbr0 ovsbr0p1 -- <span class="nb">set </span>interface ovsbr0p1 <span class="nb">type</span><span class="o">=</span>internal
+</span><span class='line'>reboot
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>Modify network service sleep times</strong></p>
+
+<p>That took forever to boot.    We can fix that by modifying sleeps in /etc/init/failsafe.conf and reboot again to make sure it helped.</p>
+
+<p>Change :</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$PLYMOUTH message --text="Waiting for network configuration..." || :
+</span><span class='line'>sleep 40
+</span><span class='line'>$PLYMOUTH message --text="Waiting up to 60 more seconds for network configuration..." || :
+</span><span class='line'>sleep 59
+</span><span class='line'>$PLYMOUTH message --text="Booting system without full network configuration..." || :</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To :</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$PLYMOUTH message --text="Waiting for network configuration..." || :
+</span><span class='line'>sleep 1
+</span><span class='line'>$PLYMOUTH message --text="Waiting up to 60 more seconds for network configuration..." || :
+</span><span class='line'>sleep 1
+</span><span class='line'>$PLYMOUTH message --text="Booting system without full network configuration..." || :</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>LVM configure</strong></p>
+
+<p>We&#8217;re going to also use LVM to for the KVM virtual machines to use as storage.    I have a pair of 500g disks in a software raid1 which I&#8217;ll use for this.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>pvcreate /dev/md0
+</span><span class='line'>vgcreate data-disk /dev/md0
+</span><span class='line'>lvcreate -L 10G -n ISO data-disk
+</span><span class='line'>mkfs.ext4 /dev/data-disk/ISO
+</span><span class='line'>mkdir -p /data-disk/ISO
+</span><span class='line'><span class="nb">echo</span> <span class="s2">&quot;/dev/data-disk/ISO /data-disk/ISO defaults    ext4    0 0&quot;</span> &gt;&gt; /etc/fstab
+</span><span class='line'>mount -a
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>Create VM</strong></p>
+
+<p>Now we can go ahead and create our first VM.   I&#8217;ve already downloaded the Ubuntu ISO to /data-disk/ISO</p>
+
+<p><em>note: virt-install does not support setting a virtualport type of openvswitch yet .. so we have to trick it</em></p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>lvcreate -L 8G -n VM-UbuntuTest data-disk
+</span><span class='line'>virt-install --name UbuntuTest --hvm --noautoconsole --ram 1024 <span class="se">\</span>
+</span><span class='line'>--disk <span class="nv">path</span><span class="o">=</span>/dev/data-disk/VM-UbuntuTest --nonetworks --vnc <span class="se">\</span>
+</span><span class='line'>--os-type<span class="o">=</span>linux --os-variant<span class="o">=</span>ubuntuquantal <span class="se">\</span>
+</span><span class='line'>--cdrom /data-disk/ISO/ubuntu-12.10-server-amd64.iso
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>set up the networking by editing the VM&#8217;s XML and adding a network interface stanza just before the &lt;/devices>.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>virsh edit UbuntuTest
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;interface</span> <span class="na">type=</span><span class="s">&#39;bridge&#39;</span><span class="nt">&gt;</span>
+</span><span class='line'> <span class="nt">&lt;source</span> <span class="na">bridge=</span><span class="s">&#39;ovsbr0&#39;</span><span class="nt">/&gt;</span>
+</span><span class='line'> <span class="nt">&lt;virtualport</span> <span class="na">type=</span><span class="s">&#39;openvswitch&#39;</span> <span class="nt">/&gt;</span>
+</span><span class='line'> <span class="nt">&lt;model</span> <span class="na">type=</span><span class="s">&#39;virtio&#39;</span><span class="nt">/&gt;</span>
+</span><span class='line'><span class="nt">&lt;/interface&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The VM will need to be reset to pick up the network change,  however that will cause it to drop the ISO mount.  We can either continue through with the OS install without networking or reset the VM and then re-attach the ISO as a CD.    I connected to it from my desktop using the VirtualMachineManager GUI to do that but you could use virsh commands if you want to stick to CLI.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Moving VMs from VMWare to KVM]]></title>
+    <link href="http://paulczar.github.com/2012/12/moving-vms-from-vmware-to-kvm.html"/>
+    <updated>2012-12-09T13:17:00-06:00</updated>
+    <id>http://paulczar.github.com/2012/12/moving-vms-from-vmware-to-kvm</id>
+    <content type="html"><![CDATA[<p>I&#8217;m migrating from my old VMWare ESXi box to a new machine running Ubuntu 12.10 and KVM.    Not wanting to rebuild all of my VMs I set about trying to work out the best way to migrate the VMs.</p>
+
+<p><strong>Steps to make Windows migrate without Bluescreen</strong></p>
+
+<p>If you migrate a windows box it&#8217;ll bluescreen due to the shock of so much hardware changing.   The following .reg hack will prevent this from happening by opening up access to a bunch of random system drivers.   Copy and run the .reg file in your VM before doing any further steps.</p>
+
+<p><a href="https://gist.github.com/4247499">c:\temp\vmdriverhack.reg</a></p>
+
+<p><strong>Move your VM to shared storage</strong></p>
+
+<p>I mounted an nfs partition to vmware from my freenas box and migrated the data across using the vmware datastore tools.   If you don&#8217;t have a NAS you could export a directory from your KVM server to achieve the same goal.</p>
+
+<p>To move VMs in ESXi we click on the ESXi server, pick the Configuration tab,  click on &#8216;Storage&#8217; and then right-click on the datastore and select &#8216;Browse Datastore&#8217;.   Select the VM folder you wish to move and click the move icon.</p>
+
+<p><img src="https://lh6.googleusercontent.com/-R5x6JyT5x14/UMUkr4qNr4I/AAAAAAAAAHY/CYhOlizOLb8/s640/VMWare-move-1.png"></p>
+
+<!--more-->
+
+
+<p><strong>Convert your VM to qcow2 format</strong></p>
+
+<p>Next we need to make your VM available to the KVM server.   Again I just mounted my nfs volume to it.     You could run the VM from NFS if you want,  but I want to run it locally.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>kvm-img convert -O qcow2 /mnt/freenas/vms/WindowsGuest/WindowsGuest.vmdk \
+</span><span class='line'>  /data-disk/VMs/WindowsGuest.qcow2</span></code></pre></td></tr></table></div></figure>
+
+
+<p>`</p>
+
+<p>It&#8217;ll take a while to convert.   Once it&#8217;s done you can make it available to KVM.    I used the VirtualMachineManager GUI,  but you could use virsh if you want.   Simply create a new VM like you would usually except check the &#8216;Import existing disk image&#8217; option.</p>
+
+<p><img src="https://lh6.googleusercontent.com/-dXfvXbUOE5c/UMUkwnky73I/AAAAAAAAAHg/DDjgO2CAwqI/s800/vmware-2.png"></p>
+
+<p>Then choose your VM image and set the OS versions.</p>
+
+<p><img src="https://lh3.googleusercontent.com/-OybiOO1KsGI/UMUk9JbhzpI/AAAAAAAAAHo/zayosuFa5co/s800/vmware-3.png"></p>
+
+<p>If Windows then choose &#8216;edit VM before starting it and select the realtek network adaptor.</p>
+
+<p><img src="https://lh4.googleusercontent.com/-MHBkRrhkCI4/UMUlQJ_6ZcI/AAAAAAAAAHw/-Dj9UYNszgU/s800/VMWare-4.png"></p>
+
+<p>Once created the VM should start up fine.   If the VM is running Windows you&#8217;ll probably need to re-activate it as the hardware change will make it think you&#8217;ve pirated it.</p>
+
+<p><img src="https://lh5.googleusercontent.com/-iJuM6CXhWVo/UMUlnT4qjHI/AAAAAAAAAH4/mahRyoBn4ZM/s800/vmware-5.png"></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Moving from a self hosted Wordpress blog to Blogger]]></title>
+    <link href="http://paulczar.github.com/2012/10/moving-from-a-self-hosted-wordpress-blog-to-blogger.html"/>
+    <updated>2012-10-21T15:15:00-05:00</updated>
+    <id>http://paulczar.github.com/2012/10/moving-from-a-self-hosted-wordpress-blog-to-blogger</id>
+    <content type="html"><![CDATA[<p>I have a self hosted <a href="http://xesla.ro">wordpress food blog</a> hosted on an old silly domain that I&#8217;ve wanted to move away from for a while.   I also want to stop paying hosting fees some time soon.   Since I&#8217;m already looking at moving a lot of my day-to-day activities to the &#8216;cloud&#8217;  it made sense to pick a blogging platform that ties into a major cloud hub.   Google&#8217;s Blogger was the obvious choice as I&#8217;m already using the Google Apps platform for my new domain <code>paulcz.net</code>.</p>
+
+<p>Creating a blog on blogger is dead simple.   I went ahead and created two: <a href="http://food.paulcz.net">food.paulcz.net</a> for the new food blog and <a href="http://tech.paulcz.net">tech.paulcz.net</a> to start journalling random tech things.     Transfering the blog content itself  is quite simple,  however, doing it in a way as to preserve links between posts, from other sites, and teaching the search engines how to find your new site requires a little more trickery.</p>
+
+<!--more-->
+
+
+<p>I&#8217;m assuming you already have some technical know-how &#8230;  this isn&#8217;t for the Octogenarians or Luddites in the audience.     You&#8217;ll need access to a linux host and have a basic understanding of editing files in vim and navigating the linux  command prompt as well as be able to navigate the Wordpress  and Blogger interfaces.</p>
+
+<p>These examples  use my own blog so where you see <a href="http://food.paulcz.net">food.paulcz.net</a> please modify the text to your own blog URL if you want to use them.   Some of the scripting is a bit silly and could be cleaner but they&#8217;re throwaway scripts and I didn&#8217;t want to spend too much time on them.</p>
+
+<h2>Step 1.   Perform Initial Import/Export of blog.</h2>
+
+<p>Log into your wordpress blog and export the blog to an XMLfile ( <code>wordpress_export.xml</code> ).     You should be able to do this by going to <code>Dashboard -&gt; Tools -&gt; Export -&gt; Download Export file</code>.</p>
+
+<p>Browse  to <a href="http://wordpress2blogger.appspot.com/">http://wordpress2blogger.appspot.com/</a>.   This site will convert the file from Wordpress format to Blogger format.   Upload and Convert your file, saving it to <code>blogger_export.xml</code>.</p>
+
+<p>Log into blogger and create a new blog.   if you&#8217;re using your own domain set up the address in basic settings and then go to <code>Other Settings -&gt; Import blog</code>  and select the <code>blogger-export.xml</code> file.   You&#8217;ll also need to publish all the posts ( they don&#8217;t seem to publish by default ).  You can do this  50 at a  time from the Posts section.</p>
+
+<p>Now if you have a small blog, or don&#8217;t have any intrasite links you&#8217;re basically done here.   However A lot of my posts have links back to other posts and these are not converted.   This means that there&#8217;s tons of links on my new blog posting back to my old blog.</p>
+
+<p>Thankfully I don&#8217;t upload images to the blog, rather link to them on my picasa/google+ albums.   This means I don&#8217;t have to deal with some wacky image stuff.</p>
+
+<h2>Step 2.   Modify links to point to new site.</h2>
+
+<p>The first thing to do is get a list of all blog post links on your new Blogger site.   This is pretty easy,  you can do it via an RSS feed and some perl magic.</p>
+
+<p>Browse to your new blog like so:   <a href="http://food.paulcz.net/feeds/posts/default?start-index=1&amp;max-results=999">http://food.paulcz.net/feeds/posts/default?start-index=1&amp;max-results=999</a>.   This  will give you a page showing your entire blog ( assuming you have less than 999 posts ).    Save this file from your browser as default.xhtml.</p>
+
+<p>now create a perl script called <code>urls.pl</code> &#8230;    notice the URL ( with \ escaped characters ) .. you&#8217;ll need to modify this to match your new blogger url.</p>
+
+<figure class='code'><figcaption><span>urls.pl </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="c1">#!/usr/bin/perl</span>
+</span><span class='line'><span class="nb">open</span> <span class="p">(</span><span class="n">TXT</span><span class="p">,</span><span class="s">&quot;&lt; default.xhtml&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="k">while</span> <span class="p">(</span><span class="sr">&lt;TXT&gt;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'> <span class="nb">chomp</span><span class="p">;</span>
+</span><span class='line'> <span class="sr">/(http:\/\/food\.paulcz\.net\/\d\d\d\d.*?html)/</span><span class="p">;</span>
+</span><span class='line'> <span class="k">print</span> <span class="nv">$1</span> <span class="o">.</span> <span class="s">&quot;\n&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then run the following:</p>
+
+<figure class='code'><figcaption><span>Terminal</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>perl urls.pl | uniq &gt; blogger_urls.txt<span class="s1">&#39;</span>
+</span><span class='line'><span class="s1">grep &quot;&lt;link&gt;&quot; wordpress_export.xml | sed &quot;s/&lt;link&gt;//&quot; | sed &quot;s/&lt;\/link&gt;//&quot; \</span>
+</span><span class='line'><span class="s1"> | perl -e &#39;</span>print reverse &lt;&gt;<span class="err">&#39;</span> &gt; wordpress_posts.txt
+</span><span class='line'>cp blogger_export.xml blogger_munge.xml
+</span><span class='line'>vim -O wordpress_posts.txt blogger_urls.txt
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This  will extract a unique list of URLs  of posts from both your new blogger and old wordpress sites. Chances are they won&#8217;t match up exactly and some hand editing will be required.  That&#8217;s okay the  last line  above will open the  files side-by-side in vim  to allow you  to clean this  up.     Hand edit each side  to ensure that both URLs on the same line match the same a posts.</p>
+
+<p>Once that is done we can write  and run some more perl to create a shell script  that will modify the  <code>blogger_munge.xml</code> file ( copied from the original <code>blogger_export.xml</code> above ) replacing all your old links.</p>
+
+<p>Create the following perl script named <code>create_sed.pl</code></p>
+
+<figure class='code'><figcaption><span>create_sed.pl</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="c1">#!/usr/bin/perl</span>
+</span><span class='line'><span class="k">my</span> <span class="nv">@combined</span><span class="p">;</span>
+</span><span class='line'><span class="nb">open</span><span class="p">(</span><span class="n">TXT</span><span class="p">,</span> <span class="s">&quot;&lt; wordpress_posts.txt&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="k">my</span> <span class="nv">@wordpress</span> <span class="o">=</span> <span class="sr">&lt;TXT&gt;</span><span class="p">;</span>
+</span><span class='line'><span class="nb">close</span> <span class="n">TXT</span><span class="p">;</span>
+</span><span class='line'><span class="nb">open</span><span class="p">(</span><span class="n">TXT</span><span class="p">,</span> <span class="s">&quot;&lt; blogger_urls&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="k">my</span> <span class="nv">@blogger</span> <span class="o">=</span> <span class="sr">&lt;TXT&gt;</span><span class="p">;</span>
+</span><span class='line'><span class="nb">chomp</span><span class="p">(</span><span class="nv">@wordpress</span><span class="p">);</span>
+</span><span class='line'><span class="nb">chomp</span><span class="p">(</span><span class="nv">@blogger</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$size</span> <span class="o">=</span> <span class="nv">$#blogger</span><span class="p">;</span>
+</span><span class='line'><span class="k">for</span> <span class="p">(</span> <span class="nv">$count</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="nv">$count</span><span class="o">&lt;=</span><span class="nv">$size</span><span class="p">;</span><span class="nv">$count</span><span class="o">++</span> <span class="p">)</span> <span class="p">{</span>
+</span><span class='line'> <span class="nv">$string</span> <span class="o">=</span> <span class="nv">$wordpress</span><span class="p">[</span><span class="nv">$count</span><span class="p">]</span> <span class="o">.</span> <span class="s">&quot;|&quot;</span> <span class="o">.</span> <span class="nv">$blogger</span><span class="p">[</span><span class="nv">$count</span><span class="p">];</span>
+</span><span class='line'> <span class="nb">push</span><span class="p">(</span><span class="nv">@combined</span><span class="p">,</span> <span class="nv">$string</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">foreach</span> <span class="p">(</span> <span class="nv">@combined</span> <span class="p">)</span> <span class="p">{</span>
+</span><span class='line'> <span class="sr">s/\//\\\//g</span><span class="p">;</span>
+</span><span class='line'> <span class="sr">s/\./\\./g</span><span class="p">;</span>
+</span><span class='line'> <span class="sr">s/\|/\//</span><span class="p">;</span>
+</span><span class='line'> <span class="k">print</span> <span class="s">&quot;sed -i \&#39;s/$_/g\&#39; blogger-munge.xml\n&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now run <code>create_sed.pl</code>, and the resultant <code>munge.sh</code> script.</p>
+
+<figure class='code'><figcaption><span>Terminal</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>perl create_sed.pl  &gt; munge.sh
+</span><span class='line'>sh munge.sh
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>now you have a blogger_munge.xml file that links back to its own articles.    There may be some residual links  back to your old  site.   If you&#8217;re a perfectionist you  could hand edit  the XML to fix this,  but I&#8217;d say its now good  enough.</p>
+
+<h2>Step 3. Re-Create your blogger blog.</h2>
+
+<p>Now you&#8217;ll want to delete your initial blogger blog and recreate it.   Remember to set your URL again, then import the <code>blogger_munge.xml</code> file and republish all the posts.</p>
+
+<h2>Step 4.  Set redirects from your old blog space.</h2>
+
+<p>Since we have the matching pairs of URLs  it becomes quite simple to set up some permanent redirects from your apache config, or even better from inside a <code>.htaccess</code> file.  Setting a permanent redirect not only redirects the user to the correct place,  but in theory also informs a search engine ( on its next pass over your blog )  to update its database to the new location.</p>
+
+<p>Links from around the web pointing at your old domain will continue to work for as long as the redirects work.    At some point if you want to retire your old domain this will break those links&#8230;   But there&#8217;s not a great deal you can do about that.</p>
+
+<p>save the following perl snippet as <code>rewrite.pl</code>.  remember to rewrite any strings specific to my domains to match your own:</p>
+
+<figure class='code'><figcaption><span>rewrite.pl</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="c1">#!/usr/bin/perl</span>
+</span><span class='line'><span class="k">my</span> <span class="nv">@combined</span><span class="p">;</span>
+</span><span class='line'><span class="k">my</span> <span class="nv">@wordpress</span><span class="p">;</span>
+</span><span class='line'><span class="nb">open</span><span class="p">(</span><span class="n">TXT</span><span class="p">,</span> <span class="s">&quot;&lt; wordpress_posts.txt&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="k">while</span> <span class="p">(</span><span class="sr">&lt;TXT&gt;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'> <span class="nb">chomp</span><span class="p">;</span>
+</span><span class='line'> <span class="sr">s/\/$//</span><span class="p">;</span>  <span class="c1"># remove trailing /</span>
+</span><span class='line'> <span class="k">my</span> <span class="nv">@temp</span> <span class="o">=</span> <span class="nb">split</span> <span class="s">&quot;/&quot;</span><span class="p">;</span>
+</span><span class='line'> <span class="nv">$last</span> <span class="o">=</span> <span class="nb">pop</span> <span class="nv">@temp</span><span class="p">;</span>
+</span><span class='line'> <span class="nb">push</span><span class="p">(</span><span class="nv">@wordpress</span><span class="p">,</span> <span class="nv">$last</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nb">close</span> <span class="n">TXT</span><span class="p">;</span>
+</span><span class='line'><span class="nb">open</span><span class="p">(</span><span class="n">TXT</span><span class="p">,</span> <span class="s">&quot;&lt; blogger_urls&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="k">my</span> <span class="nv">@blogger</span> <span class="o">=</span> <span class="sr">&lt;TXT&gt;</span><span class="p">;</span>
+</span><span class='line'><span class="nb">chomp</span><span class="p">(</span><span class="nv">@blogger</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$size</span> <span class="o">=</span> <span class="nv">$#blogger</span><span class="p">;</span>
+</span><span class='line'><span class="k">for</span> <span class="p">(</span> <span class="nv">$count</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="nv">$count</span><span class="o">&lt;=</span><span class="nv">$size</span><span class="p">;</span><span class="nv">$count</span><span class="o">++</span> <span class="p">)</span> <span class="p">{</span>
+</span><span class='line'> <span class="nv">$string</span> <span class="o">=</span> <span class="nv">$wordpress</span><span class="p">[</span><span class="nv">$count</span><span class="p">]</span> <span class="o">.</span> <span class="s">&quot;|&quot;</span> <span class="o">.</span> <span class="nv">$blogger</span><span class="p">[</span><span class="nv">$count</span><span class="p">];</span>
+</span><span class='line'> <span class="nb">push</span><span class="p">(</span><span class="nv">@combined</span><span class="p">,</span> <span class="nv">$string</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="k">print</span> <span class="s">&quot;rewriteEngine on\n&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="k">foreach</span> <span class="p">(</span> <span class="nv">@combined</span> <span class="p">)</span> <span class="p">{</span>
+</span><span class='line'> <span class="sr">s/\|/ /</span><span class="p">;</span>
+</span><span class='line'> <span class="sr">s/^http:\/\/*.?\///</span><span class="p">;</span>
+</span><span class='line'> <span class="k">print</span> <span class="s">&quot;rewriteRule $_ [R=permanent,L]\n&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="k">print</span> <span class="s">&quot;rewriteRule ^.*\$ http://food.paulcz.net [R=permanent,L]\n&quot;</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Run the script and output to a file.   The contents of this file can be added to a .htaccess file and will immediately start redirecting your traffic to the correct post on your new blog.   Any hits that don&#8217;t match a mapped blog post will get redirected to the main page of your blog.</p>
+
+<figure class='code'><figcaption><span>Terminal</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>perl rewrite.pl &gt; rewrite.txt
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Inspect the file and if it looks correct you can append it to your <code>.htaccess</code> file.   If you have other redirect rules already in your <code>.htaccess</code> file you&#8217;ll need to remove them or comment them out.</p>
+
+<figure class='code'><figcaption><span>Terminal</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>cat rewrite.txt &gt;&gt; /var/www/html/.htaccess
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>There&#8217;s no need to restart apache for a changed .htaccess file,  so you can immediately test that the redirects are working &#8230;</p>
+
+<ol>
+<li><a href="http://xesla.ro">http://xesla.ro</a> &#8211;> <a href="http://food.paulcz.net/">http://food.paulcz.net/</a></li>
+<li><a href="http://xesla.ro/wordpress/cooking/prickly-pear-syrup">http://xesla.ro/&#8230;/prickly-pear-syrup</a> &#8211;> <a href="http://food.paulcz.net/2012/08/prickly-pear-syrup.html">http://food.paulcz.net/&#8230;/prickly-pear-syrup.html</a></li>
+</ol>
+
+
+<p>Perfect!  we&#8217;re working.</p>
+
+<h2>Step 5.   More Things to do &#8230; ?</h2>
+
+<p>This has taken care of almost everything I care about.  However I do want to be able to cancel my webhost subscription so I&#8217;ll need to try and find a cloud type service to perform the redirects for me.    <a href="www.heroku.com">Heroku</a> is probably the place I&#8217;ll go for that.</p>
+]]></content>
+  </entry>
+  
+</feed>
