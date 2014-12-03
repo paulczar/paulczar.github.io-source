@@ -7,20 +7,23 @@
     <language>en-us</language>
     
     
-    <updated>Mon, 01 Jan 0001 00:00:00 UTC</updated>
+    <updated>Wed, 03 Dec 2014 00:00:00 UTC</updated>
     
     <item>
       <title>BreadOps - Continuous Delivery of Fresh Baked Bread</title>
-      <link>http://tech.paulcz.net/1/01/breadops-continous-delivery-of-fresh-baked-bread/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 UTC</pubDate>
+      <link>http://tech.paulcz.net/2014/12/breadops-continous-delivery-of-fresh-baked-bread/</link>
+      <pubDate>Wed, 03 Dec 2014 00:00:00 UTC</pubDate>
       
-      <guid>http://tech.paulcz.net/1/01/breadops-continous-delivery-of-fresh-baked-bread/</guid>
+      <guid>http://tech.paulcz.net/2014/12/breadops-continous-delivery-of-fresh-baked-bread/</guid>
       <description>
 
 &lt;p&gt;&lt;img src=&#34;https://lh3.googleusercontent.com/-rMMuR_Itcmk/VH9eSsVZ18I/AAAAAAAAOc8/bJBp9UaoMI0/s1024/20141203_124907.jpg&#34; alt=&#34;the best way to eat fresh bread&#34; /&gt;
- &lt;strong&gt;&amp;ldquo;See how this sparkly devop princess bakes bread every day with almost no effort at all with this one weird trick&amp;rdquo;&lt;/strong&gt;&lt;/p&gt;
+
+&amp;ldquo;See how this sparkly devop princess bakes bread every day with almost no effort at all with this one weird trick&amp;rdquo;&lt;/p&gt;
 
 &lt;p&gt;Store bought bread is shit.  Even the  &amp;ldquo;artisanal&amp;rdquo; bread at most supermarkets is little better than cake baked in a bread shaped mold ( seriously check next time you&amp;rsquo;re at a supermarket ).  You might be lucky and have a really good bread baker near you,  but like butchers and other important crafts they have all but disappeared.  My solution to this was to start baking bread myself.  I did a ton of research, started my own sourdough starter ( 5 years and going strong! ) and started baking bread regularly.&lt;/p&gt;
+
+&lt;p&gt;Reading Boyd&amp;rsquo;s excellent blog post on &lt;a href=&#34;http://stackengine.com/laundryops-practical-devops-at-home/&#34;&gt;LaundryOps&lt;/a&gt; made me realize that I should write this up as I had somewhat unwittingly applied these DevOps practices to baking bread.&lt;/p&gt;
 
 &lt;!--more --&gt;
 

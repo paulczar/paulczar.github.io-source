@@ -1,12 +1,15 @@
 ---
-date: "2014-12-3T17:14:45-06:00"
+date: "2014-12-03"
 title: "BreadOps - Continuous Delivery of Fresh Baked Bread"
 categories: [ bread, food, devops ]
 ---
 
-![the best way to eat fresh bread](https://lh3.googleusercontent.com/-rMMuR_Itcmk/VH9eSsVZ18I/AAAAAAAAOc8/bJBp9UaoMI0/s1024/20141203_124907.jpg) __"See how this sparkly devop princess bakes bread every day with almost no effort at all with this one weird trick"__
+![the best way to eat fresh bread](https://lh3.googleusercontent.com/-rMMuR_Itcmk/VH9eSsVZ18I/AAAAAAAAOc8/bJBp9UaoMI0/s1024/20141203_124907.jpg) 
+"See how this sparkly devop princess bakes bread every day with almost no effort at all with this one weird trick"
 
 Store bought bread is shit.  Even the  "artisanal" bread at most supermarkets is little better than cake baked in a bread shaped mold ( seriously check next time you're at a supermarket ).  You might be lucky and have a really good bread baker near you,  but like butchers and other important crafts they have all but disappeared.  My solution to this was to start baking bread myself.  I did a ton of research, started my own sourdough starter ( 5 years and going strong! ) and started baking bread regularly.
+
+Reading Boyd's excellent blog post on [LaundryOps](http://stackengine.com/laundryops-practical-devops-at-home/) made me realize that I should write this up as I had somewhat unwittingly applied these DevOps practices to baking bread.
 
 <!--more -->
 

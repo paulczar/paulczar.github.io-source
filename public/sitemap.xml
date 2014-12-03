@@ -3,8 +3,13 @@
   
   <url>
     <loc>http://tech.paulcz.net/</loc>
-    <lastmod>2014-05-13T00:00:00+00:00</lastmod>
+    <lastmod>2014-12-03T00:00:00+00:00</lastmod>
     <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://tech.paulcz.net/2014/12/breadops-continous-delivery-of-fresh-baked-bread/</loc>
+    <lastmod>2014-12-03T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -55,11 +60,6 @@
   <url>
     <loc>http://tech.paulcz.net/2012/10/moving-from-a-self-hosted-wordpress-blog-to-blogger/</loc>
     <lastmod>2012-10-21T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://tech.paulcz.net/1/01/breadops-continous-delivery-of-fresh-baked-bread/</loc>
-    <lastmod>0001-01-01T00:00:00+00:00</lastmod>
   </url>
   
 </urlset>
