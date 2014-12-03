@@ -1,22 +1,22 @@
 ---
-date: "2014-11-30T11:14:45-06:00"
-draft: true
+date: "2014-12-3T17:14:45-06:00"
 title: "BreadOps - Continuous Delivery of Fresh Baked Bread"
 categories: [ bread, food, devops ]
 ---
 
-![the best way to eat fresh bread](https://lh6.googleusercontent.com/-_AuYSwAc_8A/VHtTnddC1CI/AAAAAAAAOZc/9cgRejB_s4g/w1122-h631-no/20141129_181010.jpg) __"See how this sparkly devop princess bakes bread every day with almost no effort at all with this one weird trick"__
+![the best way to eat fresh bread](https://lh3.googleusercontent.com/-rMMuR_Itcmk/VH9eSsVZ18I/AAAAAAAAOc8/bJBp9UaoMI0/s1024/20141203_124907.jpg) __"See how this sparkly devop princess bakes bread every day with almost no effort at all with this one weird trick"__
 
 Store bought bread is shit.  Even the  "artisanal" bread at most supermarkets is little better than cake baked in a bread shaped mold ( seriously check next time you're at a supermarket ).  You might be lucky and have a really good bread baker near you,  but like butchers and other important crafts they have all but disappeared.  My solution to this was to start baking bread myself.  I did a ton of research, started my own sourdough starter ( 5 years and going strong! ) and started baking bread regularly.
 
 <!--more -->
 
-For a while it was tough going making bread all the time,  starters and doughs are fickle beasts and required constant care and feeding ( literally, you have to feed a sourdough starter at least twice a day ).   After almost giving up several times I started to apply what I now know as _devops techniques_. Over that time I've iterated constantly over my processes to come up with a process that is optimized for my time.  I can even apply CAMS across it:
+For a while it was tough going making bread all the time,  starters and doughs are fickle beasts and required constant care and feeding ( literally, you have to feed a sourdough starter at least twice a day ).   After almost giving up several times I started to apply what I now know as _devops techniques_. Over that time I've iterated on my processes to come up with a process that is optimized for my time.  I can even apply CAMS across it:
 
 ## Culture
 * Lactobacillus ... HAHAHAHA Bakers joke!
-* A long fermentation time which converts more of the sugars into gas and makes the proteins more digestible.
+* A long fermentation time which converts more of the sugars into gas and makes the proteins more digestible... Wait still wrong culture.
 * Minimal human interaction ( approx 5 minutes per loaf ) reduces impact on normal life.
+* Healthy Fresh bread for you and your family
 
 ## Automation
 * Slow ferment reduces requirement to knead to almost zero.
@@ -34,7 +34,7 @@ For a while it was tough going making bread all the time,  starters and doughs a
 * Ensure this process is approachable by others.
 * This blog post.
 
-The final technique that I came up with is not unique and is similar to a number several hundred page $30+ books aimed and making baking bread more accessible to the home cook, except its just a short blog post and is free as in beer.  It's fairly descriptive and may seem like a lot of work, but I tend to average a little over 5 minutes of active time per loaf of bread.   Without further shenanigans here is my process.
+The final technique that I came up with is not exactly unique and is similar to a number of several hundred page thirty dollar books aimed at making baking bread more accessible to the home cook, where it differs is that this is just a short blog post and is free as in beer and speech.  It's fairly descriptive and may seem like a lot of work, but I tend to average a little over 5 minutes of active time per loaf of bread which is a negligible amount of time.
 
 ## Ingredients and Tools
 
@@ -42,10 +42,9 @@ I worked hard to ensure that you don't need to use any specialized tools.   No n
 
 ![things what you need to make bread](https://lh4.googleusercontent.com/v_kKOKFKupOdtI2_44MImjl5L8GYzq7QYMs1BxRyGgc=w1229-h692-no)
 
-* Kitchen Scale
+* Kitchen Scale[1]
     - capable of measuring to the gram
-    - measuring by volume is a mugs game.
-* Baking Stone
+* Baking Stone[2]
     - large square one, the biggest that will fit in your oven
     - A cast iron pan or dutch oven will do in a pinch.
 * One large and one small mixing bowl
@@ -66,38 +65,38 @@ I worked hard to ensure that you don't need to use any specialized tools.   No n
     - For oiling the bowls used in the final shaping.
     - I usually line the bowl with floured cheesecloth instead.
 
+[1] Measuring by volume is a mugs game.  Flour and Salt across different brands have different sized grains and this are different weights for the same volume.
+
+[2] you could get away with using a baking tray, but a baking stone or a cast iron skillet will give you the best results.
+
 ## The Starter
 
-I use a [sourdough starter](http://www.sourdoughhome.com/index.php?content=startermyway2), and I would recommend that you do the same ... but not until you've mastered this with regular yeast.  Which is what I'll describe below.  If you have a sourdough starter then skip this step.
+I use a [sourdough starter](http://www.sourdoughhome.com/index.php?content=startermyway2), and I would recommend that you do the same ... But unless you already have a starter or have a friend who will give you some ( I'd be happy to give you some of mine ) You'll probably want to use regular yeast which is what I'll describe below.  If you have a sourdough starter then skip this step.
 
-Mix 50g Flour, 50g Water, 2g yeast until it forms a paste and then cover with plastic wrap:
+Mix 50g Flour, 50g Water, 3g yeast until it forms a paste and then cover with plastic wrap:
 ![Starter](https://lh3.googleusercontent.com/-IKFdhJcTr7c/VHtUZeGewaI/AAAAAAAAObE/NQpFh4jQiCs/w1228-h691-no/20141124_123134.jpg)
 
 After 4-6 hours it should be all bubby and smell yeasty and ready for The Mix:
-![fermented starter](https://lh6.googleusercontent.com/-SMJSvqAzQhQ/VHtUX-Gj7qI/AAAAAAAAOa8/9Aig_NSR2rc/w1228-h691-no/20141124_140654.jpg)
+![fermented starter](https://lh6.googleusercontent.com/-_ap54clqH38/VH9em5xPMRI/AAAAAAAAOdk/syJCBF_2AJA/s640/20141201_085112.jpg)
 
 ## The Mix
 
 Add the Starter and 375g of water to the large bowl and mix with a fork until it looks like milk:
+
+_Metric protip: a gram of water is the same as a milliliter of water_
+
 ![don't drink it silly!](https://lh4.googleusercontent.com/-0Se5tsoJoH4/VHtUWeoTVdI/AAAAAAAAOa0/57hyMA0sBPk/w1228-h691-no/20141124_140942.jpg)
 
 Add 500g of flour and 15g salt.  Mix it until fully incorporated ( we're not kneading here, just making sure there is no dry flour left ):
-![mixed](https://lh6.googleusercontent.com/-jJo3GtezCdM/VHtUVO9mCHI/AAAAAAAAOas/7Mlz3AyR2oQ/w1228-h691-no/20141124_141131.jpg)
+![mixed](https://lh5.googleusercontent.com/-FGpOS40YpWM/VH9elHUFGCI/AAAAAAAAOdc/tKkrmoXplWw/s640/20141201_085637.jpg)
 
 _These quantities form a ratio that can be used to make batches as big or as small as your want.  I usually double it which gives me a decent sized loaf every two days._
 
 ## The Warm Ferment
 
-Cover the bowl and leave it at room temperature for 4 to 8 hours.  The timing doesn't have to be precise,  you're just looking for sings of the yeast to start fermenting the flour and creating air bubbles:
+Cover the bowl and leave it at room temperature for 4 to 8 hours.  The timing doesn't have to be precise,  you're just looking for sings of the yeast to start fermenting the flour and creating air bubbles.  Cover and refrigerate for at least 24 hours, up to 5 days:
 
-NEED PHOTO!
-![fermentation activated]()
-
-## The Cold Ferment
-
-Place the bowl in the refrigerator for at least 24 hours, up to 5 days:
-
-NEED PHOTO!
+![fermentation activated](https://lh3.googleusercontent.com/-DRtoK892ZEI/VH-U6UZeLFI/AAAAAAAAOd8/pmbYgIUPmJU/s640/20141105_101952.jpg)
 
 ## The Shaping
 
@@ -122,6 +121,8 @@ Watch this [video](https://www.youtube.com/watch?feature=player_detailpage&v=4Vd
 Oil your shaping bowl and flip your ball over so that the top of the dough is facing down in the bowl and cover it:
 ![final shaping](https://lh5.googleusercontent.com/-xbzq6cwYJis/VHtUNHuDbiI/AAAAAAAAOaE/8EdixPbGN1k/w1228-h691-no/20141129_144021.jpg)
 
+You can easily make Ciabatta ( just fold it over itself in one direction and crimp the edges ), or Baguettes ( harder to explain, but youtube has plenty of guides ), or any other style of bread that you prefer.   Even works great for pizza bases!
+
 ## The Final Ferment
 
 Let the dough warm back up to room temperature and the yeasts to wake up and get active again.   This will probably take about two hours.  Crank the oven on to 450F after about an hour.  This gives the oven a good solid hour to get up to temperature and stabilize.
@@ -137,6 +138,8 @@ Bake for 5 minutes, then turn the oven back down to 450F and bake for another 20
 ## The Cooldown
 
 Avoid the tempation to cut into the bread while its still hot.  Bread continues to cook as it cools down and its important to not allow steam and heat to escape.
+
+![some other styles](https://lh4.googleusercontent.com/-8v2AonhRmTE/VH9eUSh3hxI/AAAAAAAAOdE/kx4in89KNTk/s640/20141202_184332.jpg)
 
 ## The Eatening
 

@@ -3,35 +3,36 @@
   <channel>
       <title>Food on Paul Czarkowski </title>
       <generator uri="https://hugo.spf13.com">Hugo</generator>
-    <link>http://localhost:1313/categories/food/index.xml/</link>
+    <link>http://tech.paulcz.net/categories/food/index.xml/</link>
     <language>en-us</language>
     
     
-    <updated>Sun, 30 Nov 2014 11:14:45 CST</updated>
+    <updated>Mon, 01 Jan 0001 00:00:00 UTC</updated>
     
     <item>
       <title>BreadOps - Continuous Delivery of Fresh Baked Bread</title>
-      <link>http://localhost:1313/2014/11/breadops-continous-delivery-of-fresh-baked-bread/</link>
-      <pubDate>Sun, 30 Nov 2014 11:14:45 CST</pubDate>
+      <link>http://tech.paulcz.net/1/01/breadops-continous-delivery-of-fresh-baked-bread/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 UTC</pubDate>
       
-      <guid>http://localhost:1313/2014/11/breadops-continous-delivery-of-fresh-baked-bread/</guid>
+      <guid>http://tech.paulcz.net/1/01/breadops-continous-delivery-of-fresh-baked-bread/</guid>
       <description>
 
-&lt;p&gt;&lt;img src=&#34;https://lh6.googleusercontent.com/-_AuYSwAc_8A/VHtTnddC1CI/AAAAAAAAOZc/9cgRejB_s4g/w1122-h631-no/20141129_181010.jpg&#34; alt=&#34;the best way to eat fresh bread&#34; /&gt;
+&lt;p&gt;&lt;img src=&#34;https://lh3.googleusercontent.com/-rMMuR_Itcmk/VH9eSsVZ18I/AAAAAAAAOc8/bJBp9UaoMI0/s1024/20141203_124907.jpg&#34; alt=&#34;the best way to eat fresh bread&#34; /&gt;
  &lt;strong&gt;&amp;ldquo;See how this sparkly devop princess bakes bread every day with almost no effort at all with this one weird trick&amp;rdquo;&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;Store bought bread is shit.  Even the  &amp;ldquo;artisanal&amp;rdquo; bread at most supermarkets is little better than cake baked in a bread shaped mold ( seriously check next time you&amp;rsquo;re at a supermarket ).  You might be lucky and have a really good bread baker near you,  but like butchers and other important crafts they have all but disappeared.  My solution to this was to start baking bread myself.  I did a ton of research, started my own sourdough starter ( 5 years and going strong! ) and started baking bread regularly.&lt;/p&gt;
 
 &lt;!--more --&gt;
 
-&lt;p&gt;For a while it was tough going making bread all the time,  starters and doughs are fickle beasts and required constant care and feeding ( literally, you have to feed a sourdough starter at least twice a day ).   After almost giving up several times I started to apply what I now know as &lt;em&gt;devops techniques&lt;/em&gt;. Over that time I&amp;rsquo;ve iterated constantly over my processes to come up with a process that is optimized for my time.  I can even apply CAMS across it:&lt;/p&gt;
+&lt;p&gt;For a while it was tough going making bread all the time,  starters and doughs are fickle beasts and required constant care and feeding ( literally, you have to feed a sourdough starter at least twice a day ).   After almost giving up several times I started to apply what I now know as &lt;em&gt;devops techniques&lt;/em&gt;. Over that time I&amp;rsquo;ve iterated on my processes to come up with a process that is optimized for my time.  I can even apply CAMS across it:&lt;/p&gt;
 
 &lt;h2 id=&#34;toc_0&#34;&gt;Culture&lt;/h2&gt;
 
 &lt;ul&gt;
 &lt;li&gt;Lactobacillus &amp;hellip; HAHAHAHA Bakers joke!&lt;/li&gt;
-&lt;li&gt;A long fermentation time which converts more of the sugars into gas and makes the proteins more digestible.&lt;/li&gt;
+&lt;li&gt;A long fermentation time which converts more of the sugars into gas and makes the proteins more digestible&amp;hellip; Wait still wrong culture.&lt;/li&gt;
 &lt;li&gt;Minimal human interaction ( approx 5 minutes per loaf ) reduces impact on normal life.&lt;/li&gt;
+&lt;li&gt;Healthy Fresh bread for you and your family&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h2 id=&#34;toc_1&#34;&gt;Automation&lt;/h2&gt;
@@ -59,7 +60,7 @@
 &lt;li&gt;This blog post.&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;The final technique that I came up with is not unique and is similar to a number several hundred page $30+ books aimed and making baking bread more accessible to the home cook, except its just a short blog post and is free as in beer.  It&amp;rsquo;s fairly descriptive and may seem like a lot of work, but I tend to average a little over 5 minutes of active time per loaf of bread.   Without further shenanigans here is my process.&lt;/p&gt;
+&lt;p&gt;The final technique that I came up with is not exactly unique and is similar to a number of several hundred page thirty dollar books aimed at making baking bread more accessible to the home cook, where it differs is that this is just a short blog post and is free as in beer and speech.  It&amp;rsquo;s fairly descriptive and may seem like a lot of work, but I tend to average a little over 5 minutes of active time per loaf of bread which is a negligible amount of time.&lt;/p&gt;
 
 &lt;h2 id=&#34;toc_4&#34;&gt;Ingredients and Tools&lt;/h2&gt;
 
@@ -69,13 +70,12 @@
 &lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;Kitchen Scale
+&lt;li&gt;Kitchen Scale[1]
 
 &lt;ul&gt;
 &lt;li&gt;capable of measuring to the gram&lt;/li&gt;
-&lt;li&gt;measuring by volume is a mugs game.&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;Baking Stone
+&lt;li&gt;Baking Stone[2]
 
 &lt;ul&gt;
 &lt;li&gt;large square one, the biggest that will fit in your oven&lt;/li&gt;
@@ -118,44 +118,45 @@
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
+&lt;p&gt;[1] Measuring by volume is a mugs game.  Flour and Salt across different brands have different sized grains and this are different weights for the same volume.&lt;/p&gt;
+
+&lt;p&gt;[2] you could get away with using a baking tray, but a baking stone or a cast iron skillet will give you the best results.&lt;/p&gt;
+
 &lt;h2 id=&#34;toc_5&#34;&gt;The Starter&lt;/h2&gt;
 
-&lt;p&gt;I use a &lt;a href=&#34;http://www.sourdoughhome.com/index.php?content=startermyway2&#34;&gt;sourdough starter&lt;/a&gt;, and I would recommend that you do the same &amp;hellip; but not until you&amp;rsquo;ve mastered this with regular yeast.  Which is what I&amp;rsquo;ll describe below.  If you have a sourdough starter then skip this step.&lt;/p&gt;
+&lt;p&gt;I use a &lt;a href=&#34;http://www.sourdoughhome.com/index.php?content=startermyway2&#34;&gt;sourdough starter&lt;/a&gt;, and I would recommend that you do the same &amp;hellip; But unless you already have a starter or have a friend who will give you some ( I&amp;rsquo;d be happy to give you some of mine ) You&amp;rsquo;ll probably want to use regular yeast which is what I&amp;rsquo;ll describe below.  If you have a sourdough starter then skip this step.&lt;/p&gt;
 
-&lt;p&gt;Mix 50g Flour, 50g Water, 2g yeast until it forms a paste and then cover with plastic wrap:
+&lt;p&gt;Mix 50g Flour, 50g Water, 3g yeast until it forms a paste and then cover with plastic wrap:
 &lt;img src=&#34;https://lh3.googleusercontent.com/-IKFdhJcTr7c/VHtUZeGewaI/AAAAAAAAObE/NQpFh4jQiCs/w1228-h691-no/20141124_123134.jpg&#34; alt=&#34;Starter&#34; /&gt;
 &lt;/p&gt;
 
 &lt;p&gt;After 4-6 hours it should be all bubby and smell yeasty and ready for The Mix:
-&lt;img src=&#34;https://lh6.googleusercontent.com/-SMJSvqAzQhQ/VHtUX-Gj7qI/AAAAAAAAOa8/9Aig_NSR2rc/w1228-h691-no/20141124_140654.jpg&#34; alt=&#34;fermented starter&#34; /&gt;
+&lt;img src=&#34;https://lh6.googleusercontent.com/-_ap54clqH38/VH9em5xPMRI/AAAAAAAAOdk/syJCBF_2AJA/s640/20141201_085112.jpg&#34; alt=&#34;fermented starter&#34; /&gt;
 &lt;/p&gt;
 
 &lt;h2 id=&#34;toc_6&#34;&gt;The Mix&lt;/h2&gt;
 
-&lt;p&gt;Add the Starter and 375g of water to the large bowl and mix with a fork until it looks like milk:
-&lt;img src=&#34;https://lh4.googleusercontent.com/-0Se5tsoJoH4/VHtUWeoTVdI/AAAAAAAAOa0/57hyMA0sBPk/w1228-h691-no/20141124_140942.jpg&#34; alt=&#34;don&#39;t drink it silly!&#34; /&gt;
+&lt;p&gt;Add the Starter and 375g of water to the large bowl and mix with a fork until it looks like milk:&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Metric protip: a gram of water is the same as a milliliter of water&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://lh4.googleusercontent.com/-0Se5tsoJoH4/VHtUWeoTVdI/AAAAAAAAOa0/57hyMA0sBPk/w1228-h691-no/20141124_140942.jpg&#34; alt=&#34;don&#39;t drink it silly!&#34; /&gt;
 &lt;/p&gt;
 
 &lt;p&gt;Add 500g of flour and 15g salt.  Mix it until fully incorporated ( we&amp;rsquo;re not kneading here, just making sure there is no dry flour left ):
-&lt;img src=&#34;https://lh6.googleusercontent.com/-jJo3GtezCdM/VHtUVO9mCHI/AAAAAAAAOas/7Mlz3AyR2oQ/w1228-h691-no/20141124_141131.jpg&#34; alt=&#34;mixed&#34; /&gt;
+&lt;img src=&#34;https://lh5.googleusercontent.com/-FGpOS40YpWM/VH9elHUFGCI/AAAAAAAAOdc/tKkrmoXplWw/s640/20141201_085637.jpg&#34; alt=&#34;mixed&#34; /&gt;
 &lt;/p&gt;
 
 &lt;p&gt;&lt;em&gt;These quantities form a ratio that can be used to make batches as big or as small as your want.  I usually double it which gives me a decent sized loaf every two days.&lt;/em&gt;&lt;/p&gt;
 
 &lt;h2 id=&#34;toc_7&#34;&gt;The Warm Ferment&lt;/h2&gt;
 
-&lt;p&gt;Cover the bowl and leave it at room temperature for 4 to 8 hours.  The timing doesn&amp;rsquo;t have to be precise,  you&amp;rsquo;re just looking for sings of the yeast to start fermenting the flour and creating air bubbles:&lt;/p&gt;
+&lt;p&gt;Cover the bowl and leave it at room temperature for 4 to 8 hours.  The timing doesn&amp;rsquo;t have to be precise,  you&amp;rsquo;re just looking for sings of the yeast to start fermenting the flour and creating air bubbles.  Cover and refrigerate for at least 24 hours, up to 5 days:&lt;/p&gt;
 
-&lt;p&gt;NEED PHOTO!
-![fermentation activated]()&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://lh3.googleusercontent.com/-DRtoK892ZEI/VH-U6UZeLFI/AAAAAAAAOd8/pmbYgIUPmJU/s640/20141105_101952.jpg&#34; alt=&#34;fermentation activated&#34; /&gt;
+&lt;/p&gt;
 
-&lt;h2 id=&#34;toc_8&#34;&gt;The Cold Ferment&lt;/h2&gt;
-
-&lt;p&gt;Place the bowl in the refrigerator for at least 24 hours, up to 5 days:&lt;/p&gt;
-
-&lt;p&gt;NEED PHOTO!&lt;/p&gt;
-
-&lt;h2 id=&#34;toc_9&#34;&gt;The Shaping&lt;/h2&gt;
+&lt;h2 id=&#34;toc_8&#34;&gt;The Shaping&lt;/h2&gt;
 
 &lt;p&gt;&lt;em&gt;Whenever you are working with the dough, it is important to try to lose as little air as possible.  Do not punch it down.&lt;/em&gt;&lt;/p&gt;
 
@@ -186,11 +187,13 @@
 &lt;img src=&#34;https://lh5.googleusercontent.com/-xbzq6cwYJis/VHtUNHuDbiI/AAAAAAAAOaE/8EdixPbGN1k/w1228-h691-no/20141129_144021.jpg&#34; alt=&#34;final shaping&#34; /&gt;
 &lt;/p&gt;
 
-&lt;h2 id=&#34;toc_10&#34;&gt;The Final Ferment&lt;/h2&gt;
+&lt;p&gt;You can easily make Ciabatta ( just fold it over itself in one direction and crimp the edges ), or Baguettes ( harder to explain, but youtube has plenty of guides ), or any other style of bread that you prefer.   Even works great for pizza bases!&lt;/p&gt;
+
+&lt;h2 id=&#34;toc_9&#34;&gt;The Final Ferment&lt;/h2&gt;
 
 &lt;p&gt;Let the dough warm back up to room temperature and the yeasts to wake up and get active again.   This will probably take about two hours.  Crank the oven on to 450F after about an hour.  This gives the oven a good solid hour to get up to temperature and stabilize.&lt;/p&gt;
 
-&lt;h2 id=&#34;toc_11&#34;&gt;The Bake&lt;/h2&gt;
+&lt;h2 id=&#34;toc_10&#34;&gt;The Bake&lt;/h2&gt;
 
 &lt;p&gt;Turn the oven up to 500F, open the door, and slide the rack with the pizza stone out so that you can get to it without burning yourself.   upend the bowl onto the stone and run a knife quickly over the top to create a shallow cut:
 &lt;img src=&#34;https://lh3.googleusercontent.com/-Pzk8zAWIWt0/VHtULim3WvI/AAAAAAAAOZ8/NTrxiDnOXmk/w1228-h691-no/20141129_155656.jpg&#34; alt=&#34;ready for baking&#34; /&gt;
@@ -200,17 +203,20 @@
 &lt;img src=&#34;https://lh4.googleusercontent.com/-hX_Gpo4YIOE/VHtTrWwzT8I/AAAAAAAAOZ0/EY1snf5ymew/w1228-h691-no/20141129_180734.jpg&#34; alt=&#34;baked&#34; /&gt;
 &lt;/p&gt;
 
-&lt;h2 id=&#34;toc_12&#34;&gt;The Cooldown&lt;/h2&gt;
+&lt;h2 id=&#34;toc_11&#34;&gt;The Cooldown&lt;/h2&gt;
 
 &lt;p&gt;Avoid the tempation to cut into the bread while its still hot.  Bread continues to cook as it cools down and its important to not allow steam and heat to escape.&lt;/p&gt;
 
-&lt;h2 id=&#34;toc_13&#34;&gt;The Eatening&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&#34;https://lh4.googleusercontent.com/-8v2AonhRmTE/VH9eUSh3hxI/AAAAAAAAOdE/kx4in89KNTk/s640/20141202_184332.jpg&#34; alt=&#34;some other styles&#34; /&gt;
+&lt;/p&gt;
+
+&lt;h2 id=&#34;toc_12&#34;&gt;The Eatening&lt;/h2&gt;
 
 &lt;p&gt;Fresh bread is best enjoyed simply with some high quality extra virgin olive oil and balsamic vinegar:
 &lt;img src=&#34;https://lh3.googleusercontent.com/-_AuYSwAc_8A/VHtTnddC1CI/AAAAAAAAOZc/9cgRejB_s4g/w1228-h691-no/20141129_181010.jpg&#34; alt=&#34;ready to eat&#34; /&gt;
 &lt;/p&gt;
 
-&lt;h2 id=&#34;toc_14&#34;&gt;Tips and Tricks&lt;/h2&gt;
+&lt;h2 id=&#34;toc_13&#34;&gt;Tips and Tricks&lt;/h2&gt;
 
 &lt;ul&gt;
 &lt;li&gt;Make your starter from Ikea&amp;rsquo;s &lt;a href=&#34;http://www.ikea.com/us/en/catalog/products/00229031/&#34;&gt;BRÖDMIX FLERKORN&lt;/a&gt; which contains all sorts of interesting grains as well as Yeast and &amp;ldquo;Sourdough Powder&amp;rdquo; whatever that is.&lt;/li&gt;
