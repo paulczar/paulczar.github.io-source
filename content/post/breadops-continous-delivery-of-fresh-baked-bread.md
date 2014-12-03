@@ -13,7 +13,7 @@ Reading Boyd's excellent blog post on [LaundryOps](http://stackengine.com/laundr
 
 <!--more -->
 
-For a while it was tough going making bread all the time,  starters and doughs are fickle beasts and required constant care and feeding ( literally, you have to feed a sourdough starter at least twice a day ).   After almost giving up several times I started to apply what I now know as _devops techniques_. Over that time I've iterated on my processes to come up with a process that is optimized for my time.  I can even apply CAMS across it:
+For a while it was tough going making bread all the time,  starters and doughs are fickle beasts and required constant care and feeding ( literally, you have to feed a sourdough starter at least twice a day ).   After almost giving up several times I started to apply what I now know as _devops techniques_. Over time I worked to constantly improve my processes specifically optimizing for my time.  I can even apply CAMS across it:
 
 ## Culture
 * Lactobacillus ... HAHAHAHA Bakers joke!
