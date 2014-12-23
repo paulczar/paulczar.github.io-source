@@ -4,6 +4,9 @@ title: "Multi Process Docker Images Done Right"
 categories: [ "docker", "devops" ]
 ---
 
+For some values of 'right'
+--------------------------
+
 Almost since [Docker](http://docker.com) was first introduced to the world there has been a fairly strong push to keeping containers to be single process.   This makes a lot of sense and definitely plays into the [12 Factor](http://12factor.net) way of thinking where all application output should be pushed to `stdout` and docker itself with tools like [logspout](https://github.com/progrium/logspout) now has fairly strong tooling to deal with those logs.
 
 Sometimes however it just makes sense to run more than one process in a container,  a perfect example would be running [confd](https://github.com/kelseyhightower/confd) as well as your application in order to modify the application's config file based on changes in service discovery systems like [etcd](https://github.com/coreos/etcd).   The [ambassador](https://docs.docker.com/articles/ambassador_pattern_linking/) container way of working can achieve similar things, but I'm not sure that running two containers with a process each to run your application is any better than running one container with two processes.
