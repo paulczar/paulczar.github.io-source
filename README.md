@@ -7,6 +7,13 @@ The public/ directory is a git subtree back to the master branch which is where 
 
 edit the source branch and then
 
+preview:
+
+```
+$ hugo server --theme=hugo-uno --buildDrafts --watch --buildFuture
+```
+
+
 push to production:
 
 ```

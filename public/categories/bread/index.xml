@@ -3,7 +3,7 @@
   <channel>
       <title>Bread on Paul Czarkowski </title>
       <generator uri="https://hugo.spf13.com">Hugo</generator>
-    <link>http://tech.paulcz.net/categories/bread/index.xml/</link>
+    <link>http://localhost:1313/categories/bread/index.xml/</link>
     <language>en-us</language>
     
     
@@ -11,10 +11,10 @@
     
     <item>
       <title>BreadOps - Continuous Delivery of Fresh Baked Bread</title>
-      <link>http://tech.paulcz.net/2014/12/breadops-continous-delivery-of-fresh-baked-bread/</link>
+      <link>http://localhost:1313/2014/12/breadops-continous-delivery-of-fresh-baked-bread/</link>
       <pubDate>Wed, 03 Dec 2014 00:00:00 UTC</pubDate>
       
-      <guid>http://tech.paulcz.net/2014/12/breadops-continous-delivery-of-fresh-baked-bread/</guid>
+      <guid>http://localhost:1313/2014/12/breadops-continous-delivery-of-fresh-baked-bread/</guid>
       <description>
 
 &lt;p&gt;&lt;img src=&#34;https://lh3.googleusercontent.com/-rMMuR_Itcmk/VH9eSsVZ18I/AAAAAAAAOc8/bJBp9UaoMI0/s1024/20141203_124907.jpg&#34; alt=&#34;the best way to eat fresh bread&#34; /&gt;

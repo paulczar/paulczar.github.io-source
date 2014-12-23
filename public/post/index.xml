@@ -3,18 +3,138 @@
   <channel>
       <title>Posts on Paul Czarkowski </title>
       <generator uri="https://hugo.spf13.com">Hugo</generator>
-    <link>http://tech.paulcz.net/post/index.xml/</link>
+    <link>http://localhost:1313/post/index.xml/</link>
     <language>en-us</language>
     
     
-    <updated>Wed, 03 Dec 2014 00:00:00 UTC</updated>
+    <updated>Mon, 22 Dec 2014 21:31:03 CST</updated>
+    
+    <item>
+      <title>Multiple Processes in Docker with Supervisord</title>
+      <link>http://localhost:1313/2014/12/multiple-processes-in-docker-with-supervisord/</link>
+      <pubDate>Mon, 22 Dec 2014 21:31:03 CST</pubDate>
+      
+      <guid>http://localhost:1313/2014/12/multiple-processes-in-docker-with-supervisord/</guid>
+      <description>
+
+&lt;p&gt;Almost since &lt;a href=&#34;http://docker.com&#34;&gt;Docker&lt;/a&gt; was first introduced to the world there has been a fairly strong push to keeping containers to be single process.   This makes a lot of sense and definitely plays into the &lt;a href=&#34;http://12factor.net&#34;&gt;12 Factor&lt;/a&gt; way of thinking where all application output should be pushed to &lt;code&gt;stdout&lt;/code&gt; and docker itself with tools like &lt;a href=&#34;https://github.com/progrium/logspout&#34;&gt;logspout&lt;/a&gt; now has fairly strong tooling to deal with those logs.&lt;/p&gt;
+
+&lt;p&gt;Sometimes however it just makes sense to run more than one process in a container,  a perfect example would be running &lt;a href=&#34;https://github.com/kelseyhightower/confd&#34;&gt;confd&lt;/a&gt; as well as your application in order to modify the application&amp;rsquo;s config file based on changes in service discovery systems like &lt;a href=&#34;https://github.com/coreos/etcd&#34;&gt;etcd&lt;/a&gt;.   The &lt;a href=&#34;https://docs.docker.com/articles/ambassador_pattern_linking/&#34;&gt;ambassador&lt;/a&gt; container way of working can achieve similar things, but I&amp;rsquo;m not sure that running two containers with a process each to run your application is any better than running one container with two processes.&lt;/p&gt;
+
+&lt;p&gt;If you&amp;rsquo;re going run multiple processes you have a few options to do it.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Start the container with the first process adnd then use the new &lt;code&gt;docker exec&lt;/code&gt; command to start the second.&lt;/li&gt;
+&lt;li&gt;Start them in sequence in a &lt;code&gt;bash&lt;/code&gt; script and background all but the last process with a &lt;code&gt;&amp;amp;&lt;/code&gt; at the end of the line.&lt;/li&gt;
+&lt;li&gt;Use a Process Supervisor such as Supervisord or Runit.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;I haven&amp;rsquo;t really messed around with the first option, maybe it could work out, but you&amp;rsquo;d lose the logs from the second process as it would need to output via the first process&amp;rsquo; &lt;code&gt;stdout&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;toc_0&#34;&gt;The Bash Script&lt;/h2&gt;
+
+&lt;p&gt;Up until recently the way I have been running multiple processes is via the &lt;code&gt;bash&lt;/code&gt; script method, but it feels really clumsy and fragile and while it works I&amp;rsquo;ve never been particularly fond of it.&lt;/p&gt;
+
+&lt;p&gt;Here&amp;rsquo;s an snippet from such a script from my &lt;a href=&#34;https://github.com/paulczar/docker-elk_confd&#34;&gt;docker-elk_confd&lt;/a&gt; project which builds out the [ELK]() stack using values in &lt;code&gt;etcd&lt;/code&gt; to orchestrate clustering and configuration via &lt;code&gt;confd&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;echo Starting ${APP_NAME}
+
+confd -node $ETCD -config-file /app/confd.toml -confdir /app &amp;amp;
+/opt/elasticsearch/bin/elasticsearch -p /app/elasticsearch.pid &amp;amp;
+
+# while the port is listening, publish to etcd
+while [[ ! -z $(netstat -lnt | awk &amp;quot;\$6 == \&amp;quot;LISTEN\&amp;quot; &amp;amp;&amp;amp; \$4 ~ \&amp;quot;.$PUBLISH\&amp;quot; &amp;amp;&amp;amp; \$1 ~ \&amp;quot;$PROTO.?\&amp;quot;&amp;quot;) ]] ; do
+  publish_to_etcd
+  sleep 5 # sleep for half the TTL
+done
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;As you can see I&amp;rsquo;ve started two processes &lt;code&gt;elasticsearch&lt;/code&gt; and &lt;code&gt;confd&lt;/code&gt; both backgrounded and then I finish with a loop which publishes data to etcd every 5 seconds until the &lt;code&gt;elasticsearch&lt;/code&gt; process quits listening on its published tcp port.  This works, but it leaves me feeling a bit icky.&lt;/p&gt;
+
+&lt;h2 id=&#34;toc_1&#34;&gt;Process Supervisor&lt;/h2&gt;
+
+&lt;p&gt;I have used various supervisors in containers before but never really liked the experience as I could never get all the logs out to &lt;code&gt;stdout&lt;/code&gt; and using the standard docker logging mechanisms so I&amp;rsquo;ve always gone back to the &lt;code&gt;bash&lt;/code&gt; script method.  Recently while working on the ELK project mentioned above I decided to give using a process supervisor another chance.&lt;/p&gt;
+
+&lt;p&gt;My primary measure of success for using a supervisor going forward was to come up with a way to push all output to the supervisor&amp;rsquo;s stdout so that I can use the regular docker logging.&lt;/p&gt;
+
+&lt;p&gt;I decided to try with &lt;a href=&#34;http://supervisord.org&#34;&gt;supervisor&lt;/a&gt; as a starting point because it is a fairly small install and has an easily templatable config.   At about the same time I was looking at this I found a &lt;a href=&#34;http://supervisord.org&#34;&gt;blog post&lt;/a&gt; ( I believe it was linked in a recent Docker Weekly ) that talked about using &lt;code&gt;supervisor&lt;/code&gt; in docker containers.  They had even (sortof) solved the logging problem,  however the logging was appended with debug lines and made it messy and difficult to read.  I figured there had to be a cleaner way.&lt;/p&gt;
+
+&lt;p&gt;Reading through the documentation I saw that you can specify a file to log each supervised process to.   I just needed a way to hijack that config item to write to supervisor&amp;rsquo;s stdout instead.   Turns out that&amp;rsquo;s quite easy as there&amp;rsquo;s a special device &lt;code&gt;/dev/stdout&lt;/code&gt; which links to &lt;code&gt;/dev/self/fd/1&lt;/code&gt; which is the &lt;code&gt;stdout&lt;/code&gt; for the running application.   I quickly threw together a test and it did indeed pipe the logs from the process through &lt;code&gt;stdout&lt;/code&gt; of supervisor.&lt;/p&gt;
+
+&lt;p&gt;I end up with a &lt;code&gt;/etc/supervisord.conf&lt;/code&gt; ( which is written out by confd before supervisor is started ) file that looks like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[supervisord]
+logfile=/dev/null
+pidfile=/var/run/supervisord.pid
+nodaemon=true
+
+[program:publish_etcd]
+command=/app/bin/publish_etcd
+redirect_stderr=true
+stdout_logfile=/dev/stdout
+stdout_logfile_maxbytes=0
+auto_start=true
+autorestart=true
+
+[program:confd]
+command=confd -node %(ENV_ETCD)s -config-file /app/confd.toml -confdir /app
+redirect_stderr=true
+stdout_logfile=/dev/stdout
+stdout_logfile_maxbytes=0
+auto_start=true
+autorestart=true
+
+[program:elasticsearch]
+command=/opt/elasticsearch/bin/elasticsearch
+redirect_stderr=true
+stdout_logfile=/dev/stdout
+stdout_logfile_maxbytes=0
+auto_start=true
+autorestart=true
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;and my boot script that docker runs the following to launch my app:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;echo Starting ${APP_NAME}
+/usr/bin/supervisord -c /etc/supervisor/supervisord.conf
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;All output from &lt;code&gt;Elasticsearch&lt;/code&gt;, &lt;code&gt;confd&lt;/code&gt;, &lt;code&gt;supervisord&lt;/code&gt; now output via the docker logging systems so that I can see what is going on by running:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ docker logs elasticsearch
+docker logs -f 7270755ce94c03dda930fbdedeee7722dddf6fdbbf8902aaee52c9f94f2147ca
+2014-12-23T04:46:02Z 7270755ce94c confd[37]: INFO /opt/elasticsearch/config/elasticsearch.yml has md5sum 08a09998560b7b786eca1e594b004ddc should be d83b49b485b5acad2666aa03b1ee90a0
+2014-12-23T04:46:02Z 7270755ce94c confd[37]: INFO Target config /opt/elasticsearch/config/elasticsearch.yml out of sync
+2014-12-23T04:46:02Z 7270755ce94c confd[37]: INFO Target config /opt/elasticsearch/config/elasticsearch.yml has been updated
+2014-12-23T04:46:02Z 7270755ce94c confd[37]: INFO /etc/supervisor/supervisord.conf has mode -rw-r--r-- should be -rwxr-xr-x
+2014-12-23T04:46:02Z 7270755ce94c confd[37]: INFO /etc/supervisor/supervisord.conf has md5sum 99dc7e8a1178ede9ae9794aaecbca436 should be ad9bc3735991d133a09f4fc665e2305f
+2014-12-23T04:46:02Z 7270755ce94c confd[37]: INFO Target config /etc/supervisor/supervisord.conf out of sync
+2014-12-23T04:46:02Z 7270755ce94c confd[37]: INFO Target config /etc/supervisor/supervisord.conf has been updated
+Starting elasticsearch
+2014-12-23 04:46:02,245 CRIT Supervisor running as root (no user in config file)
+2014-12-23 04:46:02,251 INFO supervisord started with pid 51
+2014-12-23 04:46:03,255 INFO spawned: &#39;publish_etcd&#39; with pid 54
+2014-12-23 04:46:03,258 INFO spawned: &#39;elasticsearch&#39; with pid 55
+2014-12-23 04:46:03,260 INFO spawned: &#39;confd&#39; with pid 56
+==&amp;gt; sleeping for 20 seconds, then testing if elasticsearch is up.
+[2014-12-23 04:46:04,146][INFO ][node                     ] [Sultan] version[1.4.2], pid[55], build[927caff/2014-12-16T14:11:12Z]
+[2014-12-23 04:46:04,149][INFO ][node                     ] [Sultan] initializing ...
+[2014-12-23 04:46:04,156][INFO ][plugins                  ] [Sultan] loaded [], sites []
+2014-12-23 04:46:05,158 INFO success: publish_etcd entered RUNNING state, process has stayed up for &amp;gt; than 1 seconds (startsecs)
+2014-12-23 04:46:05,159 INFO success: elasticsearch entered RUNNING state, process has stayed up for &amp;gt; than 1 seconds (startsecs)
+2014-12-23 04:46:05,161 INFO success: confd entered RUNNING state, process has stayed up for &amp;gt; than 1 seconds (startsecs)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;One last thing that I should mention.  the &lt;code&gt;publish_etcd&lt;/code&gt; talk in the supervisor config is running a script that contains the &lt;code&gt;while&lt;/code&gt; loop to make sure that &lt;code&gt;elasticsearch&lt;/code&gt; is listening on the approriate port, If that loop is broken it means that&lt;code&gt;elasticsearch&lt;/code&gt; is not responding and it sends a kill signal to &lt;code&gt;supervisor&lt;/code&gt; which then causes the container to shoot itself in the head because the rest of the  processes running are useless without &lt;code&gt;elasticsearch&lt;/code&gt; running.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>BreadOps - Continuous Delivery of Fresh Baked Bread</title>
-      <link>http://tech.paulcz.net/2014/12/breadops-continous-delivery-of-fresh-baked-bread/</link>
+      <link>http://localhost:1313/2014/12/breadops-continous-delivery-of-fresh-baked-bread/</link>
       <pubDate>Wed, 03 Dec 2014 00:00:00 UTC</pubDate>
       
-      <guid>http://tech.paulcz.net/2014/12/breadops-continous-delivery-of-fresh-baked-bread/</guid>
+      <guid>http://localhost:1313/2014/12/breadops-continous-delivery-of-fresh-baked-bread/</guid>
       <description>
 
 &lt;p&gt;&lt;img src=&#34;https://lh3.googleusercontent.com/-rMMuR_Itcmk/VH9eSsVZ18I/AAAAAAAAOc8/bJBp9UaoMI0/s1024/20141203_124907.jpg&#34; alt=&#34;the best way to eat fresh bread&#34; /&gt;
@@ -233,10 +353,10 @@
     
     <item>
       <title>EZBake - A new way to converge docker containers with chef</title>
-      <link>http://tech.paulcz.net/2014/05/ezbake-a-new-way-to-converge-docker-containers-with-chef/</link>
+      <link>http://localhost:1313/2014/05/ezbake-a-new-way-to-converge-docker-containers-with-chef/</link>
       <pubDate>Tue, 13 May 2014 00:00:00 UTC</pubDate>
       
-      <guid>http://tech.paulcz.net/2014/05/ezbake-a-new-way-to-converge-docker-containers-with-chef/</guid>
+      <guid>http://localhost:1313/2014/05/ezbake-a-new-way-to-converge-docker-containers-with-chef/</guid>
       <description>&lt;p&gt;&lt;code&gt;EZ Bake&lt;/code&gt; came from an idea I had while watching the &lt;a href=&#34;https://twitter.com/hangops&#34;&gt;HangOps&lt;/a&gt; &lt;a href=&#34;https://www.youtube.com/watch?v=clLFKIeSADo&amp;amp;feature=youtu.be&#34;&gt;episode 2014-04-11&lt;/a&gt; in which they were talking about &lt;code&gt;Docker&lt;/code&gt; and Config Management being complementary rather than adversary.&lt;/p&gt;
 
 &lt;p&gt;I have expermented with using &lt;code&gt;Chef&lt;/code&gt; and &lt;code&gt;Docker&lt;/code&gt; together in the &lt;a href=&#34;/2013/09/creating-immutable-servers-with-chef-and-docker-dot-io.html&#34;&gt;past&lt;/a&gt; but wanted to tackle the problem from a slightly different angle.  I&amp;rsquo;ve recently been working on some PAAS stuff, both &lt;a href=&#34;http://deis.io&#34;&gt;Deis&lt;/a&gt; and &lt;a href=&#34;http://solum.io&#34;&gt;Solum&lt;/a&gt; these both utilize the tooling from &lt;a href=&#34;https://github.com/flynn/flynn&#34;&gt;Flynn&lt;/a&gt; which builds heroku style &lt;code&gt;buildpacks&lt;/code&gt; in &lt;code&gt;Docker&lt;/code&gt;.&lt;/p&gt;
@@ -289,10 +409,10 @@ Java HotSpot(TM) 64-Bit Server VM (build 24.51-b03, mixed mode)
     
     <item>
       <title>Running DEIS.IO on Rackspace Cloud</title>
-      <link>http://tech.paulcz.net/2014/02/running-deis-io-on-rackspace-cloud/</link>
+      <link>http://localhost:1313/2014/02/running-deis-io-on-rackspace-cloud/</link>
       <pubDate>Sun, 23 Feb 2014 00:00:00 UTC</pubDate>
       
-      <guid>http://tech.paulcz.net/2014/02/running-deis-io-on-rackspace-cloud/</guid>
+      <guid>http://localhost:1313/2014/02/running-deis-io-on-rackspace-cloud/</guid>
       <description>
 
 &lt;p&gt;I recently did a presentation at the Cloud Austin meetup titled &lt;a href=&#34;http://tech.paulcz.net/presentation-cloud-austin-deis/#/&#34;&gt;Docking with Unicorns&lt;/a&gt; about new PAAS on the block &lt;a href=&#34;http://deis.io&#34;&gt;DEIS&lt;/a&gt;.   Building out DEIS is quite easy,  make more easy by some tight integration they have with Rackspace Cloud.    If you&amp;rsquo;re interested in what deis is go through my slides linked above, and the documentation on their website.    If you want to build out an environment to kick the tires a bit,  then click &amp;lsquo;Read on&amp;rsquo; below and follow me down the rabbit hole.&lt;/p&gt;
@@ -1026,10 +1146,10 @@ $ nova image-delete deis-node-image
     
     <item>
       <title>Managing docker services with this one easy trick</title>
-      <link>http://tech.paulcz.net/2013/10/managing-docker-services-with-this-one-easy-trick/</link>
+      <link>http://localhost:1313/2013/10/managing-docker-services-with-this-one-easy-trick/</link>
       <pubDate>Sun, 20 Oct 2013 00:00:00 UTC</pubDate>
       
-      <guid>http://tech.paulcz.net/2013/10/managing-docker-services-with-this-one-easy-trick/</guid>
+      <guid>http://localhost:1313/2013/10/managing-docker-services-with-this-one-easy-trick/</guid>
       <description>
 
 &lt;p&gt;I have been having a lot of internal debate about the idea of running more than one service in a docker container.   A Docker container is built to run a single process in the foreground and to live for only as long as that process is running.  This is great in a utopian world where servers are immutable and sysadmins drink tiki drinks on the beach,  however it doesn&amp;rsquo;t always translate well to the real world.&lt;/p&gt;
@@ -1154,10 +1274,10 @@ $ tail opt/kibana/logs/access.log
     
     <item>
       <title>Creating immutable servers with chef and docker.io</title>
-      <link>http://tech.paulcz.net/2013/09/creating-immutable-servers-with-chef-and-docker-dot-io/</link>
+      <link>http://localhost:1313/2013/09/creating-immutable-servers-with-chef-and-docker-dot-io/</link>
       <pubDate>Sat, 07 Sep 2013 00:00:00 UTC</pubDate>
       
-      <guid>http://tech.paulcz.net/2013/09/creating-immutable-servers-with-chef-and-docker-dot-io/</guid>
+      <guid>http://localhost:1313/2013/09/creating-immutable-servers-with-chef-and-docker-dot-io/</guid>
       <description>
 
 &lt;p&gt;Building applications in a &lt;a href=&#34;http://docker.io&#34;&gt;docker.io&lt;/a&gt; Dockerfile is relatively simple,  but sometimes you want to just install the application exactly as you would normally via already built chef cookbooks.   Turns out this is actually pretty simple.&lt;/p&gt;
@@ -1256,10 +1376,10 @@ RUN echo &amp;ldquo;daemon off;&amp;rdquo; &amp;gt;&amp;gt; /etc/nginx/nginx.con
     
     <item>
       <title>Logstash &#43; Opscode Omnibus</title>
-      <link>http://tech.paulcz.net/2013/05/logstash-plus-opscode-omnibus/</link>
+      <link>http://localhost:1313/2013/05/logstash-plus-opscode-omnibus/</link>
       <pubDate>Mon, 06 May 2013 00:00:00 UTC</pubDate>
       
-      <guid>http://tech.paulcz.net/2013/05/logstash-plus-opscode-omnibus/</guid>
+      <guid>http://localhost:1313/2013/05/logstash-plus-opscode-omnibus/</guid>
       <description>&lt;p&gt;At &lt;a href=&#34;http://devopsdays.org/events/2013-austin/&#34;&gt;DevOps Days Austin&lt;/a&gt; &lt;a href=&#34;http://twitter.com/mattray&#34;&gt;@mattray&lt;/a&gt; did an Openspace session on &lt;a href=&#34;https://github.com/opscode/omnibus-ruby&#34;&gt;Omnibus&lt;/a&gt; which is a toolset based around the concept of installing an app and all of it&amp;rsquo;s prerequisites from source into a directory and then building a package ( either .deb or .rpm ) of that using &lt;a href=&#34;https://github.com/jordansissel/fpm&#34;&gt;fpm&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;Having battled many times with OS Packages trying to get newer versions of Ruby, or Redis or other software installed and having to hunt down some random package repo or manually build from source this seems like an excellent idea.&lt;/p&gt;
@@ -1280,10 +1400,10 @@ RUN echo &amp;ldquo;daemon off;&amp;rdquo; &amp;gt;&amp;gt; /etc/nginx/nginx.con
     
     <item>
       <title>Vagrant&#43;Puppet&#43;FPM=Amazeballs</title>
-      <link>http://tech.paulcz.net/2013/04/vagrant-plus-puppet-plus-fpm-equals-amazeballs/</link>
+      <link>http://localhost:1313/2013/04/vagrant-plus-puppet-plus-fpm-equals-amazeballs/</link>
       <pubDate>Sun, 07 Apr 2013 00:00:00 UTC</pubDate>
       
-      <guid>http://tech.paulcz.net/2013/04/vagrant-plus-puppet-plus-fpm-equals-amazeballs/</guid>
+      <guid>http://localhost:1313/2013/04/vagrant-plus-puppet-plus-fpm-equals-amazeballs/</guid>
       <description>&lt;p&gt;Lately I&amp;rsquo;ve been doing a lot of prototyping with &lt;a href=&#34;http://www.vagrantup.com/&#34;&gt;Vagrant&lt;/a&gt;, specifically for a couple of distinct activities:-&lt;/p&gt;
 
 &lt;ul&gt;
@@ -1335,10 +1455,10 @@ PONG
     
     <item>
       <title>Creating a Github Pages Blog With Octopress</title>
-      <link>http://tech.paulcz.net/2012/12/creating-a-github-pages-blog-with-octopress/</link>
+      <link>http://localhost:1313/2012/12/creating-a-github-pages-blog-with-octopress/</link>
       <pubDate>Sat, 15 Dec 2012 00:00:00 UTC</pubDate>
       
-      <guid>http://tech.paulcz.net/2012/12/creating-a-github-pages-blog-with-octopress/</guid>
+      <guid>http://localhost:1313/2012/12/creating-a-github-pages-blog-with-octopress/</guid>
       <description>
 
 &lt;p&gt;A lot of tech bloggers will write their blog posts in &lt;a href=&#34;http://daringfireball.net/projects/markdown/&#34;&gt;Markdown&lt;/a&gt;, convert it to HTML and paste that HTML into their blog of choice and then in the blog&amp;rsquo;s editor clean it up to suit their blog.   This is an excellent way to create easy to read portable documents that can easily be published in multiple formats.&lt;/p&gt;
@@ -1446,10 +1566,10 @@ cd ..
     
     <item>
       <title>Running KVM and Openvswitch on Ubuntu 12.10</title>
-      <link>http://tech.paulcz.net/2012/12/running-kvm-and-openvswitch-on-ubuntu-12-dot-10/</link>
+      <link>http://localhost:1313/2012/12/running-kvm-and-openvswitch-on-ubuntu-12-dot-10/</link>
       <pubDate>Thu, 13 Dec 2012 00:00:00 UTC</pubDate>
       
-      <guid>http://tech.paulcz.net/2012/12/running-kvm-and-openvswitch-on-ubuntu-12-dot-10/</guid>
+      <guid>http://localhost:1313/2012/12/running-kvm-and-openvswitch-on-ubuntu-12-dot-10/</guid>
       <description>
 
 &lt;p&gt;I&amp;rsquo;ve got an aging VMWare ESXi 4.0 server that needs to be replaced with something a little more modern and flexing.   Obviously at home I don&amp;rsquo;t need all the cool features that licensed VMWare comes with,  but I do want more than just the basic free version.&lt;/p&gt;
@@ -1608,10 +1728,10 @@ virsh edit UbuntuTest
     
     <item>
       <title>Moving VMs from VMWare to KVM</title>
-      <link>http://tech.paulcz.net/2012/12/moving-vms-from-vmware-to-kvm/</link>
+      <link>http://localhost:1313/2012/12/moving-vms-from-vmware-to-kvm/</link>
       <pubDate>Sun, 09 Dec 2012 00:00:00 UTC</pubDate>
       
-      <guid>http://tech.paulcz.net/2012/12/moving-vms-from-vmware-to-kvm/</guid>
+      <guid>http://localhost:1313/2012/12/moving-vms-from-vmware-to-kvm/</guid>
       <description>&lt;p&gt;I&amp;rsquo;m migrating from my old VMWare ESXi box to a new machine running Ubuntu 12.10 and KVM.    Not wanting to rebuild all of my VMs I set about trying to work out the best way to migrate the VMs.&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;Steps to make Windows migrate without Bluescreen&lt;/strong&gt;&lt;/p&gt;
@@ -1657,10 +1777,10 @@ kvm-img convert -O qcow2 /mnt/freenas/vms/WindowsGuest/WindowsGuest.vmdk \
     
     <item>
       <title>Moving from a self hosted Wordpress blog to Blogger</title>
-      <link>http://tech.paulcz.net/2012/10/moving-from-a-self-hosted-wordpress-blog-to-blogger/</link>
+      <link>http://localhost:1313/2012/10/moving-from-a-self-hosted-wordpress-blog-to-blogger/</link>
       <pubDate>Sun, 21 Oct 2012 00:00:00 UTC</pubDate>
       
-      <guid>http://tech.paulcz.net/2012/10/moving-from-a-self-hosted-wordpress-blog-to-blogger/</guid>
+      <guid>http://localhost:1313/2012/10/moving-from-a-self-hosted-wordpress-blog-to-blogger/</guid>
       <description>
 
 &lt;p&gt;I have a self hosted &lt;a href=&#34;http://xesla.ro&#34;&gt;wordpress food blog&lt;/a&gt; hosted on an old silly domain that I&amp;rsquo;ve wanted to move away from for a while.   I also want to stop paying hosting fees some time soon.   Since I&amp;rsquo;m already looking at moving a lot of my day-to-day activities to the &amp;lsquo;cloud&amp;rsquo;  it made sense to pick a blogging platform that ties into a major cloud hub.   Google&amp;rsquo;s Blogger was the obvious choice as I&amp;rsquo;m already using the Google Apps platform for my new domain &lt;code&gt;paulcz.net&lt;/code&gt;.&lt;/p&gt;
