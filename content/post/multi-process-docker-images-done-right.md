@@ -1,6 +1,6 @@
 ---
 date: "2014-12-22T21:31:03-06:00"
-title: "Multiple Processes in Docker with Supervisord"
+title: "Multi Process Docker Images Done Right"
 categories: [ "docker", "devops" ]
 ---
 
