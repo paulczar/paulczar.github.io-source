@@ -1,10 +1,9 @@
 +++
-date = "2015-01-03T13:29:27-06:00"
-draft = true
-title = "The Twelve-Fakter App"
+date = "2015-01-06T13:29:27-06:00"
+title = "Factorish and The Twelve-Fakter App"
 +++
 
-Last year's calendar has been flipped for the last time and we've welcomed in a new year and unless you've been living under a rock (in which case I envy you) you've heard a fair bit about The [Twelve-Factor App](http://12factor.net). A wonderful stateless application that is completely disposable and can run anywhere from your own physical servers to [Cloud Foundry](http://cloudfoundry.org) or [Heroku](http://heroku.com).
+Unless you've been living under a rock (in which case I envy you) you've heard a fair bit about The [Twelve-Factor App](http://12factor.net). A wonderful stateless application that is completely disposable and can run anywhere from your own physical servers to [Deis](http://deis.io), [Cloud Foundry](http://cloudfoundry.org) or [Heroku](http://heroku.com).
 
 Chances are you're stuck writing and running an application that is decidely not 12Factor, nor will it ever be.  In a perfect world you'd scrap it and rewrite it as a dozen microservices that are loosely coupled but run and work indepently of eachother. The reality however is you could never get the okay to do that.
 
@@ -21,7 +20,7 @@ __One codebase tracked in revision control, many deploys__
 
 The goal here is to have both your app and deployment tooling in the same codebase which is stored in source control.  This means adding a `Dockerfile`, and `Vagrantfile` and other pieces of tooling into your codebase.  If however you have a monolithic codebase that contains more than just your app you can create a seperate codebase ( use git! ) containing this tooling and have that tooling collect the application from its existing codebase.
 
-You should be able to merge [Factorish](http://github.com/paulczar/factorish) into your existing code,  or fork it and use the `Dockerfile` in it to pull the actual application code in as part of the build process.
+You should be able to achieve this by either merging [Factorish](http://github.com/paulczar/factorish) into your existing git repo,  or fork it and use the `Dockerfile` in it to pull the actual application code in as part of the build process.
 
 ## Fakter II. Dependencies
 
@@ -31,24 +30,53 @@ This is a really easy win with Docker,  The very nature of Docker both Explicitl
 
 ### Declaration
 
+#### /app/example/Dockerfile
 ```
-# Dockerfile: factorish/example
 FROM python:2
-MAINTAINER Paul Czarkowski "paul@paulcz.net"
+
+# Base deps layer
 RUN \
-  apt-get update && apt-get install -yq
+  apt-get update && apt-get install -yq \
+  make \
+  ca-certificates \
+  net-tools \
+  sudo \
+  wget \
+  vim \
+  strace \
+  lsof \
+  netcat \
+  lsb-release \
+  locales \
+  socat \
   supervisor \
-...
-...
+  --no-install-recommends && \
+  locale-gen en_US.UTF-8
+
+# etcdctl and confd layer
+RUN \
+  curl -sSL -o /usr/local/bin/etcdctl https://s3-us-west-2.amazonaws.com/opdemand/etcdctl-v0.4.6 \
+  && chmod +x /usr/local/bin/etcdctl \
+  && curl -sSL -o /usr/local/bin/confd https://github.com/kelseyhightower/confd/releases/download/v0.7.1/confd-0.7.1-linux-amd64 \
+  && chmod +x /usr/local/bin/confd
+
 ADD . /app
 WORKDIR /app
+
+# app layer
 RUN \
   useradd -d /app -c 'application' -s '/bin/false' app && \
   chmod +x /app/bin/* && \
   pip install -r /app/example/requirements.txt
+
+# Define default command.
 CMD ["/app/bin/boot"]
+
+# Expose ports.
 EXPOSE 8080
 ```
+
+You might notice I have sets of commands joined together with `&&` in my `Dockerfile`, I do this to control the docker layers more to try and end up with fewer more meaningful layers.
 
 ### Isolation
 
@@ -71,22 +99,26 @@ Successfully built 374cb835239c
 
 __Store config in the environment__
 
-Another easy win with Docker.   You can pass in environment variables in the `Dockerfile` as we as when running the docker container with `docker run -d -e TEXT=bacon factorish/example`.
+Another easy win with Docker.   You can pass in environment variables in the `Dockerfile` as we as when running the docker container using the `-e` option like this:
 
-Chances are your app reads from a config file rather than environment variables. There are two relatively simple ways to overcome this.
+```
+$ docker run -d -e TEXT=bacon factorish/example
+```
 
-### sed
+However chances are your app reads from a config file rather than environment variables. There are [at least] two fairly simple ways to achieve this.
 
-Have your startup script edit your config file and replace values in it with the values of the environment variables using `sed`:
+### sed inline replacement
+
+use a startup script to edit your config file and replace values in it with the values of the environment variables using `sed` before runnin your app:
 
 #### /app/bin/boot
 ```
 #!/bin/bash
-`sed -i "s/xxxTEXTxxx/${TEXT}" /app/example/example.conf`
+sed -i "s/xxxTEXTxxx/${TEXT}" /app/example/example.conf
 python /app/example/app.py
 ```
 
-### confd
+### confd templating
 
 [confd](https://github.com/kelseyhightower/confd) is a tool written specifically for templating config files from data sources such as environment variables.  This is a much better option as it also opens up the ability to use service discovery tooling like [etcd](https://coreos.com/using-coreos/etcd/) (also supported in Factorish) rather than environment variables.
 
@@ -97,12 +129,15 @@ src   = "example.conf"
 dest  = "/app/example/example.conf"
 keys = ["/services/example"]
 ```
+
 #### /app/templates/example.conf
 ```
 [example]
 text: {{ getv "/services/example/text" }}
-
 ```
+
+_The `{{ }}` syntax above is the golang/confd macros used to perform tasks like fetching variables from etcd or environment._
+
 #### /app/bin/boot
 ```
 #!/bin/bash
@@ -122,16 +157,18 @@ This is easier for some backing services than others.  For example if your app r
 * Clustered FS: drdb, gluster
 * Ghetto: rsync + concerned
 
+The docker volume mounts actually work really well in a vagrant based development environment because you can pass your code all the way into the container from your workstation,  however there are definitely some security considerations to think about if you want to do volume mounts in production.
+
 ### Example
 
-A fictional `PHP` based blog about bacon requires a database and a filestore:
+A fictional __PHP__ based blog about bacon requires a database and a filestore:
 
 #### /app/templates/config.php
 ```
-define('DB_NAME', '{{ getv "db/name" }}');
-define('DB_USER', '{{ getv "db/user" }}');
-define('DB_PASSWORD', '{{ getv "db/pass" }}');
-define('DB_HOST', '{{ getv "db/host" }}');
+define('DB_NAME', '{{ getv "/db/name" }}');
+define('DB_USER', '{{ getv "/db/user" }}');
+define('DB_PASSWORD', '{{ getv "/db/pass" }}');
+define('DB_HOST', '{{ getv "/db/host" }}');
 ```
 
 #### Docker Run command
@@ -141,7 +178,9 @@ $ docker run -d -e DB_NAME=bacon -e DB_USER=bacon \
   -v /mnt/nfs/bacon:/app/bacon factorish/bacon-blog
 ```
 
-## Fakter V. Build, release, run
+confd will use the environment variables passed in via the `docker run` command to fill out the variables called in the `{{ }}` macros.  Note that confd transforms the environment variables so that the environment variable `DB_USER` will be read by `{{ getv "/db/user" }}`.  This is done to normalize the macro across the various data source options.
+
+## Fakter V. Build, Release, Run
 
 __Strictly separate build and run stages__
 
@@ -151,36 +190,52 @@ Converts a code repo into an executable bundle. Sound familiar?  Yup, we've alre
 
 ### Release
 
-Takes the build and combines it with the current configuration. In a purely docker based system this can be split between the __Build__ (versioning and defaults) and __Run__ (current config) stages. However systems like Heroku and Deis have a seperate step for this.
+Takes the build and combines it with the current configuration. In a purely docker based system this can be split between the __Build__ (versioning and defaults) and __Run__ (current config) stages. However systems like Heroku and Deis have a seperate step for this which they handle internally.
 
 ### Run
 
-Runs the application by launching a set of the app's processes against a selected release.  In a docker based system this is simply the `docker run` command which can be called via a deploy script, or a init script (systemd/runit) or a scheduler like [fleet](https://coreos.com/using-coreos/clustering/) or [mesos](http://mesos.apache.org/).
+Runs the application by launching a set of the app's processes against a selected release.  In a docker based system this is simply the `$ docker run` command which can be called via a deploy script, or a init script (systemd/runit) or a scheduler like [fleet](https://coreos.com/using-coreos/clustering/) or [mesos](http://mesos.apache.org/).
 
 ## Fakter VI. Processes
 
 __Execute the app as one or more stateless processes__
 
-Your application inside the docker container should behave like a standard linux process running in the foreground and be stateless and share-nothing.  Being inside a docker container means that this is hidden and therefore we can fairly easily fake this but you do need to think about process management and logging which are discussed later.
+Your application inside the docker container should behave like a standard linux process running in the foreground and be stateless and share-nothing.  Being inside a docker container means that this is hidden and therefore we can fairly easily fake this but you do need to think about process management and logging which are discussed later and is further explored [here](http://tech.paulcz.net/2014/12/multi-process-docker-images-done-right/).
 
 ## Fakter VII. Port binding
 __Export services via port binding__
 
 Your application should appear to be completely self contained and not require runtime injection of a webserver.  Thankfully this is pretty easy to fake in a docker container as any extra processes are isolated in the container and effectively invisible to the outside.
 
-Docker itself takes care of the port binding by use of the `-p` option on the command line.
+It is still preferable to use a native language based web library such as jetty (java) or flask (python) but for languages like PHP using apache or nginx is ok.
+
+Docker itself takes care of the port binding by use of the `-p` option on the command line.  It's useful to register the port and host IP to somewhere ( etcd ) to allow for loadbalancers and other services to easily locate your application.
 
 ## Fakter VIII. Concurrency
 __Scale out via the process model__
 
 We should be able to scale up or down simply by creating or destroying docker containers containing the application.  Any upstream load balancers as an external dependency would need to be notified of the container starting ( usually a fairly easy API call) and stopping.  But these are external dependencies and should be solved outside of your application itself.
 
-Inside te container your application should not daemonize or write pid files (if unavoidable, not too difficult to script around) and use tooling like `upstart` or `supervisord` to manage the processes.
+Inside the container your application should not daemonize or write pid files (if unavoidable, not too difficult to script around) and use tooling like `upstart` or `supervisord` if there is more than one process that needs to be run.
 
 ## Fakter IX. Disposability
 __Maximize robustness with fast startup and graceful shutdown__
 
 Docker helps a lot with this.   We want to ensure that we're optimized for fast yet reliable startup as well as graceful shutdown.  Your app should be able to be shut down gracefully when `docker kill` is called and just as importantly there should be minimal if any external effect if the application crashes or stops ungracefully.
+
+The container itself should kill itself if the app inside it stops working right.  If your app is running behind a [supervisor](http://tech.paulcz.net/2014/12/multi-process-docker-images-done-right/) this can be a achieved with a really lightweight healthcheck script like this.
+
+#### /app/bin/healhthcheck
+```
+#!/bin/bash
+while [[ ! -z $(netstat -lnt | awk "\$6 == \"LISTEN\" && \$4 ~ \".$PORT\" && \$1 ~ \"tcp.?\"") ]] ; do
+  [[ -n $ETCD_HOST ]] && etcdctl set /service/web/hosts/$HOST $PORT --ttl 10 >/dev/null
+  sleep 5
+done
+kill `cat /var/run/supervisord.pid`
+```
+
+You'll note that I'm also publishing host and port values to etcd if `$ETCD_HOST` is set.  This can then be used to notify loadbalancers and the like when services start or stop.
 
 ## Fakter X. Dev/prod parity
 
@@ -201,7 +256,7 @@ If your app _has_ to write to a logfile you should be able to configure that log
 
 ### Example
 
-This example shows running `Supervisord` as your primary process in the docker container and `nginx` writing logs to stdout which in turn are written to the containers `stdout`:
+This example shows running `Supervisord` as your primary process in the docker container and `nginx` writing logs to stdout which in turn are written to the containers `stdout`.  A more thorough writeup on using [supervisor](http://tech.paulcz.net/2014/12/multi-process-docker-images-done-right/) inside docker containers can be found [here](http://tech.paulcz.net/2014/12/multi-process-docker-images-done-right/):
 
 #### /etc/supervisor/conf.d/nginx
 ```
@@ -234,6 +289,9 @@ http {
   }
 }
 ```
+
+For a more detailed post on using logspout to produce consumable logs check out [@behemphi](https://twitter.com/behemphi)'s blog post - [Docker Logs – Aggregating with Ease](http://stackengine.com/docker-logs-aggregating-ease/)
+
 
 ## Fakter XII. Admin processes
 
