@@ -1,6 +1,12 @@
 Source of Paul's Blog
 =====================
 
+new page:
+
+```
+$ hugo new post/i-am-a-blogger.md
+```
+
 preview:
 
 ```
