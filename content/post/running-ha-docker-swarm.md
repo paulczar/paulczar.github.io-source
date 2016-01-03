@@ -1,8 +1,7 @@
 ---
 date: "2016-01-02T14:44:30-06:00"
 title: "Deploying a HA Docker Swarm Cluster"
-categories: [ "openstack" ]
-draft: true
+categories: [ "docker", "swarm" ]
 ---
 
 Given Docker's propensity for creating easy to use tools it shouldn't come as a surprise that Docker Swarm is one of the easier to understand and run of the "Docker Clustering" options currently out there. I recently built some [Terraform](http://terraform.io) configs for deploying a [Highly Available Docker Swarm cluster on Openstack](https://github.com/openstack/osops-tools-contrib/tree/master/terraform/dockerswarm-coreos) and learned a fair bit about Swarm in the process.
