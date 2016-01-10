@@ -13,6 +13,11 @@ preview:
 $ hugo server --theme=hugo-uno --buildDrafts --watch --buildFuture
 ```
 
+generate site:
+
+```
+$ hugo --theme=hugo-uno --destination=../publish
+
 
 push to production:
 
