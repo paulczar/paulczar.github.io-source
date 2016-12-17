@@ -13,11 +13,20 @@ preview:
 $ hugo server --theme=hugo-uno --buildDrafts --watch --buildFuture
 ```
 
-
-push to production:
+save:
 
 ```
+$ git add .
+$ git commit -m 'new post'
 $ git push origin master
-$ hugo --theme=hugo-uno
-$ ./deploy.sh
+```
+
+generate site:
+
+```
+$ hugo --theme=hugo-uno --destination=../publish
+$ cd ../publish
+$ git add .
+$ git commit -m "publish site"
+$ git push origin master
 ```
