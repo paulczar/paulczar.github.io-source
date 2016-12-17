@@ -4,6 +4,9 @@ languageCode: "en-us"
 title: "Paul Czarkowski"
 author: "Paul Czarkowski"
 disqusShortname: "tech-paulcz"
+googleAnalytics: "UA-35638296-2"
+theme: "hugo-sustain"
+
 permalinks:
   post: /:year/:month/:filename/
 
@@ -11,10 +14,30 @@ indexes:
   category: "categories"
   tag: "tags"
 
+social:
+  Github: "paulczar"
+  Twitter: "pczarkowski"
+  Email: "username.taken+tech@gmail.com"
+  LinkedIn: pczarkowski
+
 Params:
-  AuthorName: "Paul"
-  github: "paulczar"
-  twitter: "pczarkowski"
-  email: "username.taken+tech@gmail.com"
+  AuthorName: "Paul Czarkowski"
+  author: "Paul Czarkowski"
   description: "Random musings mostly about tech"
-  googlea: "UA-35638296-2"
+  avatar: "profile.jpg"
+
+## Main Menu
+menu:
+  main:
+    - name: "About"
+      identifier: "about"
+      weight: 100
+      url: "/page/about"
+    - name: "blog"
+      weight: 200
+      identifier: "blog"
+      url: "/blog/"
+    - name: "talk"
+      identifier: "talk"
+      weight: 300
+      url: "/page/speaker"
