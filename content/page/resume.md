@@ -19,7 +19,7 @@ Work Permits : US, Australian, UK/Europe.
 
 I am an experienced hands-on Architect / DevOps Engineer with a long history in Operations and Infrastructure Automation.  I have a broad depth of experience across most IT and Operations related areas with strong experience in using and evangelizing DevOps tools and methodologies.
 
-My current role at IBM has me focused on helping to rebuild the IBM developer advocacy programs and content creation processes.  Previous to that I led the conversion of our OpenStack Automation platform ([ursula](https://github.com/blueboxgroup/ursula)) from just Ubuntu to also supporting Redhat Enterprise Linux.  I also architected and built (and later led a small agile team) the Blue Box Cloud SRE Operations Platform (which we recently open-sourced as [cuttle](https://github.com/IBM/cuttle)).
+My current role at IBM has me focused on helping to rebuild the IBM developer advocacy programs and content creation processes.  Previous to that I led the conversion of our OpenStack Automation platform ([ursula](https://github.com/blueboxgroup/ursula)) from just Ubuntu to also supporting Redhat Enterprise Linux.  I also architected and built the Blue Box Cloud SRE Operations Platform (which we recently open-sourced as [cuttle](https://github.com/IBM/cuttle)) and built a team to maintain it.
 
 Previous to IBM/Blue Box I was at Rackspace where I worked on a team building a product with Docker on top of Openstack, and before that I worked at EA where I helped build and design the infrastructure for SimCity ( on AWS ) and SWTOR ( own data centers, approx 6,000 servers, 2M+ subscribers at launch ).
 
@@ -37,7 +37,7 @@ see [http://tech.paulcz.net/page/speaker/](http://tech.paulcz.net/page/speaker/)
 
 * As a joke I wrote a 100 lines of code IPVS load balancer called [lolbalancer](https://github.com/paulczar/lolbalancer), but have actually found it to be useful on occasion for demonstrations.
 
-* Over Christmas 2014 I built out [Factorish](https://github.com/factorish/factorish) as a concept to show managing the life-cycle and configuration of applications in Docker using service discovery, and built several example apps such as [Percona with Galera Replication](https://github.com/paulczar/docker-percona_galera) and the [ELK stack](https://github.com/factorish/factorish-elk).  Concepts with have found their way into tools such as [Container Pilot](https://github.com/joyent/containerpilot) and [Habitat.sh](https://habitat.sh).  I also used it as a basis for a [blog post](http://tech.paulcz.net/blog/factorish_and_the_12_fakter_app/) and a series of talks I gave on Dockerizing apps that really shouldn’t be Dockerized.
+* Over Christmas 2014 I built out [Factorish](https://github.com/factorish/factorish) as a concept to show managing the life-cycle and configuration of applications in Docker using service discovery, and built several example apps such as [Percona with Galera Replication](https://github.com/paulczar/docker-percona_galera) and the [ELK stack](https://github.com/factorish/factorish-elk).  Some of these concepts have found their way into tools such as [Container Pilot](https://github.com/joyent/containerpilot) and [Habitat.sh](https://habitat.sh).  I also used it as a basis for a [blog post](http://tech.paulcz.net/blog/factorish_and_the_12_fakter_app/) and a series of talks I gave on Dockerizing apps that really shouldn’t be Dockerized.
 
 ## Professional Accomplishments
 
@@ -47,7 +47,7 @@ see [http://tech.paulcz.net/page/speaker/](http://tech.paulcz.net/page/speaker/)
 
 * Recognized the need for a unified SRE Operations Platform to support growth and built SiteController ([cuttle](https://github.com/IBM/cuttle)) and architected and built it, later forming and leading a team to maintain and develop it further.
 
-* Successfully led the effort to make Blue Box OpenStack installable in customer data centers with no Internet access utilizing SiteController and overhauling large parts or Ursula.
+* Successfully led the effort to make Blue Box OpenStack installable in customer data centers with no Internet access utilizing SiteController and overhauling large parts of Ursula.
 
 ### Rackspace
 
