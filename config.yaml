@@ -41,3 +41,7 @@ menu:
       identifier: "talk"
       weight: 300
       url: "/page/speaker"
+    - name: "Resume"
+      identifier: "resume"
+      weight: 300
+      url: "/page/resume"
