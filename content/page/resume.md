@@ -57,6 +57,14 @@ see [http://tech.paulcz.net/page/speaker/](http://tech.paulcz.net/page/speaker/)
 
 * Maintained Community Chef Cookbooks for Elasticsearch, Logstash, and Kibana.
 
+### Electronic Arts
+
+* Planned and Executed migration of live game services for multiple games from their existing expensive datacenters to spare capacity from the cheaper BioWare datacenters.
+
+* Built and deployed dozens of websites for game code redemptions and blogs into Amazon using Rightscale.
+
+* Helped build and scale Sim City Online servers in Amazon using Rightscale, implemented monitoring and logging systems to help debug and discover load and performance issues during launch instability.
+
 ### BioWare – Star Wars The Old Republic (SWTOR)
 
 * Supported the studio during development.   Lead the Online Operations team through purchasing and deploying over 6,000 servers in four data centers to run the online environment. Ensured a successful and glitch free  launch of SWTOR on the 20th December 2011.
