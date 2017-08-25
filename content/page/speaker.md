@@ -5,6 +5,12 @@ title = "Paul Talks about stuff"
 
 An incomplete list of events that I've spoken at
 
+# 2017
+
+## Sensu Summit
+
+* Sensu @ Bluebox - [Video](https://www.youtube.com/watch?v=5i07i9iAIvw&list=PLqLtpBjHqwC_v7lyciQNwIYkN-xtsLrF2&index=12) | [Slides](http://tech.paulcz.net/sensu-at-bluebox-sensuconf-2017/#/)
+
 # 2016
 
 ## All Day DevOps
@@ -51,4 +57,3 @@ An incomplete list of events that I've spoken at
 ## DockerCon14
 
 * Automated Chef cookbook testing with Drone.io and GitHub - [Video](https://www.youtube.com/watch?v=9_H41VFfKcM)
-
