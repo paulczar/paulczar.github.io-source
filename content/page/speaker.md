@@ -5,6 +5,28 @@ title = "Paul Talks about stuff"
 
 An incomplete list of events that I've spoken at
 
+# 2018
+| Date | Event | Title | Location |
+| ---- | ----- | ----- | -------- |
+| Feb | [Cloud Foundry Meetup Singapore](https://www.meetup.com/Singapore-Cloud-Foundry-Meetup/events/247104639/) | A DevOps guide to Kubernetes | Singapore |
+| Feb | Devopsdays Charlotte | [A DevOps Guide to Kubernetes](http://sched.co/DIjN) [![Video](/img/video.png)](https://www.youtube.com/watch?v=jh3mEEAcfDY) [![Slides](/img/slides.png)](https://www.slideshare.net/PaulCzarkowski/a-devops-guide-to-kubernetes) | Charlotte NC |
+| March | [NYC Devops Meetup](https://www.meetup.com/nycdevops/events/fmgjmnyxfbbc/) | A DevOps guide to Kubernetes [![Slides](/img/slides.png)](https://www.slideshare.net/PaulCzarkowski/a-devops-guide-to-kubernetes) | New York, New York |
+| April | [Devops Madison](https://www.meetup.com/Madison-Devops/events/kbqsmlyxgbpb/) | Devops is dead, servers are dying, and I don't feel too great myself | Madison WI |
+| April | CodeCamp Wellington | [Compliance as Code, Transform your security team with DevOps](https://codecampwellington.nz/#paul-czarkowski) [![Slides](/img/slides.png)](https://www.slideshare.net/PaulCzarkowski/transform-your-devops-practices-with-security) | Wellington NZ |
+| April | Longhorn PHP | A PHP Developers Intro to Kubernetes [![Slides](/img/slides.png)](https://www.slideshare.net/PaulCzarkowski/kubernetes-for-the-php-developer) | Austin TX |
+| April | Devopsdays Seattle | [Compliance as Code](https://www.devopsdays.org/events/2018-seattle/program/paul-czarkowski/) [![Video](/img/video.png)](https://www.youtube.com/watch?v=HLN49sLdsbA) [![Slides](/img/slides.png)](https://www.slideshare.net/PaulCzarkowski/transform-your-devops-practices-with-security)  | Seattle WA |
+| May | Spring One Tour - Denver | Emcee, Intro to Kubernetes [![Slides](/img/slides.png)](https://www.slideshare.net/PaulCzarkowski/introduction-to-kubernetes-106900695) | Denver CO |
+| May | Miami Kubernetes meetup | Intro to Kubernetes [![Slides](/img/slides.png)](https://www.slideshare.net/PaulCzarkowski/introduction-to-kubernetes-106900695) | Miami FL |
+| May | VMWare PKS Roadshow Minneapolis | Application Modernization and Replatforming with PKS/Kubernetes [![Slides](/img/slides.png)](https://www.slideshare.net/PaulCzarkowski/application-modernization-with-pks-kubernetes) | Minneapolis MN |
+| May | VMWare PKS Roadshow Reston | Application Modernization and Replatforming with PKS/Kubernetes [![Slides](/img/slides.png)](https://www.slideshare.net/PaulCzarkowski/application-modernization-with-pks-kubernetes) | Minneapolis MN |
+| May | Spring One Tour - St Louis | Emcee, Intro to Kubernetes [![Slides](/img/slides.png)](https://www.slideshare.net/PaulCzarkowski/introduction-to-kubernetes-106900695) | St Louis MO |
+| June | VMWare PKS Roadshow Chicago | Application Modernization and Replatforming with PKS/Kubernetes [![Slides](/img/slides.png)](https://www.slideshare.net/PaulCzarkowski/application-modernization-with-pks-kubernetes) | Chicago IL |
+| June | Cloud Foundry Meetup Tokyo | Intro to Kubernetes | Tokyo, Japan |
+| June | Opensource Summit Tokyo | [Kubernetes Day 2 Operations](https://ossalsjp18.sched.com/event/EaYK/bof-kubernetes-day-2-paul-czarkowski-pivotal-software) [![Slides](/img/slides.png)](https://www.slideshare.net/PaulCzarkowski/kubernetes-day-2-operations)  | Tokyo, Japan |
+| June | Linuxcon Beijing | [Successful Patterns for running Platforms](https://lc32018.sched.com/event/F6Qa/bosh-a-platform-for-running-platforms-so-you-can-run-platforms-paul-czarkowski-pivotal) [![Slides](/img/slides.png)](https://www.slideshare.net/PaulCzarkowski/successful-patterns-for-running-platforms) | Beijing, China |
+
+
+
 # 2017
 
 ## Sensu Summit
