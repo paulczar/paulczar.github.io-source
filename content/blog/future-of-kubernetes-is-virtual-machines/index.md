@@ -31,7 +31,7 @@ It didn't take long for the big public clouds to provide a Kubernetes based plat
 
 ## Soft and Squishy Multi-Tenancy
 
-However there's one bit sticky problem that's left to solve, and this I believe will prove to be the downfall of the container ...  multi-tenancy.
+There's one sticky problem that's left to solve, and this I believe will prove to be the downfall of the container ...  multi-tenancy.
 
 Linux containers were not built to be secure isolated sandboxes (like Solaris Zones or FreeBSD Jails). Instead they're built upon a shared kernel model that utilizes kernel features to provide basic process isolation. As [Jessie Frazelle](https://blog.jessfraz.com/post/containers-zones-jails-vms/) would say "Containers aren't a real thing".
 
@@ -67,7 +67,7 @@ This is an elegant solutions to Kubernetes multi-tenancy. Her suggestion goes ev
 
 We have at least one more optimization to make here. Build out a suitable Hypervisor for the underlying IaaS or cloud provider. If a VM Container is a first level abstraction provided by the IaaS then we increase our resource utilization even further. The minimal number of VMs required to run a Kubernetes cluster goes down to one (or three for HA) to host the Kubernetes control plane exposed to the "Superuser".
 
-## Resource Optimized Multi-tenancy
+## Resource (cost) Optimized Multi-tenancy
 
 A Kubernetes deployment with two namespaces both with a number of applications running would look something like this.
 
