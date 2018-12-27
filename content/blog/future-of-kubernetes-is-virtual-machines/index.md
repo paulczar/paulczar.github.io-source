@@ -41,7 +41,7 @@ Compounding this is the fact that most Kubernetes components are not Tenant awar
 
 ![Kubernetes Architecture](./k8s-arch.png)
 
-Abstractions leak. A platform built on top of containers will inherit many of the soft tenancy aspects of containers. Platforms built on top of hard multi-tenancy Virtual Machines all inherit that hard tenancy (VMWare, Amazon Web Services, Openstack, etc).
+Abstractions leak. A platform built on top of containers will inherit many of the soft tenancy aspects of containers. Platforms built on top of hard multi-tenancy Virtual Machines all inherit that hard tenancy (VMware, Amazon Web Services, OpenStack, etc).
 
 The Kubernetes cluster itself becomes the line of "Hard Tenanacy". This leads to the emerging pattern of "many clusters" rather than "one big shared" cluster. Its not uncommon to see customers of Google's GKE Service have dozens of Kubernetes clusters deployed for multiple teams. Often each developer gets their own cluster. This kind of behavior leads to a shocking amount of Kubesprawl.
 
@@ -98,4 +98,4 @@ Tied together with the correct improvements to the Kubernetes hard tenancy model
 
 For those who aren't on the public cloud, we don't get the same consumption model as the onus for capacity remains with the infrastructure provider (in this case yourself). You will still get the benefits of higher resource utilization which pays off in lower capacity requirements.
 
-Let's hope VMWare and Openstack are paying attention and bring us lightweight VM Container technology based hypervisors and the appropriate Virtual Kubelet implementations.
+Let's hope VMware and OpenStack are paying attention and bring us lightweight VM Container technology based hypervisors and the appropriate Virtual Kubelet implementations.
