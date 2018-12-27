@@ -47,7 +47,7 @@ Abstractions leak. A platform built on top of containers will inherit many of th
 
 Kubernetes' soft tenancy model leaves service providers and distributions in a weird place. The Kubernetes cluster itself becomes the line of "Hard Tenanacy". There are many reasons (even inside the same organisation) to require hard tenancy between users (or appplications). Since the public clouds provide fully managed Kubernetes as a Service offerings its easy enough for each Tenant to get their own cluster and use the cluster boundary as the isolation point.
 
-Some Kubernetes distributions like Pivotal Container Service (PKS) are very aware of this [tenancy issue](https://content.pivotal.io/youtube-uberflip/kubernetes-one-cluster-or-many-3) and have taken a similar model by providing that same Kubernetes as a Service experience you'd get from a public cloud but in your own datacenter.
+Some Kubernetes distributions like [Pivotal Container Service (PKS)](https://pivotal.io/platform/pivotal-container-service) are very aware of this [tenancy issue](https://content.pivotal.io/youtube-uberflip/kubernetes-one-cluster-or-many-3) and have taken a similar model by providing that same Kubernetes as a Service experience you'd get from a public cloud but in your own datacenter.
 
 This leads to the emerging pattern of "many clusters" rather than "one big shared" cluster. Its not uncommon to see customers of Google's GKE Service have dozens of Kubernetes clusters deployed for multiple teams. Often each developer gets their own cluster. This kind of behavior leads to a shocking amount of Kubesprawl.
 
