@@ -40,7 +40,7 @@ menu:
     - name: "talk"
       identifier: "talk"
       weight: 300
-      url: "/page/speaker"
+      url: "https://noti.st/paulczar/presentations"
     - name: "Resume"
       identifier: "resume"
       weight: 300
