@@ -67,7 +67,9 @@ Resolving deltas: 100% (2908/2908), done.
 $ cd spring-petclinic
 ```
 
-Ordinarily you'd use `docker build` to create a docker image, however for [some](https://github.com/spring-projects/spring-petclinic/issues/348) reason the [spring community](https://github.com/spring-projects/spring-petclinic/pull/338) has decided [not to support building docker images in a standard way](https://github.com/spring-projects/spring-petclinic/issues/339) and thus this repo does not have a `Dockerfile`, thankfully we have some less obvious ways through maven to do this using tools like the [Google JIB project](https://github.com/GoogleContainerTools/jib):
+Ordinarily you'd use `docker build` to create a docker image, however this repo does not have a `Dockerfile`, so thankfully we have some less obvious ways through maven to do this using tools like the [Google JIB project](https://github.com/GoogleContainerTools/jib):
+
+> Note: For more ways to build Docker images for Spring Applications see the official [Spring documentation](https://spring.io/guides/gs/spring-boot-docker/).
 
 ```console
 $ mvn compile -Dimage=spring/petclinic:spring-k8s-1 \
@@ -146,10 +148,10 @@ There are two main ways of interacting with Kubernetes. __declarative__ and __im
 
 Most advanced users of Kubernetes use the declarative methods, but the imperative are perfect for when you're just getting started or want to do something quickly.
 
-Create a Kubernetes deployment by running the `kubectl run` command and then validate it with `kubectl get all`:
+Create a Kubernetes deployment by running the `kubectl create` command and then validate it with `kubectl get all`:
 
 ```console
-$ kubectl run petclinic --image=paulczar/petclinic:spring-k8s-1
+$ kubectl create deployment petclinic --image=paulczar/petclinic:spring-k8s-1
 deployment.apps/petclinic created
 
 $ kubectl get all
