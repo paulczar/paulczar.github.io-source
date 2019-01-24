@@ -67,7 +67,7 @@ Resolving deltas: 100% (2908/2908), done.
 $ cd spring-petclinic
 ```
 
-Ordinarily you'd use `docker build` to create a docker image, however this repo does not have a `Dockerfile`, thankfully we have a way through maven to do this using the [Google JIB project](https://github.com/GoogleContainerTools/jib):
+Ordinarily you'd use `docker build` to create a docker image, however for [some](https://github.com/spring-projects/spring-petclinic/issues/348) reason the [spring community](https://github.com/spring-projects/spring-petclinic/pull/338) has decided [not to support building docker images in a standard way](https://github.com/spring-projects/spring-petclinic/issues/339) and thus this repo does not have a `Dockerfile`, thankfully we have some less obvious ways through maven to do this using tools like the [Google JIB project](https://github.com/GoogleContainerTools/jib):
 
 ```console
 $ mvn compile -Dimage=spring/petclinic:spring-k8s-1 \
@@ -84,6 +84,15 @@ $ mvn compile -Dimage=spring/petclinic:spring-k8s-1 \
 [INFO] Total time: 20.561 s
 [INFO] Finished at: 2019-01-24T08:56:30-06:00
 [INFO] ------------------------------------------------------------------------
+```
+
+If like me you don't have `java` installed on your local desktop you can cheat your way through by mapping your docker socket through to a maven container like this:
+
+```console
+$ docker run -ti --rm --workdir /src -v $(pwd):/src \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    maven:3.6-jdk-11 mvn compile -Dimage=spring/petclinic:spring-k8s-1 \
+    com.google.cloud.tools:jib-maven-plugin:1.0.0:dockerBuild
 ```
 
 This will have built an image called `spring/petclinic:spring-k8s-1`. Verify it:
