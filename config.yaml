@@ -3,7 +3,7 @@ baseurl: "https://tech.paulcz.net/"
 languageCode: "en-us"
 title: "Paul Czarkowski"
 author: "Paul Czarkowski"
-disqusShortname: "tech-paulcz"
+#disqusShortname: "tech-paulcz"
 googleAnalytics: "UA-35638296-2"
 theme: "hugo-sustain"
 
