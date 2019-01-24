@@ -165,7 +165,9 @@ NAME                                   DESIRED   CURRENT   READY   AGE
 replicaset.apps/petclinic-5ffccf75c4   1         1         1       36s
 ```
 
-You can see that Kubernetes has created several resources. It created a __Deployment__ which is a Kubernetes controller for managing the lifecycle of __ReplicaSets__. The __Deployment__ created the __ReplicaSet__ which is a controller for ensuring a set number of replicas of your application is running. The __ReplicaSet__ created a __Pod__ which is your running application.
+You can see that Kubernetes has created several resources. It created a __Deployment__ which is reconciled by a [Kubernetes controller](https://kubernetes.io/docs/concepts/workloads/controllers/) for managing the lifecycle of __ReplicaSets__. The __Deployment__ created the __ReplicaSet__ which has a controller for ensuring a set number of replicas of your application is running. The __ReplicaSet__ created a __Pod__ which is your running application.
+
+> Note: [Controllers](https://kubernetes.io/docs/concepts/workloads/controllers/) are a major part of what makes Kubernetes so good. They create tight control loops around resources to add more complex functionality as described above.
 
 You might notice that the Kubernetes output above does not give you an IP address or any hints as to how to access your application. This is because we need to expose the application using a __Service__ resource.
 
