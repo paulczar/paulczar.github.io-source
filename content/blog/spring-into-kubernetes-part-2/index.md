@@ -1,6 +1,6 @@
 ---
 date: "2019-02-07"
-title: "Spring into Kubernetes - Part 2"
+title: "Spring into Kubernetes - Deploying with Helm"
 categories: ["kubernetes","pivotal","spring", "helm"]
 ---
 
