@@ -96,7 +96,7 @@ Point your browser at http://localhost:8080 and you should see the following:
 
 But this isn't Petclinic it's an empty nginx container. Since our petclinic app is pretty simple we can use this boilerplate chart to deploy Petclinic with just a few minor changes.
 
-* The nginx app inside the container listens on port 80, petclinic listens on port 8080 so you'll need to edit the file `templates/deployment.yaml` and find the YAML `containerPort: 8080` under the container spec and change the value to `8080`.
+* The nginx app inside the container listens on port 80, petclinic listens on port 8080 so you'll need to edit the file `templates/deployment.yaml` and find the YAML `containerPort: 80` under the container spec and change the value to `8080`.
 
 * Also in the `templates/deployment.yaml` file you want to increase the initial timeout for the `livenessCheck` check as Java takes longer to be ready than nginx. Find the YAML key `livenessProbe:` and add the keypair `initialDelaySeconds: 60` to it.
 

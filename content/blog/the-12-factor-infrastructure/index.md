@@ -13,45 +13,53 @@ One of the seminal pieces of literature for developing Microservces and Cloud Na
 
 These 12 factors apply really well to Infrastructure concepts as well, and so lets create the __12 Factor Infrastructure Manifest__ to go with it.
 
-# I. Codebase
+1. People
 
-A 12 factor infrastructure as always tracked in version control system such as Git. Generally speaking their are two sets of artifacts; Manifests and Inventories.
+* People trump all other factors of Cloud Native Operations.
+* Optimize for people first.
 
-* __Manifests__ describe the resources required to build your infrastructure. A manifest is usually written in a DSL that is consumed by a specific tool such as Terraform, Ansible, or Helm.
+2. Platform [as a product]
 
-* __Inventories__ describe the deployment of your infrastructure. They contain a series of variables that when combined with your _Manifest_ will deploy, update, or verify an environment (an environment is a deployed infrastructure).
+* Ultimately you're building a platform, build it with a focus on the users and their needs.
+* Use existing platforms and abstractions where possible and focus your efforts on smoothing out the rough edges and user experience
+* Create the "paved road" that provides utility to your users and encourages them to use the platform by making it the _best choice_ for deploying their software.
+* Do not treat it as an infrastructure project, treat it as a product, have a product owner to drive roadmap and features.
+* Start simple and iterate. Do not go for "mass digital transformation" instead focus on one or two teams and help them solve their problems.
 
-Generally each Manifest would have its own code repository and a shared repository for the Inventories. Any secrets or keys should be encrypted before adding to the repo, or should be stored in an external encrypted secret store such as Hashicorp's Vault.
+2. Everything As Code
 
-# II. Dependencies
-Explicitly declare and isolate dependencies
+* Automate everything with simple and clean code.
+* Focus on readability and composability.
+* Store in github and test
 
-# III. Config
-Store config in the environment
+3. Composable
 
-# IV. Backing services
-Treat backing services as attached resources
+* The components of your infrastructure should be Composable and work together with external systems to create a coherent platform.
+* Where possible use systems provided by the underlying platform
 
-# V. Build, release, run
-Strictly separate build and run stages
+4. Observable
 
-# VI. Processes
-Execute the app as one or more stateless processes
+* Metrics and Alerts are important but only tell part of the story.
+* Treat your logs as structured events
+* Provide standard metric/logging APIs and endpoints for applications to tie into
+* Provide tracing infrastructure to support complex systems of microservices
 
-# VII. Port binding
-Export services via port binding
+6. Configuration
 
-# VIII. Concurrency
-Scale out via the process model
+* Provide a configuration service and service discovery
+* Applications should be able to query one or more configuration servers to request their configuration
+* Some form of encrypted secret management should be provided.
 
-# IX. Disposability
-Maximize robustness with fast startup and graceful shutdown
+7. Security
 
-# X. Dev/prod parity
-Keep development, staging, and production as similar as possible
+* do not rely on edge security, every application should have its own security with explicit ingress and egress rules
+* provide certificate and endpoint management
 
-# XI. Logs
-Treat logs as event streams
+8. Pipelines
+9. Artifacts
 
-# XII. Admin processes
-Run admin/management tasks as one-off processes
+10. State
+  Where-ever possible state should be kept outside of the application.
+
+11. Resilience
+12. Platform [as a product]
