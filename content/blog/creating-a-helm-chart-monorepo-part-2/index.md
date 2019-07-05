@@ -1,21 +1,21 @@
 ---
 date: "2019-07-03"
-title: "Creating a Helm Chart Repository - Part 2"
+title: "Creating a [Helm](https://helm.sh) Chart Repository - Part 2"
 categories: ["kubernetes","devops","helm"]
 draft: false
 ---
 
 ## Introduction
 
-Welcome to a three part blog series on Creating a Helm Chart Repository. In [part 1](/blog/creating-a-helm-chart-monorepo-part-1) of this series I demonstrated creating a helm chart repository using GitHub and GitHub Pages. In this **part 2** I will add Automation to automatically update the repository, and in [part 2](/blog/creating-a-helm-chart-monorepo-part-3) I will add testing for changes to the charts themselves.
+Welcome to a three part blog series on Creating a [Helm](https://helm.sh) Chart Repository. In [part 1](/blog/creating-a-helm-chart-monorepo-part-1) of this series I demonstrated creating a [Helm](https://helm.sh) chart repository using [GitHub](https://github.com)and [GitHub](https://github.com)Pages. In this **part 2** I will add Automation to automatically update the repository, and in [part 2](/blog/creating-a-helm-chart-monorepo-part-3) I will add testing for changes to the charts themselves.
 
-## Use Circle CI to automate Helm Chart Updates
+## Use Circle CI to automate [Helm](https://helm.sh) Chart Updates
 
-> Note - You could use any other CI system here, I chose Circle as it is easy to integrate with github and has a free tier. If you do use a different CI system the scripts should still work, but you'll need to rewrite a config file suitable for your CI choice.
+> Note - You could use any other CI system here, I chose Circle as it is easy to integrate with [GitHub](https://github.com)and has a free tier. If you do use a different CI system the scripts should still work, but you'll need to rewrite a config file suitable for your CI choice.
 
-Now that we've successfully created a Helm Chart Repostiory using github and github pages we can move on to adding some Automation so that our Chart Repository is updated any time we push changes up to our master branch.
+Now that we've successfully created a [Helm](https://helm.sh) Chart Repostiory using [GitHub](https://github.com)and [GitHub](https://github.com)pages we can move on to adding some Automation so that our Chart Repository is updated any time we push changes up to our master branch.
 
-Its pretty easy to create a new Circle CI account. You simply go to their website and hit [sign-up](https://circleci.com/signup/), it will ask you to log using github Oauth2 and once you've given it access to your repositories you are good to go.
+Its pretty easy to create a new Circle CI account. You simply go to their website and hit [sign-up](https://circleci.com/signup/), it will ask you to log using [GitHub](https://github.com)Oauth2 and once you've given it access to your repositories you are good to go.
 
 Once logged in you need to hit the **ADD Projects** menu item and hit the **set up project** button next to **my-helm-charts**.
 
@@ -48,7 +48,7 @@ $ touch .circleci/config.yml
 
 Write out the `config.yml` file like so:
 
-> Note: this CircleCI config file creates two jobs, One to lint the shell scripts we're about to create, the other to release charts and copy documentation into our helm repo website. These tasks will run when code is pushed or merged into the `master` branch.
+> Note: this CircleCI config file creates two jobs, One to lint the shell scripts we're about to create, the other to release charts and copy documentation into our [Helm](https://helm.sh) repo website. These tasks will run when code is pushed or merged into the `master` branch.
 
 #### [.circleci/config.yml](https://github.com/paulczar/my-helm-charts/blob/part-2/.circleci/config.yml)
 
@@ -187,8 +187,8 @@ find_latest_tag() {
 
 package_chart() {
     local chart="$1"
-    helm dependency build "$chart"
-    helm package "$chart" --destination .deploy
+    Helm dependency build "$chart"
+    Helm package "$chart" --destination .deploy
 }
 
 release_charts() {
@@ -267,7 +267,7 @@ $ git push origin gh-pages
 
 ### Validate the release of new charts
 
-So far we haven't actually changed our Helm Charts, so the automation hasn't created a new release. We can change this by bumping the chart version of one of them.  Edit `./charts/app1/Chart.yaml` and bump the version like so:
+So far we haven't actually changed our [Helm](https://helm.sh) Charts, so the automation hasn't created a new release. We can change this by bumping the chart version of one of them.  Edit `./charts/app1/Chart.yaml` and bump the version like so:
 
 ```yaml
 apiVersion: v1
@@ -287,7 +287,7 @@ $ git push origin master
 
 You should see the new job show up in Circle and complete fairly quickly.
 
-Once the job has completed successfully you can check you now have a `myapp-0.1.1` release in your github repo and your helm repository now has `myapp-0.1.1` in its `index.yaml`.
+Once the job has completed successfully you can check you now have a `myapp-0.1.1` release in your [GitHub](https://github.com)repo and your [Helm](https://helm.sh) repository now has `myapp-0.1.1` in its `index.yaml`.
 
 ```bash
 $ curl http://tech.paulcz.net/my-helm-charts/index.yaml
@@ -316,7 +316,7 @@ entries:
   - apiVersion: v1
     appVersion: "1.0"
     created: "2019-07-03T23:16:21.22793015Z"
-    description: A Helm chart for Kubernetes
+    description: Helm chart for Kubernetes
     digest: 64b00fc4804aba524201f64e78ee22ad8e61d0923424f8e24e8b70befed88141
     name: app2
     urls:
@@ -327,6 +327,6 @@ generated: "2019-07-03T23:16:20.624914794Z"
 
 ## Conclusion
 
-In [Part 1](/blog/creating-a-helm-chart-monorepo-part-1) we created set of Helm Charts managed in source control (GitHub) and in Part 2 we just added automation via CircleCI to automate building and deploying Chart packages to a Helm Chart Repository hosted in GitHub pages and GitHub releases.
+In [Part 1](/blog/creating-a-helm-chart-monorepo-part-1) we created set of [Helm](https://helm.sh) Charts managed in source control (GitHub) and in Part 2 we just added automation via CircleCI to automate building and deploying Chart packages to a [Helm](https://helm.sh) Chart Repository hosted in [GitHub](https://github.com)pages and [GitHub](https://github.com)releases.
 
-In [Part 3](/blog/creating-a-helm-chart-monorepo-part-3) we will add further automation to test for changes in those Helm charts and to pass them through rigorous testing before allowing them to be merged into the `master` branch.
+In [Part 3](/blog/creating-a-helm-chart-monorepo-part-3) we will add further automation to test for changes in those [Helm](https://helm.sh) charts and to pass them through rigorous testing before allowing them to be merged into the `master` branch.

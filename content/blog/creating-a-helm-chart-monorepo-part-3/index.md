@@ -1,21 +1,21 @@
 ---
 date: "2019-07-03"
-title: "Creating a Helm Chart Repository - Part 3"
+title: "Creating a [Helm](https://helm.sh) Chart Repository - Part 3"
 categories: ["kubernetes","devops","helm"]
 draft: false
 ---
 
 ## Introduction
 
-Welcome to a three part blog series on Creating a Helm Chart Repository. In [part 1](/blog/creating-a-helm-chart-monorepo-part-1) of this series I demonstrated creating a helm chart repository using GitHub and GitHub Pages. In [part 2](/blog/creating-a-helm-chart-monorepo-part-2) I will add Automation to automatically update the repository, and in **part 3** I will add testing for changes to the charts themselves.
+Welcome to a three part blog series on Creating a [Helm](https://helm.sh) Chart Repository. In [part 1](/blog/creating-a-helm-chart-monorepo-part-1) of this series I demonstrated creating a [Helm](https://helm.sh) chart repository using [GitHub](https://github.com) nd [GitHub](https://github.com) ages. In [part 2](/blog/creating-a-helm-chart-monorepo-part-2) I will add Automation to automatically update the repository, and in **part 3** I will add testing for changes to the charts themselves.
 
-## Use Circle CI to test Helm Charts
+## Use Circle CI to test [Helm](https://helm.sh) Charts
 
-> Note - You could use any other CI system here, I chose Circle as it is easy to integrate with github and has a free tier. If you do use a different CI system the scripts should still work, but you'll need to rewrite a config file suitable for your CI choice.
+> Note - You could use any other CI system here, I chose Circle as it is easy to integrate with [GitHub](https://github.com) nd has a free tier. If you do use a different CI system the scripts should still work, but you'll need to rewrite a config file suitable for your CI choice.
 
 ### Introducing Chart Testing
 
-The Helm community has built a tool very imaginitively named [Chart Testing]((https://github.com/helm/chart-testing) specifically for testing Helm charts. Not only is it capable of linting and performing test installs of a Helm chart, but its also designed to work within a monorepo and only test those charts that have changed.
+The [Helm](https://helm.sh) community has built a tool very imaginitively named [Chart Testing]((https://github.com/helm/chart-testing) specifically for testing [Helm](https://helm.sh) charts. Not only is it capable of linting and performing test installs of a [Helm](https://helm.sh) chart, but its also designed to work within a monorepo and only test those charts that have changed.
 
 You can download and use [Chart Testing](https://github.com/helm/chart-testing/releases) locally, but really the power of it is using it in CI, so lets go straight to that.
 
@@ -27,7 +27,7 @@ We need to add a new script, a chart-testing config file, and update the Circle 
 
 Create two new jobs:
 
-The first job tells Chart Testing to lint the charts according to the Helm Community [Best Practices Guide](https://helm.sh/docs/chart_best_practices/).
+The first job tells Chart Testing to lint the charts according to the [Helm](https://helm.sh) Community [Best Practices Guide](https://helm.sh/docs/chart_best_practices/).
 
 The second job tells Chart Testing to actually install and test the charts using KIND (Kubernetes IN Docker).
 
@@ -74,7 +74,7 @@ Add a new workflow telling Circle to lint and test any changes.
 
 #### [./circleci/ct.yaml](https://github.com/paulczar/my-helm-charts/blob/part-3/.circleci/ct.yaml)
 
-This file provides configuration for Chart Testing. For now all we need is to tell it to provide Helm with a longer timeout:
+This file provides configuration for Chart Testing. For now all we need is to tell it to provide [Helm](https://helm.sh) with a longer timeout:
 
 ```yaml
 helm-extra-args: --timeout 600
@@ -95,7 +95,7 @@ nodes:
 
 #### [./circleci/install_charts.sh](https://github.com/paulczar/my-helm-charts/blob/part-3/.circleci/install_charts.sh)
 
-Finally this script will install KIND and will perform test installations for any changed Helm Charts:
+Finally this script will install KIND and will perform test installations for any changed [Helm](https://helm.sh) Charts:
 
 ```bash
 #!/usr/bin/env bash
@@ -268,7 +268,7 @@ It took about 6 minutes to run, because it did a full install of both Charts (as
 
 > Note: Since this was a branch, the charts were not released to the Chart Repository as that job is only triggered on the `master branch`.
 
-Next you'll want to create a pull request for this change, you can do that via the GitHub web ui:
+Next you'll want to create a pull request for this change, you can do that via the [GitHub](https://github.com) eb ui:
 
 ![github pull request](github-pull-request.png)
 
@@ -276,7 +276,7 @@ Next you'll want to create a pull request for this change, you can do that via t
 
 Since the PR is showing as passing tests, you can go ahead and Merge it by clicking that green `Merge` button (although I like to use `Squash and Merge`).
 
-This Merge into the `master` branch will kick off the `release-charts` workflow and after a few seconds we'll have an updated Helm Repository:
+This Merge into the `master` branch will kick off the `release-charts` workflow and after a few seconds we'll have an updated [Helm](https://helm.sh) Repository:
 
 ```bash
 $ curl http://tech.paulcz.net/my-helm-charts/index.yaml
@@ -298,16 +298,16 @@ entries:
 
 ## Testing Pull Requests
 
-In the advanced settings of Circle CI you can tell it to automatically test Pull Requests that come from forks of your GitHub repository. Adding this is a great feature if you want others to work on your code with you. However you do need to protect your secrets.
+In the advanced settings of Circle CI you can tell it to automatically test Pull Requests that come from forks of your [GitHub](https://github.com) epository. Adding this is a great feature if you want others to work on your code with you. However you do need to protect your secrets.
 
-For example a bad actor could add "echo $CH_TOKEN" to one of the scripts and steal my github token which they could then use to mess with my Repositories.
+For example a bad actor could add "echo $CH_TOKEN" to one of the scripts and steal my [GitHub](https://github.com) oken which they could then use to mess with my Repositories.
 
 For that reason I've opted not to include that in this example.
 
 ## Conclusion
 
-In [Part 1](/blog/creating-a-helm-chart-monorepo-part-1) we created set of Helm Charts managed in source control (GitHub).
+In [Part 1](/blog/creating-a-helm-chart-monorepo-part-1) we created set of [Helm](https://helm.sh) Charts managed in source control (GitHub).
 
-In [Part 2](/blog/creating-a-helm-chart-monorepo-part-2) we added automation via CircleCI to automate building and deploying Chart packages to a Helm Chart Repository hosted in GitHub pages and GitHub releases.
+In [Part 2](/blog/creating-a-helm-chart-monorepo-part-2) we added automation via CircleCI to automate building and deploying Chart packages to a [Helm](https://helm.sh) Chart Repository hosted in [GitHub](https://github.com) ages and [GitHub](https://github.com) eleases.
 
-In **Part 3** we added further automation to test changes in those Helm charts and to pass them through rigorous testing before allowing them to be merged into the `master` branch.
+In **Part 3** we added further automation to test changes in those [Helm](https://helm.sh) charts and to pass them through rigorous testing before allowing them to be merged into the `master` branch.
