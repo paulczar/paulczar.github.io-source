@@ -1,6 +1,6 @@
 ---
 date: "2019-07-03"
-title: "Creating a [Helm](https://helm.sh) Chart Repository - Part 2"
+title: "Creating a Helm Chart Repository - Part 2"
 categories: ["kubernetes","devops","helm"]
 draft: false
 ---
