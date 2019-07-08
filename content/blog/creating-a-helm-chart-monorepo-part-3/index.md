@@ -21,6 +21,8 @@ You can download and use [Chart Testing](https://github.com/helm/chart-testing/r
 
 ### Creat a Chart Testing script and update Circle CI config
 
+> Note: While I would usually use [Concourse CI](https://concourse-ci.org/) for my CI workflows, I wanted to *only* use managed services and I chose Circle as that is already commonly used in the Helm community.
+
 We need to add a new script, a chart-testing config file, and update the Circle CI config file.
 
 #### [./circleci/config.yaml](https://github.com/paulczar/my-helm-charts/blob/part-2/.circleci/config.yaml)

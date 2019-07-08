@@ -18,6 +18,8 @@ This makes hosting a repository perfectly suited to running in [GitHub](https://
 
 I will walk you through creating a new [GitHub](https://github.com) roject hosting multiple [Helm](https://helm.sh) charts and demonstrate how to set up Continuous Integration with CircleCI to automatically test and publish new changes to your [Helm](https://helm.sh) Charts.
 
+> Note: While I would usually use [Concourse CI](https://concourse-ci.org/) for my CI workflows, I wanted to *only* use managed services and I chose Circle as that is already commonly used in the Helm community.
+
 ## Create a new [GitHub](https://github.com) epository
 
 Log into [GitHub](https://github.com) nd [create a new repository](https://github.com/new) called `my-helm-charts`. I chose to have [GitHub](https://github.com) reate it as with an Apache2 License.

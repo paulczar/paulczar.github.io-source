@@ -11,7 +11,7 @@ Welcome to a three part blog series on Creating a [Helm](https://helm.sh) Chart 
 
 ## Use Circle CI to automate [Helm](https://helm.sh) Chart Updates
 
-> Note - You could use any other CI system here, I chose Circle as it is easy to integrate with [GitHub](https://github.com)and has a free tier. If you do use a different CI system the scripts should still work, but you'll need to rewrite a config file suitable for your CI choice.
+> Note: While I would usually use [Concourse CI](https://concourse-ci.org/) for my CI workflows, I wanted to *only* use managed services and I chose Circle as that is already commonly used in the Helm community. It would be trivial to whip up a Concourse Pipeline to do the same thing.
 
 Now that we've successfully created a [Helm](https://helm.sh) Chart Repostiory using [GitHub](https://github.com)and [GitHub](https://github.com)pages we can move on to adding some Automation so that our Chart Repository is updated any time we push changes up to our master branch.
 
