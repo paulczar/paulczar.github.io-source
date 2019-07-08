@@ -27,6 +27,8 @@ We need to add a new script, a chart-testing config file, and update the Circle 
 
 Create two new jobs:
 
+> These scripts and configs were heavily borrowed from [Reinhard Nägele](https://twitter.com/unguiculus) who is a primary maintainer of both [chart-testing](https://github.com/helm/chart-testing) and [chart-releaser](https://github.com/helm/chart-releaser).
+
 The first job tells Chart Testing to lint the charts according to the [Helm](https://helm.sh) Community [Best Practices Guide](https://helm.sh/docs/chart_best_practices/).
 
 The second job tells Chart Testing to actually install and test the charts using KIND (Kubernetes IN Docker).
