@@ -88,7 +88,9 @@ workflows:
               only: master
 ```
 
-We referenced two scripts in the `config.yml` file, so we better create those. These scripts are a mix of ones that I have written, and have borrowed from others in the [Helm Community](https://github.com/codecentric/helm-charts/blob/master/.circleci/release.sh).
+We referenced two scripts in the `config.yml` file, so we better create those. These scripts are a mix of ones that I have written, and have borrowed from [Reinhard Nägele](https://twitter.com/unguiculus) one of the main contributors to awesome tooling in the Helm Community as found [here](https://github.com/codecentric/helm-charts/blob/master/.circleci/release.sh).
+
+> It's no surprise that these scripts came from [Reinhard Nägele](https://twitter.com/unguiculus)as he is a primary maintainer of both [chart-testing](https://github.com/helm/chart-testing) and [chart-releaser](https://github.com/helm/chart-releaser).
 
 #### [.circleci/install_tools.sh](https://github.com/paulczar/my-helm-charts/blob/part-2/.circleci/install_tools.sh)
 

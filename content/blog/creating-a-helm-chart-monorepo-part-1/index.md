@@ -119,7 +119,7 @@ To github.com:paulczar/my-helm-charts.git
 
 ## Publish your [Helm](https://helm.sh) Repository
 
-### Prepare [GitHub](https://github.com) ages
+### Prepare [GitHub](https://github.com) Pages
 
 We're going to use a combination of [GitHub](https://github.com) ages and releases to host our [Helm](https://helm.sh) Repository. Therefore we need to ensure we have [GitHub](https://github.com) ages enabled on the git repo and to create an empty `gh-pages` branch.
 
@@ -224,7 +224,7 @@ Run `cr upload` to create releases and upload the packages, note if it runs corr
 $ cr upload -o paulczar -r my-helm-charts -p .deploy
 ```
 
-Check your [GitHub](https://github.com) epository now has a releases page with two releases:
+Check your [GitHub](https://github.com) repository now has a releases page with two releases:
 
 ![github releases page](./github-releases)
 
