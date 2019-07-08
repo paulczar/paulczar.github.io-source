@@ -7,13 +7,13 @@ draft: false
 
 ## Introduction
 
-Welcome to a three part blog series on Creating a [Helm](https://helm.sh) Chart Repository. In [part 1](/blog/creating-a-helm-chart-monorepo-part-1) of this series I demonstrated creating a [Helm](https://helm.sh) chart repository using [GitHub](https://github.com)and [GitHub](https://github.com)Pages. In this **part 2** I will add Automation to automatically update the repository, and in [part 2](/blog/creating-a-helm-chart-monorepo-part-3) I will add testing for changes to the charts themselves.
+Welcome to a three part blog series on Creating a [Helm](https://helm.sh) Chart Repository. In [part 1](/blog/creating-a-helm-chart-monorepo-part-1) of this series I demonstrated creating a [Helm](https://helm.sh) chart repository using [GitHub](https://github.com) and [GitHub](https://github.com) Pages. In this **part 2** I will add Automation to automatically update the repository, and in [part 2](/blog/creating-a-helm-chart-monorepo-part-3) I will add testing for changes to the charts themselves.
 
 ## Use Circle CI to automate [Helm](https://helm.sh) Chart Updates
 
 > Note: While I would usually use [Concourse CI](https://concourse-ci.org/) for my CI workflows, I wanted to *only* use managed services and I chose Circle as that is already commonly used in the Helm community. It would be trivial to whip up a Concourse Pipeline to do the same thing.
 
-Now that we've successfully created a [Helm](https://helm.sh) Chart Repostiory using [GitHub](https://github.com)and [GitHub](https://github.com)pages we can move on to adding some Automation so that our Chart Repository is updated any time we push changes up to our master branch.
+Now that we've successfully created a [Helm](https://helm.sh) Chart Repostiory using [GitHub](https://github.com) and [GitHub](https://github.com) pages we can move on to adding some Automation so that our Chart Repository is updated any time we push changes up to our master branch.
 
 Its pretty easy to create a new Circle CI account. You simply go to their website and hit [sign-up](https://circleci.com/signup/), it will ask you to log using [GitHub](https://github.com)Oauth2 and once you've given it access to your repositories you are good to go.
 
@@ -329,6 +329,6 @@ generated: "2019-07-03T23:16:20.624914794Z"
 
 ## Conclusion
 
-In [Part 1](/blog/creating-a-helm-chart-monorepo-part-1) we created set of [Helm](https://helm.sh) Charts managed in source control (GitHub) and in Part 2 we just added automation via CircleCI to automate building and deploying Chart packages to a [Helm](https://helm.sh) Chart Repository hosted in [GitHub](https://github.com)pages and [GitHub](https://github.com)releases.
+In [Part 1](/blog/creating-a-helm-chart-monorepo-part-1) we created set of [Helm](https://helm.sh) Charts managed in source control (GitHub) and in Part 2 we just added automation via CircleCI to automate building and deploying Chart packages to a [Helm](https://helm.sh) Chart Repository hosted in [GitHub](https://github.com) pages and [GitHub](https://github.com)releases.
 
 In [Part 3](/blog/creating-a-helm-chart-monorepo-part-3) we will add further automation to test for changes in those [Helm](https://helm.sh) charts and to pass them through rigorous testing before allowing them to be merged into the `master` branch.

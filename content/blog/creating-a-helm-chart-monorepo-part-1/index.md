@@ -7,22 +7,22 @@ draft: false
 
 ## Introduction
 
-Welcome to a three part blog series on Creating a [Helm](https://helm.sh) Chart Repository. In **part 1** I will demonstrate creating a [Helm](https://helm.sh) chart repository using [GitHub](https://github.com) nd [GitHub](https://github.com) ages. In [part 2](/blog/creating-a-helm-chart-monorepo-part-2) I will add Automation to automatically update the repository, and in [part 3](/blog/creating-a-helm-chart-monorepo-part-3) I will add testing for changes to the charts themselves.
+Welcome to a three part blog series on Creating a [Helm](https://helm.sh) Chart Repository. In **part 1** I will demonstrate creating a [Helm](https://helm.sh) chart repository using [GitHub](https://github.com) and [GitHub](https://github.com) Pages. In [part 2](/blog/creating-a-helm-chart-monorepo-part-2) I will add Automation to automatically update the repository, and in [part 3](/blog/creating-a-helm-chart-monorepo-part-3) I will add testing for changes to the charts themselves.
 
 
 Helm is the defacto tool for packaging, sharing, and running Kubernetes Manifests. I'm going to assume you know the basics of [Helm](https://helm.sh) and have used it before. There's plenty of great introductory topics around.
 
 You can host and share [Helm](https://helm.sh) Charts (packages) via a [Helm](https://helm.sh) Repository which is effectively a static website with an `index.yaml` providing metadata and links to the [Helm](https://helm.sh) Packages.
 
-This makes hosting a repository perfectly suited to running in [GitHub](https://github.com) ages, s3, google cloud storage, etc. I like to use [GitHub](https://github.com) ages as it allows your source code and repo to live effectively in the same place.
+This makes hosting a repository perfectly suited to running in [GitHub](https://github.com) Pages, s3, google cloud storage, etc. I like to use [GitHub](https://github.com) Pages as it allows your source code and repo to live effectively in the same place.
 
-I will walk you through creating a new [GitHub](https://github.com) roject hosting multiple [Helm](https://helm.sh) charts and demonstrate how to set up Continuous Integration with CircleCI to automatically test and publish new changes to your [Helm](https://helm.sh) Charts.
+I will walk you through creating a new [GitHub](https://github.com) Project hosting multiple [Helm](https://helm.sh) charts and demonstrate how to set up Continuous Integration with CircleCI to automatically test and publish new changes to your [Helm](https://helm.sh) Charts.
 
 > Note: While I would usually use [Concourse CI](https://concourse-ci.org/) for my CI workflows, I wanted to *only* use managed services and I chose Circle as that is already commonly used in the Helm community.
 
-## Create a new [GitHub](https://github.com) epository
+## Create a new [GitHub](https://github.com) Repository
 
-Log into [GitHub](https://github.com) nd [create a new repository](https://github.com/new) called `my-helm-charts`. I chose to have [GitHub](https://github.com) reate it as with an Apache2 License.
+Log into [GitHub](https://github.com) and [create a new repository](https://github.com/new) called `my-helm-charts`. I chose to have [GitHub](https://github.com) create it as with an Apache2 License.
 
 ![Creating new repo](./github-new-repo.png)
 
@@ -123,7 +123,7 @@ To github.com:paulczar/my-helm-charts.git
 
 ### Prepare [GitHub](https://github.com) Pages
 
-We're going to use a combination of [GitHub](https://github.com) ages and releases to host our [Helm](https://helm.sh) Repository. Therefore we need to ensure we have [GitHub](https://github.com) ages enabled on the git repo and to create an empty `gh-pages` branch.
+We're going to use a combination of [GitHub](https://github.com) Pages and releases to host our [Helm](https://helm.sh) Repository. Therefore we need to ensure we have [GitHub](https://github.com) Pages enabled on the git repo and to create an empty `gh-pages` branch.
 
 You can create an empty `gh-pages` branch by creating an orphan branch like so:
 
@@ -150,7 +150,7 @@ To github.com:paulczar/my-helm-charts.git
  * [new branch]      gh-pages -> gh-pages
 ```
 
-Next check that [GitHub](https://github.com) ages is enabled by clicking on your git repo settings in GitHub:
+Next check that [GitHub](https://github.com) Pages is enabled by clicking on your git repo settings in GitHub:
 
 ![github repo settings](./github-pages.png)
 
@@ -162,7 +162,7 @@ After a few minutes you should have a default rendering on your README.md at the
 
 ### Introducing chart-releaser
 
-You could use a combination of `helm package` and `helm repo` commands to construct your [Helm](https://helm.sh) repository by hand, or you can simplify your life by using `chart-releaser` which will not only create your packages, but will upload them as binaries into an appropriately versioned [GitHub](https://github.com) elease.
+You could use a combination of `helm package` and `helm repo` commands to construct your [Helm](https://helm.sh) repository by hand, or you can simplify your life by using `chart-releaser` which will not only create your packages, but will upload them as binaries into an appropriately versioned [GitHub](https://github.com) Release.
 
 Download chart-releaser for your architecture [here].
 
@@ -177,7 +177,7 @@ $ curl -sSL https://github.com/helm/chart-releaser/releases/download/v0.2.1/char
 $ mv cr ~/bin/cr
 
 $ cr help
-Create [Helm](https://helm.sh) chart repositories on [GitHub](https://github.com) ages by uploading Chart packages
+Create [Helm](https://helm.sh) chart repositories on [GitHub](https://github.com) Pages by uploading Chart packages
 and Chart metadata to [GitHub](https://github.com) Releases and creating a suitable index file
 
 Usage:
@@ -196,7 +196,7 @@ Flags:
 Use "cr [command] --help" for more information about a command.
 ```
 
-There are two commands we care about `cr index` and `cr upload`, the first will create an appropriate `index.yaml` and the second will upload the packages to [GitHub](https://github.com) eleases. In order to do the latter you'll need to pass it in a [GitHub](https://github.com) oken so that it can use the [GitHub](https://github.com) PIs.
+There are two commands we care about `cr index` and `cr upload`, the first will create an appropriate `index.yaml` and the second will upload the packages to [GitHub](https://github.com) Releases. In order to do the latter you'll need to pass it in a [GitHub](https://github.com) Token so that it can use the [GitHub](https://github.com) APIs.
 
 In your browser go to your [github developer settings](https://github.com/settings/tokens) and create a new personal access token.
 
@@ -230,7 +230,7 @@ Check your [GitHub](https://github.com) repository now has a releases page with 
 
 ![github releases page](./github-releases)
 
-### Create and upload index file to [GitHub](https://github.com) ages
+### Create and upload index file to [GitHub](https://github.com) Pages
 
 Checkout your `gh-pages` branch and run `cr index`:
 
@@ -277,7 +277,7 @@ entries:
 generated: "2019-07-03T13:03:05.685803874-05:00"
 ```
 
-Commit this to git and then wait a few minutes and check that it exists in your [GitHub](https://github.com) ages url:
+Commit this to git and then wait a few minutes and check that it exists in your [GitHub](https://github.com) Pages url:
 
 ```bash
 $ git add index.yaml
@@ -293,7 +293,7 @@ To github.com:paulczar/my-helm-charts.git
    75f1fe8..696df18  gh-pages -> gh-pages
 ```
 
-Check it exists in [GitHub](https://github.com) ages:
+Check it exists in [GitHub](https://github.com) Pages:
 
 ![github pages index.yaml](github-pages-index-yaml.png)
 

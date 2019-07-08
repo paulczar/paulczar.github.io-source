@@ -7,11 +7,11 @@ draft: false
 
 ## Introduction
 
-Welcome to a three part blog series on Creating a [Helm](https://helm.sh) Chart Repository. In [part 1](/blog/creating-a-helm-chart-monorepo-part-1) of this series I demonstrated creating a [Helm](https://helm.sh) chart repository using [GitHub](https://github.com) nd [GitHub](https://github.com) ages. In [part 2](/blog/creating-a-helm-chart-monorepo-part-2) I will add Automation to automatically update the repository, and in **part 3** I will add testing for changes to the charts themselves.
+Welcome to a three part blog series on Creating a [Helm](https://helm.sh) Chart Repository. In [part 1](/blog/creating-a-helm-chart-monorepo-part-1) of this series I demonstrated creating a [Helm](https://helm.sh) chart repository using [GitHub](https://github.com) and [GitHub](https://github.com) Pages. In [part 2](/blog/creating-a-helm-chart-monorepo-part-2) I will add Automation to automatically update the repository, and in **part 3** I will add testing for changes to the charts themselves.
 
 ## Use Circle CI to test [Helm](https://helm.sh) Charts
 
-> Note - You could use any other CI system here, I chose Circle as it is easy to integrate with [GitHub](https://github.com) nd has a free tier. If you do use a different CI system the scripts should still work, but you'll need to rewrite a config file suitable for your CI choice.
+> Note - You could use any other CI system here, I chose Circle as it is easy to integrate with [GitHub](https://github.com) and has a free tier. If you do use a different CI system the scripts should still work, but you'll need to rewrite a config file suitable for your CI choice.
 
 ### Introducing Chart Testing
 
@@ -272,7 +272,7 @@ It took about 6 minutes to run, because it did a full install of both Charts (as
 
 > Note: Since this was a branch, the charts were not released to the Chart Repository as that job is only triggered on the `master branch`.
 
-Next you'll want to create a pull request for this change, you can do that via the [GitHub](https://github.com) eb ui:
+Next you'll want to create a pull request for this change, you can do that via the [GitHub](https://github.com) web ui:
 
 ![github pull request](github-pull-request.png)
 
@@ -302,9 +302,9 @@ entries:
 
 ## Testing Pull Requests
 
-In the advanced settings of Circle CI you can tell it to automatically test Pull Requests that come from forks of your [GitHub](https://github.com) epository. Adding this is a great feature if you want others to work on your code with you. However you do need to protect your secrets.
+In the advanced settings of Circle CI you can tell it to automatically test Pull Requests that come from forks of your [GitHub](https://github.com) repository. Adding this is a great feature if you want others to work on your code with you. However you do need to protect your secrets.
 
-For example a bad actor could add "echo $CH_TOKEN" to one of the scripts and steal my [GitHub](https://github.com) oken which they could then use to mess with my Repositories.
+For example a bad actor could add "echo $CH_TOKEN" to one of the scripts and steal my [GitHub](https://github.com) token which they could then use to mess with my Repositories.
 
 For that reason I've opted not to include that in this example.
 
@@ -312,6 +312,6 @@ For that reason I've opted not to include that in this example.
 
 In [Part 1](/blog/creating-a-helm-chart-monorepo-part-1) we created set of [Helm](https://helm.sh) Charts managed in source control (GitHub).
 
-In [Part 2](/blog/creating-a-helm-chart-monorepo-part-2) we added automation via CircleCI to automate building and deploying Chart packages to a [Helm](https://helm.sh) Chart Repository hosted in [GitHub](https://github.com) ages and [GitHub](https://github.com) eleases.
+In [Part 2](/blog/creating-a-helm-chart-monorepo-part-2) we added automation via CircleCI to automate building and deploying Chart packages to a [Helm](https://helm.sh) Chart Repository hosted in [GitHub](https://github.com) Pages and [GitHub](https://github.com) Releases.
 
 In **Part 3** we added further automation to test changes in those [Helm](https://helm.sh) charts and to pass them through rigorous testing before allowing them to be merged into the `master` branch.
