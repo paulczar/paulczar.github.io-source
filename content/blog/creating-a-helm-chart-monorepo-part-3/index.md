@@ -9,6 +9,8 @@ draft: false
 
 Welcome to a three part blog series on Creating a [Helm](https://helm.sh) Chart Repository. In [part 1](/blog/creating-a-helm-chart-monorepo-part-1) of this series I demonstrated creating a [Helm](https://helm.sh) chart repository using [GitHub](https://github.com) and [GitHub](https://github.com) Pages. In [part 2](/blog/creating-a-helm-chart-monorepo-part-2) I will add Automation to automatically update the repository, and in **part 3** I will add testing for changes to the charts themselves.
 
+> If you're into Videos, I walked JJ through starting with Helm from scratch all the way to creating a Helm Repo and CI/CD.  {{< youtube xn63krHJNKI >}}
+
 ## Use Circle CI to test [Helm](https://helm.sh) Charts
 
 > Note - You could use any other CI system here, I chose Circle as it is easy to integrate with [GitHub](https://github.com) and has a free tier. If you do use a different CI system the scripts should still work, but you'll need to rewrite a config file suitable for your CI choice.

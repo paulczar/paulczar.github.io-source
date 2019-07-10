@@ -9,6 +9,7 @@ draft: false
 
 Welcome to a three part blog series on Creating a [Helm](https://helm.sh) Chart Repository. In **part 1** I will demonstrate creating a [Helm](https://helm.sh) chart repository using [GitHub](https://github.com) and [GitHub](https://github.com) Pages. In [part 2](/blog/creating-a-helm-chart-monorepo-part-2) I will add Automation to automatically update the repository, and in [part 3](/blog/creating-a-helm-chart-monorepo-part-3) I will add testing for changes to the charts themselves.
 
+> If you're into Videos, I walked JJ through starting with Helm from scratch all the way to creating a Helm Repo and CI/CD.  {{< youtube xn63krHJNKI >}}
 
 Helm is the defacto tool for packaging, sharing, and running Kubernetes Manifests. I'm going to assume you know the basics of [Helm](https://helm.sh) and have used it before. There's plenty of great introductory topics around.
 
