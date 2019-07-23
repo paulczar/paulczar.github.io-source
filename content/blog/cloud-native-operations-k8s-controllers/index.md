@@ -4,6 +4,8 @@ title: "Cloud Native Operations - Kubernetes Controllers"
 categories: ["kubernetes","pivotal","devops", "cloud-native"]
 ---
 
+> Note: If this topic has peaked your interest, you can join me for a Webinar on August 15 where I'll dive deep into [Cloud Native Operations with Kubernetes and CI/CD Pipelines](https://content.pivotal.io/webinars/aug-15-cloud-native-operations-with-kubernetes-and-ci-cd-webinar?utm_campaign=cno-k8s-ci-cd-q319&utm_source=blog&utm_medium=website).
+
 # Lulz what? Cloud Native Operations ?!?!?!
 
 Historically Operations practices have lagged behind development. During the 90s a number of lightweight software development practices evolved such as Scrum and Extreme Programming. During the early 2000's it became pretty common to practice (or at least claim to) some form of Agile in software development.

@@ -5,6 +5,8 @@ categories: ["kubernetes","devops","helm"]
 draft: false
 ---
 
+> Note: If this topic has peaked your interest, you can join me for a Webinar on August 15 where I'll dive deep into [Cloud Native Operations with Kubernetes and CI/CD Pipelines](https://content.pivotal.io/webinars/aug-15-cloud-native-operations-with-kubernetes-and-ci-cd-webinar?utm_campaign=cno-k8s-ci-cd-q319&utm_source=blog&utm_medium=website).
+
 ## Introduction
 
 Welcome to a three part blog series on Creating a [Helm](https://helm.sh) Chart Repository. In **part 1** I will demonstrate creating a [Helm](https://helm.sh) chart repository using [GitHub](https://github.com) and [GitHub](https://github.com) Pages. In [part 2](/blog/creating-a-helm-chart-monorepo-part-2) I will add Automation to automatically update the repository, and in [part 3](/blog/creating-a-helm-chart-monorepo-part-3) I will add testing for changes to the charts themselves.
