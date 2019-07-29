@@ -5,7 +5,7 @@ title = "Resume for Paul Czarkowski"
 
 # Paul Czarkowski
 
-**Technical Lead, IBM Cloud Developer Labs**
+**Principal Technologist (Developer Advocate) @ Pivotal Software**
 
 [username.taken@gmail.com](mailto:username.taken@gmail.com)
 
@@ -13,29 +13,31 @@ title = "Resume for Paul Czarkowski"
 
 [https://github.com/paulczar](https://github.com/paulczar)
 
-Work Permits : US, Australian, UK/Europe.
+Work Permits : USA, Australia, UK/Europe.
 
 ## Overview
 
 I am an experienced hands-on Architect / DevOps Engineer with a long history in Operations and Infrastructure Automation.  I have a broad depth of experience across most IT and Operations related areas with strong experience in using and evangelizing DevOps tools and methodologies.
 
-My current role at IBM has me focused on helping to rebuild the IBM developer advocacy programs and content creation processes.  Previous to that I led the conversion of our OpenStack Automation platform ([ursula](https://github.com/blueboxgroup/ursula)) from just Ubuntu to also supporting Redhat Enterprise Linux.  I also architected and built the Blue Box Cloud SRE Operations Platform (which we recently open-sourced as [cuttle](https://github.com/IBM/cuttle)) and built a team to maintain it.
+My current role at Pivotal has me primarily acting as a Developer Advocate. This is a customer and public facing role in which I work to Advocate for customers and opensource communities into Pivotal, as well as Advocating for Pivotal to customers and communities. I am heavily involved in the Kubernetes community and can be found all over the world advocating for Kubernetes and am an core member of the Helm and Helm Charts community.
+
+My previous role at IBM has me focused on helping to rebuild the IBM developer advocacy programs and content creation processes.  Previous to that I led the conversion of our OpenStack Automation platform ([ursula](https://github.com/blueboxgroup/ursula)) from just Ubuntu to also supporting Redhat Enterprise Linux.  I also architected and built the Blue Box Cloud SRE Operations Platform (which we recently open-sourced as [cuttle](https://github.com/IBM/cuttle)) and built a team to maintain it.
 
 Previous to IBM/Blue Box I was at Rackspace where I worked on a team building a product with Docker on top of Openstack, and before that I worked at EA where I helped build and design the infrastructure for SimCity ( on AWS ) and SWTOR ( own data centers, approx 6,000 servers, 2M+ subscribers at launch ).
 
 ## Speaking Engagements
 
-see [http://tech.paulcz.net/page/speaker/](http://tech.paulcz.net/page/speaker/)
+As a Developer Advocate I have travelled to all corners of the globe to speak about Kubernetes, DevOps, and related topics. Some highlighted events, recordings, and slide decks can be found at my Speaking page: [https://speaking.paulcz.net/](https://speaking.paulcz.net/)
 
 ## Open Source and Passion Projects
 
-* In an effort to learn more about Kubernetes I got involved in the Kargo/Kubespray community and made a significant amount of contributions to help improve the quality of the Ansible being written and the composability of the Roles. Surprisingly a year on I'm still in the top [5 contributors](https://github.com/kubernetes-incubator/kubespray/graphs/contributors) (based on lines of code, which is obviously the most important metric AMIRITE)
+* In an effort to reduce the toil involved in managing and deploying to Helm Repositories I wrote a tool called [Chart Releaser](https://github.com/helm/chart-releaser) which uses github + github pages to fully host helm chart repositories. This tool was adopted into the official Helm repository as an official project.
+
+* At IBM I involved myself in the Kargo/Kubespray community and made a significant amount of contributions to help improve the quality of the Ansible being written and the composability of the Roles. Surprisingly a year on I'm still in the top [5 contributors](https://github.com/kubernetes-incubator/kubespray/graphs/contributors) (based on lines of code, which is obviously the most important metric AMIRITE).
 
 * Built out a Chef Inspec Repository for [RedHat 6 STIG auditing](https://github.com/inspec-stigs/inspec-stig-rhel6) and formed a small community around using [Inspec for STIG auditing](https://github.com/inspec-stigs).
 
 * I got tired of fighting openssl commands to create SSL/TLS for development so I built a Docker Image called [omgwtfssl](https://github.com/paulczar/omgwtfssl) that takes a few environment variables and spits out a CA/key/cert combo.
-
-* As a joke I wrote a 100 lines of code IPVS load balancer called [lolbalancer](https://github.com/paulczar/lolbalancer), but have actually found it to be useful on occasion for demonstrations.
 
 * Over Christmas 2014 I built out [Factorish](https://github.com/factorish/factorish) as a concept to show managing the life-cycle and configuration of applications in Docker using service discovery, and built several example apps such as [Percona with Galera Replication](https://github.com/paulczar/docker-percona_galera) and the [ELK stack](https://github.com/factorish/factorish-elk).  Some of these concepts have found their way into tools such as [Container Pilot](https://github.com/joyent/containerpilot) and [Habitat.sh](https://habitat.sh).  I also used it as a basis for a [blog post](http://tech.paulcz.net/blog/factorish_and_the_12_fakter_app/) and a series of talks I gave on Dockerizing apps that really shouldn’t be Dockerized.
 
@@ -69,13 +71,19 @@ see [http://tech.paulcz.net/page/speaker/](http://tech.paulcz.net/page/speaker/)
 
 * Supported the studio during development.   Lead the Online Operations team through purchasing and deploying over 6,000 servers in four data centers to run the online environment. Ensured a successful and glitch free  launch of SWTOR on the 20th December 2011.
 
-* Built a large cluster of Xen Hypervisors to provide virtual game servers for development and wrote scripts for deploying game databases from SAN snapshots ( reducing storage requirements from 36Tb to less than 1Tb ).   
+* Built a large cluster of Xen Hypervisors to provide virtual game servers for development and wrote scripts for deploying game databases from SAN snapshots ( reducing storage requirements from 36Tb to less than 1Tb ).
 
 * Successfully deployed a proof of concept private cloud with CloudStack to further increase our Virtualization abilities and create a self-service portal for our developers.
 
 ## Employment History
 
-### BlueBox an IBM Company – Nov 2014 to Current
+### Pivotal Software - Nov 2017 to Current
+
+*Austin, Texas*
+
+Principal Technologist / Developer Advocate
+
+### BlueBox an IBM Company – Nov 2014 to Nov 2017
 
 *Austin, Texas*
 
