@@ -10,7 +10,7 @@ jobs:
       - uses: actions/checkout@v1
         with:
           fetch-depth: 1
-      - uses: ./.github/actions/spell-check
+      # - uses: ./.github/actions/spell-check
       - uses: ./.github/actions/publish-gh-pages
         env:
           PUSH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

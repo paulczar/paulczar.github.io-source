@@ -16,15 +16,15 @@ My previous automation for [k8s.camp](https://k8s.camp) was using CircleCI which
 
 Obviously the first thing I did was google "github actions documentation" and the first hit was [developer.github.com/actions](https://developer.github.com/actions/) which I hastily clicked on to be greated with the following:
 
-> The documentation at `https://developer.github.com/actions` and support for the HCL syntax in GitHub Actions will be removed on September 30, 2019. Documentation for the new limited public beta using the YAML syntax is available on `https://help.github.com`. See ["Automating your workflow with GitHub Actions"](https://help.github.com/en/categories/automating-your-workflow-with-github-actions) for documentation using the YAML syntax.
+![doc move deprecate](./doc-move.png)
 
-Which was fine, I clicked through to the ["Automating your workflow with GitHub Actions"](https://help.github.com/en/categories/automating-your-workflow-with-github-actions) page.
+Which suggested I was off to a rocky start. I clicked through to the ["Automating your workflow with GitHub Actions"](https://help.github.com/en/categories/automating-your-workflow-with-github-actions) page.
 
-> Pretty much any time I googled for a GitHub Actions thing I was sent to the deprecated documentation with the `HCL` syntax rather than `yaml`.
+> Pretty much any time I googled a GitHub Actions question I was sent to the deprecated documentation with the `HCL` syntax rather than `yaml`.
 
 Most of the existing examples are still in `HCL`, both in the documentation and out in the wild.
 
-The examples in the documentation are quite trite and don't really help do anything useful. It's not even really clear how to structure the workflows and actions in the repo, so I had to fumble my way through it.
+On top of this the examples in the documentation are quite trite and don't really help do anything useful. It's not even really clear how to structure the workflows and actions in the repo, so I had to fumble my way through it.
 
 After a bunch of reading documentation and finding incomplete examples and blog posts I managed to slowly grok my way through it.
 
