@@ -75,6 +75,8 @@ For example the above workflow calls a remote checkout action `uses: actions/che
 
 Actions are run inside Docker containers, and thus an Action is usually a `Dockerfile` combined with a script to run inside the container. Remote actions should contain an `action.yaml` to define the action and its interactions.
 
+{{< tweet 1167437284410626054 >}}
+
 You can vendor your actions into your repo (which I prefer to do, especially compared to pulling in some other random person's action blindly) in which case I prefer to place them in the `.github/actions` directory to keep things clean.
 
 ## The three steps
