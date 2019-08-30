@@ -12,9 +12,9 @@ Before I get started I do want to mention that my experience as a new user tryin
 
 My previous automation for [k8s.camp](https://k8s.camp) was using CircleCI which was very intuitive, I can't say the same for GitHub Actions.
 
-## No good plan survives first contant
+## No good plan survives first contact
 
-Obviously the first thing I did was google "github actions documentation" and the first hit was [developer.github.com/actions](https://developer.github.com/actions/) which I hastily clicked on to be greated with the following:
+Obviously the first thing I did was google "github actions documentation" and the first hit was [developer.github.com/actions](https://developer.github.com/actions/) which I hastily clicked on to be greeted with the following:
 
 ![doc move deprecate](./doc-move.png)
 
@@ -71,7 +71,7 @@ Actions are also pretty self explanatory, they're the discrete units of work req
 
 Actions can be local to the repo, or they can be called from another repository.
 
-For example the above workflow calls a remote checkout action `uses: actions/checkout@v1` which literally looks out to the `v1` releast of the github repo `actions/checkout` [here](https://github.com/actions/checkout/releases/tag/v1.0.0).
+For example the above workflow calls a remote checkout action `uses: actions/checkout@v1` which literally looks out to the `v1` release of the github repo `actions/checkout` [here](https://github.com/actions/checkout/releases/tag/v1.0.0).
 
 Actions are run inside Docker containers, and thus an Action is usually a `Dockerfile` combined with a script to run inside the container. Remote actions should contain an `action.yaml` to define the action and its interactions.
 
@@ -214,6 +214,6 @@ Once you get through the initial hump of learning how GitHub actions work it bec
 
 For the sake of sanity I have kept the workflow for [k8s.camp](https://k8s.camp) very simple, but I can see how you could quickly build out a fairly complex set of workflows to perform your CI/CD tasks.
 
-While I kept the Actions in the local repository, I can see a very interesting versitility in having remote actions. I can see myself creating a central Actions github repo with all of my actions which I can then link back to from my various projects.
+While I kept the Actions in the local repository, I can see a very interesting versatility in having remote actions. I can see myself creating a central Actions github repo with all of my actions which I can then link back to from my various projects.
 
 If you have a basic hugo setup publishing to `gh-pages` feel free to clone down the [paulczar/k8s-camp](https://github.com/paulczar/k8s-camp) repo and re-use them in your own.
