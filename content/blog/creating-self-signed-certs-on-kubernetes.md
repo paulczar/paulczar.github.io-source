@@ -8,9 +8,7 @@ Welcome to 2020. Creating self signed TLS certificates is still hard. Five (5) y
 
 I've been using it ever since and kind of forgot about the pain of creating certificates.
 
-**Skip the words and jump to the examples:
-1. [Creating self signed certificates with cert-manager](#creating-self-signed-certificates-with-cert-manager)
-1. [Creating multiple certificates from the same self signed CA with cert-manager](#creating-multiple-certificates-from-the-same-self-signed-ca-with-cert-manager).**
+*Skip the words and jump to the examples [Creating self signed certificates with cert-manager]  (#creating-self-signed-certificates-with-cert-manager), [Creating multiple certificates from the same self signed CA with cert-manager](#creating-multiple-certificates-from-the-same-self-signed-ca-with-cert-manager).*
 
 With the advent of [letsencrypt](https://letsencrypt.org/) and later the Kubernetes [cert-manager](https://cert-manager.io/) controller we can make real signed certificates with a quick flourish of some **YAML**.
 
