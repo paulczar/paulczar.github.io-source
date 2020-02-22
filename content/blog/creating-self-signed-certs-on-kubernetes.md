@@ -6,14 +6,11 @@ categories: [kubernetes,certificates,ssl,tls,cert-manager]
 
 Welcome to 2020. Creating self signed TLS certificates is still hard. Five (5) years ago I created a project on github called [omgwtfssl](https://github.com/paulczar/omgwtfssl) which is a fairly simple bash script wrapping a bunch of `openssl` commands to create certificates.
 
-> SSL certificate generation for developers who don't TLS good
-
 I've been using it ever since and kind of forgot about the pain of creating certificates.
 
-
-  > Skip the words and jump to the examples:
-  > 1. [Creating self signed certificates with cert-manager](#creating-self-signed-certificates-with-cert-manager)
-  > 1. [Creating multiple certificates from the same self signed CA with cert-manager](#creating-multiple-certificates-from-the-same-self-signed-ca-with-cert-manager).
+**Skip the words and jump to the examples:
+1. [Creating self signed certificates with cert-manager](#creating-self-signed-certificates-with-cert-manager)
+1. [Creating multiple certificates from the same self signed CA with cert-manager](#creating-multiple-certificates-from-the-same-self-signed-ca-with-cert-manager).**
 
 With the advent of [letsencrypt](https://letsencrypt.org/) and later the Kubernetes [cert-manager](https://cert-manager.io/) controller we can make real signed certificates with a quick flourish of some **YAML**.
 
@@ -34,94 +31,94 @@ kind create cluster
 export KUBECONFIG="$(kind get kubeconfig-path --name="kind")"
 ```
 
-1. Test the cluster:
+Test the cluster:
 
-  ```bash
-  kubectl cluster-info
-  ```
+```bash
+kubectl cluster-info
+```
 
 ## Creating self signed certificates with cert-manager
 
-1. Install [cert-manager](https://cert-manager.io/):
+Install [cert-manager](https://cert-manager.io/):
 
-  ```bash
-  kubectl create namespace cert-manager
-  kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.13.1/cert-manager.yaml
-  ```
+```bash
+kubectl create namespace cert-manager
+kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.13.1/cert-manager.yaml
+```
 
-  > If you receive a validation error relating to the x-kubernetes-preserve-unknown-fields add `--validate` to the above command and run again.
+> If you receive a validation error relating to the x-kubernetes-preserve-unknown-fields add `--validate` to the above command and run again.
 
-1. Create a namespace to work in:
+Create a namespace to work in:
 
-  ```bash
-  kubectl create namespace sandbox
-  ```
+```bash
+kubectl create namespace sandbox
+```
 
-1. Create an Issuer:
+Create an Issuer:
 
-  > Note: you can create a ClusterIssuer instead if you want to be able to request certificates from any namespace.
+> Note: you can create a ClusterIssuer instead if you want to be able to request certificates from any namespace.
 
-  ```bash
-  kubectl apply -n sandbox -f <(echo "
-  apiVersion: cert-manager.io/v1alpha2
-  kind: Issuer
-  metadata:
+```bash
+kubectl apply -n sandbox -f <(echo "
+apiVersion: cert-manager.io/v1alpha2
+kind: Issuer
+metadata:
+  name: selfsigned-issuer
+spec:
+  selfSigned: {}
+")
+```
+
+Create a self signed certificate:
+
+> This creates a wildcard certificate that could be used for
+  any services in the sandbox namespace.
+
+```bash
+kubectl apply -n sandbox -f <(echo '
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: first-tls
+spec:
+  secretName: first-tls
+  dnsNames:
+  - "*.sandbox.svc.cluster.local"
+  - "*.sandbox"
+  issuerRef:
     name: selfsigned-issuer
-  spec:
-    selfSigned: {}
-  ")
-  ```
+')
+```
 
-1. Create a self signed certificate:
+**Validate the secret is created**
 
-  > This creates a wildcard certificate that could be used for
-    any services in the sandbox namespace.
+Check the certificate resource:
 
-  ```bash
-  kubectl apply -n sandbox -f <(echo '
-  apiVersion: cert-manager.io/v1alpha2
-  kind: Certificate
-  metadata:
-    name: first-tls
-  spec:
-    secretName: first-tls
-    dnsNames:
-    - "*.sandbox.svc.cluster.local"
-    - "*.sandbox"
-    issuerRef:
-      name: selfsigned-issuer
-  ')
-  ```
+```bash
+$ kubectl -n sandbox get certificate
+  NAME        READY   SECRET      AGE
+  first-tls   True    first-tls   9s
+```
 
-1. Validate the secret is created:
+Check the subsequent secret:
 
-  1. Check the certificate resource
+```bash
+$ kubectl -n sandbox get secret first-tls
+NAME        TYPE                DATA   AGE
+first-tls   kubernetes.io/tls   3      73s
+```
 
-    ```bash
-    $ kubectl -n sandbox get certificate
-      NAME        READY   SECRET      AGE
-      first-tls   True    first-tls   9s
-    ```
+> This secret contains three keys `ca.crt`, `tls.crt`, `tls.key`. You can run `kubectl -n sandbox get secret first-tls -o yaml` to see the whole thing.
 
-  2. Check the subsequent secret:
+Test that the certificate is valid:
 
-    ```bash
-    $ kubectl -n sandbox get secret first-tls
-    NAME        TYPE                DATA   AGE
-    first-tls   kubernetes.io/tls   3      73s
-    ```
+```bash
+openssl x509 -in <(kubectl -n sandbox get secret \
+  first-tls -o jsonpath='{.data.tls\.crt}' | base64 -d) \
+  -text -noout
+```
 
-    > This secret contains three keys `ca.crt`, `tls.crt`, `tls.key`. You can run `kubectl -n sandbox get secret first-tls -o yaml` to see the whole thing.
-
-1. Test that the certificate is valid:
-
-  ```bash
-  openssl x509 -in <(kubectl -n sandbox get secret \
-    first-tls -o jsonpath='{.data.tls\.crt}' | base64 -d) \
-    -text -noout
-  ```
-
-  > If you scan through the output you should find `X509v3 Subject Alternative Name: DNS:*.first.svc.cluster.local, DNS:*.first`.
+> If you scan through the output you should find `X509v3 Subject Alternative Name: DNS:*.first.svc.cluster.local, DNS:*.first`.
 
 Congratulations. You've just created your first self signed certificate with Kubernetes. While it involves more typing than `docker run paulczar/omgwtfssl` it is much more useful for Kubernetes enthusiasts to have the cluster generate them for you.
 
@@ -129,200 +126,200 @@ However, what if you want to use TLS certificates signed by the same CA for perf
 
 ## Creating multiple certificates from the same self signed CA with cert-manager
 
-1. Install [cert-manager](https://cert-manager.io/):
+Install [cert-manager](https://cert-manager.io/):
 
-  **Skip this step if you already installed cert-manager from the first example.**
+**Skip this step if you already installed cert-manager from the first example.**
 
-  ```bash
-  kubectl create namespace cert-manager
-  kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.13.1/cert-manager.yaml
-  ```
+```bash
+kubectl create namespace cert-manager
+kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.13.1/cert-manager.yaml
+```
 
-  > If you receive a validation error relating to the x-kubernetes-preserve-unknown-fields add `--validate` to the above command and run again.
+> If you receive a validation error relating to the x-kubernetes-preserve-unknown-fields add `--validate` to the above command and run again.
 
-1. Create a namespace to work in:
+Create a namespace to work in:
 
-  ```bash
-  kubectl create namespace sandbox2
-  ```
+```bash
+kubectl create namespace sandbox2
+```
 
-1. Create an Issuer:
+Create an Issuer:
 
-  > Note: you can create a ClusterIssuer instead if you want to be able to request certificates from any namespace.
+> Note: you can create a ClusterIssuer instead if you want to be able to request certificates from any namespace.
 
-  ```bash
-  kubectl apply -n sandbox2 -f <(echo "
-  apiVersion: cert-manager.io/v1alpha2
-  kind: Issuer
-  metadata:
+```bash
+kubectl apply -n sandbox2 -f <(echo "
+apiVersion: cert-manager.io/v1alpha2
+kind: Issuer
+metadata:
+  name: selfsigned-issuer
+spec:
+  selfSigned: {}
+")
+```
+
+Create a CA Certificate:
+
+> note `isCA` is set to true in the body of the `spec`.
+
+```bash
+kubectl apply -n sandbox2 -f <(echo '
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: sandbox2-ca
+spec:
+  secretName: sandbox2-ca-tls
+  commonName: sandbox2.svc.cluster.local
+  usages:
+    - server auth
+    - client auth
+  isCA: true
+  issuerRef:
     name: selfsigned-issuer
-  spec:
-    selfSigned: {}
-  ")
-  ```
+')
+```
 
-1. Create a CA Certificate:
+Check the certificate and secret were created:
 
-  > note `isCA` is set to true in the body of the `spec`.
+```bash
+$ kubectl -n sandbox2 get certificate sandbox2-ca
+NAME          READY   SECRET            AGE
+sandbox2-ca   True    sandbox2-ca-tls   15s
 
-  ```bash
-  kubectl apply -n sandbox2 -f <(echo '
-  apiVersion: cert-manager.io/v1alpha2
-  kind: Certificate
-  metadata:
-    name: sandbox2-ca
-  spec:
-    secretName: sandbox2-ca-tls
-    commonName: sandbox2.svc.cluster.local
-    usages:
-      - server auth
-      - client auth
-    isCA: true
-    issuerRef:
-      name: selfsigned-issuer
-  ')
-  ```
+$ kubectl -n sandbox2 get secret sandbox2-ca-tls
+NAME              TYPE                DATA   AGE
+sandbox2-ca-tls   kubernetes.io/tls   3      22s
+```
 
-1. Check the certificate and secret were created:
+Create a second Issuer using the secret name from the `sandbox2-ca` secret:
 
-  ```bash
-  $ kubectl -n sandbox2 get certificate sandbox2-ca
-  NAME          READY   SECRET            AGE
-  sandbox2-ca   True    sandbox2-ca-tls   15s
+> In order to sign multiple certificates from the same CA we need to create an Issuer resource from secret created by the CA.
 
-  $ kubectl -n sandbox2 get secret sandbox2-ca-tls
-  NAME              TYPE                DATA   AGE
-  sandbox2-ca-tls   kubernetes.io/tls   3      22s
-  ```
+```bash
+kubectl apply -n sandbox2 -f <(echo '
+apiVersion: cert-manager.io/v1alpha2
+kind: Issuer
+metadata:
+  name: sandbox2-ca-issuer
+spec:
+  ca:
+    secretName: sandbox2-ca-tls')
+```
 
-1. Create a second Issuer using the secret name from the `sandbox2-ca` secret:
+Create a TLS Certificate from the new CA Issuer:
 
-  > In order to sign multiple certificates from the same CA we need to create an Issuer resource from secret created by the CA.
+> We can add `usages` to the certificate `spec` to ensure that the certificates can be used for client/server authentication.
 
-  ```bash
-  kubectl apply -n sandbox2 -f <(echo '
-  apiVersion: cert-manager.io/v1alpha2
-  kind: Issuer
-  metadata:
+```bash
+kubectl apply -n sandbox2 -f <(echo '
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: sandbox2-server
+spec:
+  secretName: sandbox2-server-tls
+  isCA: false
+  usages:
+    - server auth
+    - client auth
+  dnsNames:
+  - "server.sandbox2.svc.cluster.local"
+  - "server"
+  issuerRef:
     name: sandbox2-ca-issuer
-  spec:
-    ca:
-      secretName: sandbox2-ca-tls')
-  ```
+')
+```
 
-1. Create a TLS Certificate from the new CA Issuer:
+Create a second TLS Certificate from the new CA Issuer:
 
-  > We can add `usages` to the certificate `spec` to ensure that the certificates can be used for client/server authentication.
+```bash
+kubectl apply -n sandbox2 -f <(echo '
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: sandbox2-client
+spec:
+  secretName: sandbox2-client-tls
+  isCA: false
+  usages:
+    - server auth
+    - client auth
+  dnsNames:
+  - "client.sandbox2.svc.cluster.local"
+  - "client"
+  issuerRef:
+    name: sandbox2-ca-issuer
+')
+```
 
-  ```bash
-  kubectl apply -n sandbox2 -f <(echo '
-  apiVersion: cert-manager.io/v1alpha2
-  kind: Certificate
-  metadata:
-    name: sandbox2-server
-  spec:
-    secretName: sandbox2-server-tls
-    isCA: false
-    usages:
-      - server auth
-      - client auth
-    dnsNames:
-    - "server.sandbox2.svc.cluster.local"
-    - "server"
-    issuerRef:
-      name: sandbox2-ca-issuer
-  ')
-  ```
+Check that all three certificates are created:
 
-1. Create a second TLS Certificate from the new CA Issuer:
+```bash
+$ kubectl -n sandbox2 get certificate
+NAME              READY   SECRET                AGE
+sandbox2-ca       True    sandbox2-ca-tls       7m34s
+sandbox2-client   True    sandbox2-client-tls   7s
+sandbox2-server   True    sandbox2-server-tls   16s
 
-  ```bash
-  kubectl apply -n sandbox2 -f <(echo '
-  apiVersion: cert-manager.io/v1alpha2
-  kind: Certificate
-  metadata:
-    name: sandbox2-client
-  spec:
-    secretName: sandbox2-client-tls
-    isCA: false
-    usages:
-      - server auth
-      - client auth
-    dnsNames:
-    - "client.sandbox2.svc.cluster.local"
-    - "client"
-    issuerRef:
-      name: sandbox2-ca-issuer
-  ')
-  ```
+$ kubectl -n sandbox2 get secret
+NAME                  TYPE                                  DATA   AGE
+sandbox2-ca-tls       kubernetes.io/tls                     3      8m14s
+sandbox2-client-tls   kubernetes.io/tls                     3      48s
+sandbox2-server-tls   kubernetes.io/tls                     3      57s
+```
 
-1. Check that all three certificates are created:
+Validate the certificates against the CA:
 
-  ```bash
-  $ kubectl -n sandbox2 get certificate
-  NAME              READY   SECRET                AGE
-  sandbox2-ca       True    sandbox2-ca-tls       7m34s
-  sandbox2-client   True    sandbox2-client-tls   7s
-  sandbox2-server   True    sandbox2-server-tls   16s
+```bash
+$ openssl verify -CAfile \
+<(kubectl -n sandbox2 get secret sandbox2-ca-tls \
+  -o jsonpath='{.data.ca\.crt}' | base64 -d) \
+<(kubectl -n sandbox2 get secret sandbox2-server-tls \
+  -o jsonpath='{.data.tls\.crt}' | base64 -d)
+/proc/self/fd/18: OK
 
-  $ kubectl -n sandbox2 get secret
-  NAME                  TYPE                                  DATA   AGE
-  sandbox2-ca-tls       kubernetes.io/tls                     3      8m14s
-  sandbox2-client-tls   kubernetes.io/tls                     3      48s
-  sandbox2-server-tls   kubernetes.io/tls                     3      57s
-  ```
+$ openssl verify -CAfile \
+<(kubectl -n sandbox2 get secret sandbox2-ca-tls \
+  -o jsonpath='{.data.ca\.crt}' | base64 -d) \
+<(kubectl -n sandbox2 get secret sandbox2-client-tls \
+  -o jsonpath='{.data.tls\.crt}' | base64 -d)
+/proc/self/fd/18: OK
+```
 
-1. Validate the certificates against the CA:
+**Validate the Client / Server authentication**
 
-  ```bash
-  $ openssl verify -CAfile \
-  <(kubectl -n sandbox2 get secret sandbox2-ca-tls \
-    -o jsonpath='{.data.ca\.crt}' | base64 -d) \
-  <(kubectl -n sandbox2 get secret sandbox2-server-tls \
-    -o jsonpath='{.data.tls\.crt}' | base64 -d)
-  /proc/self/fd/18: OK
+Run an `openssl` server as a background process:
 
-  $ openssl verify -CAfile \
-  <(kubectl -n sandbox2 get secret sandbox2-ca-tls \
-    -o jsonpath='{.data.ca\.crt}' | base64 -d) \
-  <(kubectl -n sandbox2 get secret sandbox2-client-tls \
-    -o jsonpath='{.data.tls\.crt}' | base64 -d)
-  /proc/self/fd/18: OK
-  ```
+```bash
+touch test.txt
 
-1. Validate the Client / Server authentication
+openssl s_server \
+  -cert <(kubectl -n sandbox2 get secret sandbox2-server-tls -o jsonpath='{.data.tls\.crt}' | base64 -d) \
+  -key <(kubectl -n sandbox2 get secret sandbox2-server-tls -o jsonpath='{.data.tls\.key}' | base64 -d) \
+  -CAfile <(kubectl -n sandbox2 get secret sandbox2-ca-tls -o jsonpath='{.data.ca\.crt}' | base64 -d) \
+  -WWW -port 12345  \
+  -verify_return_error -Verify 1 &
+```
 
-  1. Run an `openssl` server as a background process:
+Run an `openssl` client test:
 
-    ```bash
-    touch test.txt
+*look for `HTTP/1.0 200 ok` in the client output.*
 
-    openssl s_server \
-      -cert <(kubectl -n sandbox2 get secret sandbox2-server-tls -o jsonpath='{.data.tls\.crt}' | base64 -d) \
-      -key <(kubectl -n sandbox2 get secret sandbox2-server-tls -o jsonpath='{.data.tls\.key}' | base64 -d) \
-      -CAfile <(kubectl -n sandbox2 get secret sandbox2-ca-tls -o jsonpath='{.data.ca\.crt}' | base64 -d) \
-      -WWW -port 12345  \
-      -verify_return_error -Verify 1 &
-  ```
+```bash
+echo -e 'GET /test.txt HTTP/1.1\r\n\r\n' | \
+  openssl s_client \
+  -cert <(kubectl -n sandbox2 get secret sandbox2-client-tls -o jsonpath='{.data.tls\.crt}' | base64 -d) \
+  -key <(kubectl -n sandbox2 get secret sandbox2-client-tls -o jsonpath='{.data.tls\.key}' | base64 -d) \
+  -CAfile <(kubectl -n sandbox2 get secret sandbox2-client-tls -o jsonpath='{.data.ca\.crt}' | base64 -d) \
+  -connect localhost:12345 -quiet
+```
 
-  2. Run an `openssl` client test:
+stop the background process:
 
-    ```bash
-    echo -e 'GET /test.txt HTTP/1.1\r\n\r\n' | \
-      openssl s_client \
-      -cert <(kubectl -n sandbox2 get secret sandbox2-client-tls -o jsonpath='{.data.tls\.crt}' | base64 -d) \
-      -key <(kubectl -n sandbox2 get secret sandbox2-client-tls -o jsonpath='{.data.tls\.key}' | base64 -d) \
-      -CAfile <(kubectl -n sandbox2 get secret sandbox2-client-tls -o jsonpath='{.data.ca\.crt}' | base64 -d) \
-      -connect localhost:12345 -quiet
-    ```
-
-  > look for `HTTP/1.0 200 ok` in the client output.
-
-  3. stop the background process:
-
-  ```bash
-  kill %1
-  ```
+```bash
+kill %1
+```
 
 Congratulations, you've now created a pair of certificates signed by the same CA that can be used for client/server authentication.
 
