@@ -1,11 +1,11 @@
 FROM ubuntu:bionic
 
-LABEL "name"="Publish k8s.camp"
+LABEL "name"="Publish blog"
 LABEL "maintainer"="Paul Czarkowski"
 LABEL "version"="0.0.1"
 
-LABEL "com.github.actions.name"="Publish k8s.camp"
-LABEL "com.github.actions.description"="Publish k8s.camp via gh-pages"
+LABEL "com.github.actions.name"="Publish blog"
+LABEL "com.github.actions.description"="Publish blog"
 LABEL "com.github.actions.icon"="package"
 LABEL "com.github.actions.color"="green"
 
