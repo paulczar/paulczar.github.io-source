@@ -7,13 +7,13 @@ draft: false
 
 Recent world events (COVID-19) has completely turned the Developer Advocacy role on its head and many of us are scrambling to find new ways to effectively reach audiences remotely.
 
-Many of us have been reaching for tools like [Zoom](https://zoom.us) for smaller groups such as Meetups and streaming platforms like [Twitch](https://twitch.tv) / (YouTube Live)[https://youtube.com] for reaching larger groups.
+Many of us have been reaching for tools like [Zoom](https://zoom.us) for smaller groups such as Meetups and streaming platforms like [Twitch](https://twitch.tv) / [YouTube Live](https://youtube.com) for reaching larger groups.
 
 Many of us are turning to [Open Broadcaster Studio](https://obsproject.com/) (OBS) to turn our PCs into virtual production studios capable of composing multiple artifacts such as windows, audio, and webcams into layered streams. The most basic use case for OBS is to provide the ability to display onscreen code or a terminal session with a webcam image overlayed in the corner
 
 ![Example of OBS overlay scene](./obs-basic.png)
 
-OBS can record to a high definition video file on your local machine as well as broadcast it out to Twitch, YouTube, or any other (RTSP)[https://en.wikipedia.org/wiki/Real_Time_Streaming_Protocol] capable platform.
+OBS can record to a high definition video file on your local machine as well as broadcast it out to Twitch, YouTube, or any other [RTSP](https://en.wikipedia.org/wiki/Real_Time_Streaming_Protocol) capable platform.
 
 It should come as no surprise that streaming high quality video from multiple sources can be quite taxing and it often makes sense to have OBS running on a separate computer (refurbished Dell desktops are perfect for this) with a video capture device watching the primary screen.
 
