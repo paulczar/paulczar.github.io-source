@@ -7,7 +7,7 @@ draft: false
 
 Recent world events (COVID-19) has completely turned the Developer Advocacy role on its head and many of us are scrambling to find new ways to effectively reach audiences remotely.
 
-Many of us have been reaching for tools like [Zoom](https://zoom.us) for smaller groups such as Meetups and streaming platforms like [Twitch](https://twitch.tv) / (YouTube Live)[https://youtube.com] for reaching larger groups.
+Many of us have been reaching for tools like [Zoom](https://zoom.us) for smaller groups such as Meetups and streaming platforms like [Twitch](https://twitch.tv) / [YouTube Live](https://youtube.com) for reaching larger groups.
 
 Many of us are turning to [Open Broadcaster Studio](https://obsproject.com/) (OBS) to turn our PCs into virtual production studios capable of composing multiple artifacts such as windows, audio, and webcams into layered streams. The most basic use case for OBS is to provide the ability to display onscreen code or a terminal session with a webcam image overlayed in the corner
 
