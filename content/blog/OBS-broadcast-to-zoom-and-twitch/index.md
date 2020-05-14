@@ -5,6 +5,11 @@ categories: ["twitch","youtube","streaming","OBS","devops","developer advocate"]
 draft: false
 ---
 
+If you prefer a Video Tutorial, you can watch me screencast it on youtube, otherwise read on below.
+
+{{<youtube 0q05_AMWUug>}}
+
+
 Recent world events (COVID-19) has completely turned the Developer Advocacy role on its head and many of us are scrambling to find new ways to effectively reach audiences remotely.
 
 Many of us have been reaching for tools like [Zoom](https://zoom.us) for smaller groups such as Meetups and streaming platforms like [Twitch](https://twitch.tv) / [YouTube Live](https://youtube.com) for reaching larger groups.
