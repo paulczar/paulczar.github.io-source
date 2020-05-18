@@ -83,6 +83,8 @@ With the Virtual Camera plugin installed and enabled you can the select it as a 
 
 Setting up the video was relatively straight forward. Audio is the complicated beast. So far I have only solved this on Windows, but am quite certain you could solve it in Linux using the [JACK Audio Connection Kit](https://jackaudio.org/) (JACK).
 
+If you're running a Mac you should be able to use [Rogue Amoeba's Loopback app](https://rogueamoeba.com/loopback/) to perform similar (and maybe even more advanced) audio filtering. Thanks [Matty Stratton](https://twitter.com/mattstratton) for the tip.
+
 Basically we need to be able to selectively route certain inputs to certain outputs. For instance we want zoom audio to go into OBS, and we want OBS audio to go into Zoom, but we don't want them to loop eachothers audio back and create a feedback loop.
 
 ![diagram showing audio wiring](zoom-obs-audio.png)
