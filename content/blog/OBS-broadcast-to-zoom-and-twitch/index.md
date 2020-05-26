@@ -16,7 +16,7 @@ Many of us have been reaching for tools like [Zoom](https://zoom.us) for smaller
 
 Many of us are turning to [Open Broadcaster Studio](https://obsproject.com/) (OBS) to turn our PCs into virtual production studios capable of composing multiple artifacts such as windows, audio, and webcams into layered streams. The most basic use case for OBS is to provide the ability to display onscreen code or a terminal session with a webcam image overlayed in the corner
 
-![Example of OBS overlay scene](./obs-basic.png)
+![Example of OBS overlay scene](/blog/obs-broadcast-to-zoom-and-twitch/obs-basic.png)
 
 OBS can record to a high definition video file on your local machine as well as broadcast it out to Twitch, YouTube, or any other [RTSP](https://en.wikipedia.org/wiki/Real_Time_Streaming_Protocol) capable platform.
 
@@ -36,13 +36,13 @@ Unfortunately trying to share a screen and audio through multiple systems is com
 
 ## 1. Rebroadcast video from Zoom through to your stream
 
-![diagram showing zoom video in obs](video-zoom-obs.png)
+![diagram showing zoom video in obs](/blog/obs-broadcast-to-zoom-and-twitch/video-zoom-obs.png)
 
 ### Multiple Monitors
 
 If you have multiple monitors you can dedicate one of them to Zoom and add a **Display Capture** source in OBS for that whole display and set zoom to fullscreen on that monitor.
 
-![OBS sharing a whole display](obs-display.png)
+![OBS sharing a whole display](/blog/obs-broadcast-to-zoom-and-twitch/obs-display.png)
 
 > Note: I was on a Zoom between two machines and only one camera, so pretend `Not Paul` is a very handsome gentleman.
 
@@ -52,7 +52,7 @@ I'm not a fan of the layout of fullscreen zoom calls, and I prefer the flexibili
 
 In OBS you can add a **Window Capture** and select your Zoom meeting. This will capture just the Zoom window itself. You can adjust the window size to suit the resolution that you're outputting to.
 
-![OBS sharing just the zoom window](obs-window.png)
+![OBS sharing just the zoom window](/blog/obs-broadcast-to-zoom-and-twitch/obs-window.png)
 
 > Note: The window capture settings are OS dependent, on Windows it would display the name and executable file for the window you want to share.
 
@@ -62,17 +62,17 @@ You might be tempted to try and share your screen to Zoom, however Zoom behaves 
 
 ## 2. Rebroadcast video from OBS through to Zoom
 
-![diagram showing zoom video in obs and back](video-zoom-obs-zoom.png)
+![diagram showing zoom video in obs and back](/blog/obs-broadcast-to-zoom-and-twitch/video-zoom-obs-zoom.png)
 
 OBS has a plugin that lets you create a virtual camera which you can use as your Zoom camera. The people in your Zoom call will see exactly the same video that you're streaming without having to share your screen.
 
 You can download the virtual camera plugin from [here](https://obsproject.com/forum/resources/obs-virtualcam.949/) however it currently only supports Windows. (There's a [video4linux](https://github.com/CatxFish/obs-v4l2sink) you can use if you're on Linux) for the same effect.
 
-![OBS Virtual Camera](obs-camera-settings.png)
+![OBS Virtual Camera](/blog/obs-broadcast-to-zoom-and-twitch/obs-camera-settings.png)
 
 With the Virtual Camera plugin installed and enabled you can the select it as a camera in Zoom.
 
-![OBS virtual camera in zoom](obs-virtualcam-in-zoom.png)
+![OBS virtual camera in zoom](/blog/obs-broadcast-to-zoom-and-twitch/obs-virtualcam-in-zoom.png)
 
 > You can see the remote camera now showing the host's OBS scene of their webcam nested with their screen share.
 
@@ -87,7 +87,7 @@ If you're running a Mac you should be able to use [Rogue Amoeba's Loopback app](
 
 Basically we need to be able to selectively route certain inputs to certain outputs. For instance we want zoom audio to go into OBS, and we want OBS audio to go into Zoom, but we don't want them to loop eachothers audio back and create a feedback loop.
 
-![diagram showing audio wiring](zoom-obs-audio.png)
+![diagram showing audio wiring](/blog/obs-broadcast-to-zoom-and-twitch/zoom-obs-audio.png)
 
 In order to solve this, you need a Mixer that can mix three discreet inputs (Zoom, Desktop, Mic) to three discreet outputs (Speakers, Zoom, OBS).
 
@@ -99,7 +99,7 @@ This is where [VB Audio](https://www.vb-audio.com/) comes in. It's a website wit
 
 [VB Audio](https://www.vb-audio.com/) offers [virtual cables](https://www.vb-audio.com/Cable/index.htm) that we can use to patch the sound correctly. They have up to 5 cables that you can purchase via Donation. In order to wire up our sound we'll use **VB-CABLE A+B** and **VB-CABLE C+D** which gives us 4 virtual cables.
 
-All audio sent to VB-CABLE inputs is sent to the correspnding VB_CABLE output.
+All audio sent to VB-CABLE inputs is sent to the corresponding VB_CABLE output.
 
 Pay for, download, and install both bundles.
 
@@ -113,7 +113,7 @@ Now you have the Mixer and the Virtual Cables we can hook everything up together
 
 ### Configure VoiceMeeter Banana
 
-![screenshot of voicemeeter banana](voicemeeter-banana.png)
+![screenshot of voicemeeter banana](/blog/obs-broadcast-to-zoom-and-twitch/voicemeeter-banana.png)
 
 First open up VoiceMeeter Banana. You'll see there are Three Hardware Inputs and Three Hardware outputs.
 
@@ -149,23 +149,23 @@ First open up VoiceMeeter Banana. You'll see there are Three Hardware Inputs and
 
 In your status bar select the **Speaker** Icon and configure it to output to **Cable-D Input**
 
-![screenshot of desktop audio](desktop-audio.png)
+![screenshot of desktop audio](/blog/obs-broadcast-to-zoom-and-twitch/desktop-audio.png)
 
 ### Configure Zoom audio
 
 In Zoom, go to **Audio Settings**. Set **Speaker** to **Cable-B Input** and set **Microphone** to **Cable-A Output**.
 
-![screenshot of zoom audio settings](zoom-audio-settings.png)
+![screenshot of zoom audio settings](/blog/obs-broadcast-to-zoom-and-twitch/zoom-audio-settings.png)
 
 ### Configure OBS settings
 
 in OBS under **Settings**->**Audio** Disable all Audio devices. Then set **Mic/Auxillary Input** to **CABLE-C Output**.
 
-![screenshot of OBS audio settings](obs-audio-settings.png)
+![screenshot of OBS audio settings](/blog/obs-broadcast-to-zoom-and-twitch/obs-audio-settings.png)
 
 Then in the OBS **Audio Mixer** rename the **Mic/Auxillary Input** to **VoiceMeeter** and mute all other devices such as webcams.
 
-![screenshot of OBS mixer](obs-audio-mixer.png)
+![screenshot of OBS mixer](/blog/obs-broadcast-to-zoom-and-twitch/obs-audio-mixer.png)
 
 ### Test it out
 

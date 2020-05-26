@@ -22,7 +22,7 @@ Preamble aside, its fairly easy, but completely unintuitive to stream Zoom to Tw
 
 Log into your organization's Zoom, and hit the **Settings** button on the left hand menu. Scroll down to **Advanced settings** and turn **Allow live streaming meetings** on. Check either the **YouTube** or the **Custom Live Streaming Service**, the latter which we'll configure for Twitch.
 
-![Zoom Settings Page](zoom-settings.png)
+![Zoom Settings Page](/blog/streaming-from-zoom-to-twitch/zoom-settings.png)
 
 Since I'm bad at remembering things, I throw the following in the instructions text box so I remember when setting up the meeting how to do it.
 
@@ -42,30 +42,30 @@ Set a name, the start time, duration etc and click **Save**.
 
 This will drop you to the settings page for the meeting you just scheduled and on the bottom of that page is the **Live Streaming** configuration setting. Click **configure live stream settings**.
 
-![schedule a meeting](schedule-a-meeting.png)
+![schedule a meeting](/blog/streaming-from-zoom-to-twitch/schedule-a-meeting.png)
 
 Here you enter the details following the instructions you conveniently placed in the Stream settings:
 
 *You can find the twitch key at the following URL https://dashboard.twitch.tv/u/<username>/settings/channel*
 
-![configure live stream](configure-live-stream.png)
+![configure live stream](/blog/streaming-from-zoom-to-twitch/configure-live-stream.png)
 
 Hit Save. Now when you join the Meeting it will automatically configure the Live Stream, but you'll still need to start the Stream by clicking the **... More** button and select the streaming option from there.
 
 *If you didn't configure live streaming for the meeting, you can actually configure it here as long as you've enabled streaming in Settings*
 
-![configure live stream in meeting](from-in-zoom-meeting.png)
+![configure live stream in meeting](/blog/streaming-from-zoom-to-twitch/from-in-zoom-meeting.png)
 
 Zoom will redirect you to a browser and configure the stream before redirecting it to your twitch streaming page.
 
-![starting stream](start-stream.png)
+![starting stream](/blog/streaming-from-zoom-to-twitch/start-stream.png)
 
 You can close this twitch streaming window once its started or leave it open. If you leave it open turn off its sound or you'll create some fun echo loopbacks.
 
 Here's the Twitch view:
 
-![twitch stream](twitch-streaming.png)
+![twitch stream](/blog/streaming-from-zoom-to-twitch/twitch-streaming.png)
 
 Here's the Zoom View:
 
-![zoom stream](zoom-streaming.png)
+![zoom stream](/blog/streaming-from-zoom-to-twitch/zoom-streaming.png)
