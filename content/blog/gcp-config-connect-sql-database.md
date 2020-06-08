@@ -101,7 +101,7 @@ Create a service account for GCC:
 gcloud iam service-accounts create cnrm-system
 ```
 
-Bind the roles/owner to the service account:
+Bind the `roles/owner` to the service account:
 
 ```bash
 gcloud projects add-iam-policy-binding ${PROJECT_ID} \
@@ -109,7 +109,7 @@ gcloud projects add-iam-policy-binding ${PROJECT_ID} \
   --role="roles/owner"
 ```
 
-Bind roles/iam.workloadIdentityUser to the cnrm-controller-manager Kubernetes Service Account in the cnrm-system Namespace:
+Bind `roles/iam.workloadIdentityUser` to the `cnrm-controller-manager` Kubernetes Service Account in the `cnrm-system` Namespace:
 
 
 ```bash
@@ -131,7 +131,7 @@ Extract GCC:
 tar zxvf release-bundle.tar.gz
 ```
 
-Fix the manifest with your project id:
+Update the manifest with your project id:
 
 ```bash
 sed -i.bak "s/\${PROJECT_ID?}/${PROJECT_ID}/" \
