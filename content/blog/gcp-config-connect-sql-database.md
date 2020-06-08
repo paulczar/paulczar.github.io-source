@@ -8,7 +8,7 @@ draft: false
 
 *Sorry for the long preamble, feel free to just skip straight to the [technical details]({{< relref "#deploying-a-cloudsql-instance-via-gcc" >}}).*
 
-Two years ago, faced with the challenge of wanting to reduce the tooling required to deploy infrastructure to Google Cloud I started working on a [Google Cloud Operator](https://github.com/paulczar/gcp-cloud-compute-operator). The goal of this project was to be able to stand up networks, images, and Virtual Machines for installing Pivotal's [PKS](https://docs.pivotal.io/pks/1-4/index.html) (now Tanzu Kubernetes Grid Integrated).
+Two years ago, faced with the challenge of wanting to reduce the tooling required to deploy infrastructure to Google Cloud I started working on a [Google Cloud Operator](https://github.com/paulczar/gcp-cloud-compute-operator). The goal of this project was to be able to stand up networks, images, and Virtual Machines for installing Pivotal's [PKS](https://docs.pivotal.io/pks) (now Tanzu Kubernetes Grid Integrated).
 
 This worked out pretty well for me and I was able to create/destroy environments at will seeded from a single node GKE cluster running the operator.
 
