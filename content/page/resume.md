@@ -1,11 +1,11 @@
 +++
-date = "2017-06-25T09:04:08-06:00"
+date = "2020-02-09T09:04:08-06:00"
 title = "Resume for Paul Czarkowski"
 +++
 
 # Paul Czarkowski
 
-**Principal Technologist (Developer Advocate) @ Pivotal Software**
+**Staff Technologist (Developer Advocate) @ VMware**
 
 [username.taken@gmail.com](mailto:username.taken@gmail.com)
 
@@ -17,11 +17,12 @@ Work Permits : USA, Australia, UK/Europe.
 
 ## Overview
 
-I am an experienced hands-on Architect / DevOps Engineer with a long history in Operations and Infrastructure Automation.  I have a broad depth of experience across most IT and Operations related areas with strong experience in using and evangelizing DevOps tools and methodologies.
+I am an experienced hands-on Architect / DevOps Engineer who accidently fell into a Developer
+Advocate role. I have a long history in Operations and Infrastructure Automation.  I have a broad depth of experience across most IT and Operations related areas with strong experience in using and evangelizing DevOps tools and methodologies.
 
-My current role at Pivotal has me primarily acting as a Developer Advocate. This is a customer and public facing role in which I work to Advocate for customers and opensource communities into Pivotal, as well as Advocating for Pivotal to customers and communities. I am heavily involved in the Kubernetes community and can be found all over the world advocating for Kubernetes and am an core member of the Helm and Helm Charts community.
+My current role at VMware has me primarily acting as a Developer Advocate. This is a customer and public facing role in which I work to Advocate for customers and opensource communities into VMware, as well as Advocating for VMware to customers and communities. I also have a key role in improving the Operator experience for a number of VMware's flagship products. I am heavily involved in the Kubernetes community and can be found all over the world advocating for Kubernetes and am an core member of the Helm and Helm Charts community.
 
-My previous role at IBM has me focused on helping to rebuild the IBM developer advocacy programs and content creation processes.  Previous to that I led the conversion of our OpenStack Automation platform ([ursula](https://github.com/blueboxgroup/ursula)) from just Ubuntu to also supporting Redhat Enterprise Linux.  I also architected and built the Blue Box Cloud SRE Operations Platform (which we recently open-sourced as [cuttle](https://github.com/IBM/cuttle)) and built a team to maintain it.
+My previous role at IBM has me focused on helping to rebuild the IBM developer advocacy programs and content creation processes.  Previous to that I led the conversion of our OpenStack Automation platform ([ursula](https://github.com/blueboxgroup/ursula)) from just Ubuntu to also supporting Redhat Enterprise Linux.  I also architected and built the Blue Box Cloud SRE Operations Platform (which was open-sourced as [cuttle](https://github.com/IBM/cuttle)) and built a team to maintain it.
 
 Previous to IBM/Blue Box I was at Rackspace where I worked on a team building a product with Docker on top of Openstack, and before that I worked at EA where I helped build and design the infrastructure for SimCity ( on AWS ) and SWTOR ( own data centers, approx 6,000 servers, 2M+ subscribers at launch ).
 
@@ -31,7 +32,11 @@ As a Developer Advocate I have travelled to all corners of the globe to speak ab
 
 ## Open Source and Passion Projects
 
-* In an effort to reduce the toil involved in managing and deploying to Helm Repositories I wrote a tool called [Chart Releaser](https://github.com/helm/chart-releaser) which uses github + github pages to fully host helm chart repositories. This tool was adopted into the official Helm repository as an official project.
+* Built out a platform in a box project to deploy a full SRE/Ops stack of tools to turn Kubernetes into a fully features platform - [Platform Operations on Kubernetes](https://github.com/paulczar/platform-operations-on-kubernetes).
+
+* Built the first viable [Google Cloud Operator]((https://github.com/paulczar/gcp-cloud-compute-operator)) for Kubernetes that let you manage most popular Google Cloud services from within Kubernetes, Worked with the google team to help improve their official operator "Config Connector" to reach (and later exceed) feature parity with mine.
+
+* In an effort to reduce the toil involved in managing and deploying to Helm Repositories I wrote a tool called [Chart Releaser](https://github.com/helm/chart-releaser) which uses github + github pages to fully host helm chart repositories. This tool was adopted into the official Helm repository as an official project and is now used in production for hundreds of Helm Chart repositories.
 
 * At IBM I involved myself in the Kargo/Kubespray community and made a significant amount of contributions to help improve the quality of the Ansible being written and the composability of the Roles. Surprisingly a year on I'm still in the top [5 contributors](https://github.com/kubernetes-incubator/kubespray/graphs/contributors) (based on lines of code, which is obviously the most important metric AMIRITE).
 
@@ -42,6 +47,16 @@ As a Developer Advocate I have travelled to all corners of the globe to speak ab
 * Over Christmas 2014 I built out [Factorish](https://github.com/factorish/factorish) as a concept to show managing the life-cycle and configuration of applications in Docker using service discovery, and built several example apps such as [Percona with Galera Replication](https://github.com/paulczar/docker-percona_galera) and the [ELK stack](https://github.com/factorish/factorish-elk).  Some of these concepts have found their way into tools such as [Container Pilot](https://github.com/joyent/containerpilot) and [Habitat.sh](https://habitat.sh).  I also used it as a basis for a [blog post](http://tech.paulcz.net/blog/factorish_and_the_12_fakter_app/) and a series of talks I gave on Dockerizing apps that really shouldn’t be Dockerized.
 
 ## Professional Accomplishments
+
+### VMware / Pivotal
+
+* Traveled to 20+ countries and presented talks, workshops, demos, to thousands of people, from customers, to community, to individual coaching, small meetups, to massive conferences such as KubeCon and VMWorld.
+
+* Coached and mentored my (mostly developer) team in DevOps concepts and usage of Kubernetes and related technologies.
+
+* Helped plan, organize, and develop our first major outreach initiative after the COVID related travel restrictions, resulting in a 24+ hour Spring Live conference on March 19th 2020 with tens of thousands of attendees.
+
+* Took the learnings from Spring Live and lead the creation of a streaming practice [tanzu.tv](https://tanzu.tv) for developer outreach with 5 weekly shows and more coming. Became the team expert in creating video content for Twitch, Youtube, both streaming, as well as more traditional content.
 
 ### IBM / Blue Box
 
@@ -77,11 +92,11 @@ As a Developer Advocate I have travelled to all corners of the globe to speak ab
 
 ## Employment History
 
-### Pivotal Software - Nov 2017 to Current
+### VMWare / Pivotal Software - Nov 2017 to Current
 
 *Austin, Texas*
 
-Principal Technologist / Developer Advocate
+Staff Technologist / Developer Advocate
 
 ### BlueBox an IBM Company – Nov 2014 to Nov 2017
 
