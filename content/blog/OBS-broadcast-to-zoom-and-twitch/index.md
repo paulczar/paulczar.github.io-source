@@ -5,6 +5,8 @@ categories: ["twitch","youtube","streaming","OBS","devops","developer advocate"]
 draft: false
 ---
 
+> Note: I have an updated, simpler version of this on Github with saved exports of profile and sources [here](https://github.com/paulczar/obs-and-zoom).
+
 If you prefer a Video Tutorial, you can watch me screencast it on youtube, otherwise read on below.
 
 {{<youtube 0q05_AMWUug>}}
