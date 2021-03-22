@@ -61,9 +61,11 @@ We did however want to do the closing  messages live each day, and the fire-star
 
 We knew that we wanted to ensure the conference was accessible so we opted to hire [White Coat Captioning](https://whitecoatcaptioning.com/) to do live captioning and we also hired Ashton from [Minds Eye Creative](https://www.mindseyecreative.ca/) to do a live drawing of the contents of each 30-minute session.
 
-To do this I needed a way to get our conference audio/video live to both parties, Streaming services usually add some delay for processing to a stream, so it was important that we were able to provide them with an undelayed live video/audio feed. To do this I set up an [obs.ninja](obs.ninja) room.
+### OBS.Ninja pre-stream feed
 
-In OBS Ninja I shared the OBS virtual camera and VB Virtual audio cable in the Control room, both the captioning team and Ashton would connect to this able be able to see and hear the live feed from OBS without any delays.
+I needed a way to get our conference audio/video live to both parties, Streaming services usually add some delay for processing to a stream, so it was important that we were able to provide them with an undelayed live video/audio feed. I could have used Zoom, but I was already going to use that for live content, therefore I opted to do this with a web based [obs.ninja](obs.ninja) room.
+
+In OBS Ninja I shared the OBS virtual camera and VB Virtual Audio Cable from the Control room. Both the captioning team and Ashton would connect to this and able be able to see and hear the live feed from OBS without any delays, plus broadcast their own video/audio (if needed) to be captured as a Browser source in OBS.
 
 ### Live Drawing
 
@@ -81,7 +83,9 @@ _The OBS Scene containing Ashton's cartoon.  I've added a touch of transparency 
 
 ### Captions
 
-The captioner would see exactly the same feed as Ashton above. However we didn't want to capture anything directly from White Coat, instead they send a text stream to a [streaming text](https://www.streamtext.net) website. The website would show an auto-scrolling wall of text as the captioners did their thing. I created an OBS Scene that contained a Browser source pointing at the text stream like so.
+The captioning team would see exactly the same feed as Ashton above. However we didn't want to capture anything directly from White Coat, instead they send a text stream to a [streaming text](https://www.streamtext.net) website. The website would show an auto-scrolling wall of text as the captioners did their thing. I created an OBS Scene that contained a Browser source pointing at the text stream like so.
+
+> Note: There is an [OBS websocket plugin](https://github.com/EddieCameron/obs-websocket-streamtext-captions) to create a better interface to capturing from streamtext, but it involves setting up a NodeJS service and I didn't want climb that particular hill.
 
 ![OBS Scene for Captioning](./caption-scene.png)
 _The captions scene shows the whole stream text website._
@@ -91,3 +95,59 @@ The captioners would blast carriage returns at the start of each day to ensure t
 ![Captioning cropped out in session](./captions-in-session.png)
 
 _The captions thus appear in a captions bar across the top of any scenes that we wanted captioned._
+
+## Live Sessions - Zoom
+
+In order to facilitate live sessions I chose to use Zoom. I could have used OBS.Ninja like above, however that would have required a bunch of extra work vs doing the basic window-grab of Zoom.
+
+I created a Zoom scene in OBS in which I added a Window source for Zoom, a "technical difficulties" source under the Zoom source (so it would show if zoom crashed or whatever) and an Audio Input source for the Virtual Audio Cable.
+
+I used the CTRL-Drag of the bounding box for the Zoom source to cut out the borders and controls of the zoom window to make it look a little less "zoomy".
+
+I also configured Zoom to use the Virtual Audio Cable as the speaker, I wouldn't be sending audio to Zoom so I just left the Mic on the default setting, but I could have used a second Virtual Audio Cable to route audio from OBS to Zoom's Mic.
+
+![Zoom Scene](./zoom-scene.png)
+
+_With Zoom not currently running the technical difficulties message is shown._
+
+I scheduled two all-day Zoom calls and shared the invite links to the people giving live sessions. Apart from keeping the meeting open and ensuring the right people were on Zoom at the right time there was very little effort required.
+
+## Content Scenes - Sessions, Ignites, etc
+
+With the plumbing out of the way I could start building out Scenes for the Sessions, Ignites, Sponsors, etc. Given the even was time based I made the decision to prefix each scene with the time that I expected to play it.
+
+![scene naming](./scene-names.png)
+
+_By prefixing the scenes with their times it was obvious from the OBS interface what scene to play when and helped ensure the scenes were ordered chronologically._
+
+We wanted to make sure that folks had plenty of chances for breaks, so we chose to sandwich all content with some sort of short break, usually 5 minutes at a time, as well as a longer break for lunch. We also wanted to ensure that we had a variety of content so we tried not to have two pieces of similar content in a row.
+
+We had captions and live drawing for our Keynotes and main sessions, but not for other content such as Ignites and Sponsor pitches. So I built two main overlays.
+
+### Keynote and Session Scenes
+
+The Keynote and Session overlay was a scene that started with a graphics source that was had a border with DOD TX colors and graphics (designed by the talente Ahston) with a blank title bar at the bottom and a transparent rectangle (16:9 ratio to match 1080p videos).
+
+I added a text source to point viewers to our signup url so they could get access to discord, as well as the captions scene at the top of the window and the live drawing scene on the right.
+
+![keynote and session overlay](./session-overlay.png)
+
+_Here you can see the blank session overlay Scene._
+
+I then created individual scenes per Keynote and Session that started with the main content source, in most cases a media source that contained the pre-recorded session video. By default I added both the Compression and Noise Suppression filters to the videos (this helped a ton with background noise and substandard microphones) and 2 x Audio Monitor filters (one for OBS ninja, one for headphones) to ensure sound got to where it needed to go. I also skimmed through the video and made sure sound was high green to mid orange at peak and adjusted the gain to suit.
+
+> Note: you can copy transforms and filters from one source to another, this made it very easy to make the videos consistent.
+
+Next I added the Session overlay and adjusted the Video media to fit inside the virtual frame of the overlay. If the video source wasn't perfectly 16:9 I made the video slightly bigger than the transparent part of the overlay and let it  crop off the edges.
+
+Finally I added a text overlay that went over the title bar to add the Session title and speaker name.
+
+![keynote and session overlays](./captions-in-session.png)
+
+_The result was a consistent look across all sessions with branding, captions, and live drawing._
+
+### Ignite, and Sponsor pitch overlay
+
+....
+
+![Ignite and sponsor overlays](./ignite-overlay-in-use.png)
