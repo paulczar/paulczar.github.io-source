@@ -1,13 +1,13 @@
 ---
-date: "2021-03-15"
+date: "2021-03-31"
 title: "Streaming DevOpsDays Texas"
 categories: ["twitch","youtube","streaming","OBS","devops","developer advocate", "dod"]
-draft: true
+draft: false
 ---
 
 I recently had the privilege to help organize DevOpsDays Texas 2021 a virtual event that we ran to try and scratch our DevOpsDays itch given that in-person conferences won't be happening any time soon.
 
-I had the misfortune of being the most knowledgable about live streaming and therefore was nominated as the person to figure out how to live stream the event to Youtube.
+I had the misfortune of being the most experienced at OBS setup for live streaming and therefore was nominated as the person to figure out how to live stream the event to Youtube.
 
 I chose to use [Open Broadcaster Software (OBS)](https://obsproject.com/) to manage the stream and Windows as the OS to run it on (OBS support is generally best on windows).
 
@@ -40,7 +40,7 @@ Knowing that I would need to keep files in sync between the two servers I looked
 
 ## OBS Overlay and Underlay Scenes
 
-In OBS you create a Scene that contains one or more sources that are layered on top of eachother. You can use another Scene as a source. This means that you can compose fairly complex scenes together into the stream.
+In OBS you create a Scene that contains one or more sources that are layered on top of each-other. You can use another Scene as a source. This means that you can compose fairly complex scenes together into the stream.
 
 This allowed us to have a few master scenes that were the base for the rest of the scenes.
 
@@ -63,7 +63,7 @@ We knew that we wanted to ensure the conference was accessible so we opted to hi
 
 ### OBS.Ninja pre-stream feed
 
-I needed a way to get our conference audio/video live to both parties, Streaming services usually add some delay for processing to a stream, so it was important that we were able to provide them with an undelayed live video/audio feed. I could have used Zoom, but I was already going to use that for live content, therefore I opted to do this with a web based [obs.ninja](obs.ninja) room.
+I needed a way to get our conference audio/video live to both parties, Streaming services usually add some delay for processing to a stream, so it was important that we were able to provide them with an un-delayed live video/audio feed. I could have used Zoom, but I was already going to use that for live content, therefore I opted to do this with a web based [obs.ninja](obs.ninja) room.
 
 In OBS Ninja I shared the OBS virtual camera and VB Virtual Audio Cable from the Control room. Both the captioning team and Ashton would connect to this and able be able to see and hear the live feed from OBS without any delays, plus broadcast their own video/audio (if needed) to be captured as a Browser source in OBS.
 
@@ -83,14 +83,14 @@ _The OBS Scene containing Ashton's cartoon.  I've added a touch of transparency 
 
 ### Captions
 
-The captioning team would see exactly the same feed as Ashton above. However we didn't want to capture anything directly from White Coat, instead they send a text stream to a [streaming text](https://www.streamtext.net) website. The website would show an auto-scrolling wall of text as the captioners did their thing. I created an OBS Scene that contained a Browser source pointing at the text stream like so.
+The captioning team would see exactly the same feed as Ashton above. However we didn't want to capture anything directly from White Coat, instead they send a text stream to a [streaming text](https://www.streamtext.net) website. The website would show an auto-scrolling wall of text as the captionering team did their thing. I created an OBS Scene that contained a Browser source pointing at the text stream like so.
 
 > Note: There is an [OBS websocket plugin](https://github.com/EddieCameron/obs-websocket-streamtext-captions) to create a better interface to capturing from streamtext, but it involves setting up a NodeJS service and I didn't want climb that particular hill.
 
 ![OBS Scene for Captioning](./caption-scene.png)
 _The captions scene shows the whole stream text website._
 
-The captioners would blast carriage returns at the start of each day to ensure that when the captioning started it would be on the last two lines and the auto-scrolling would keep it there. This means we can add the `_captioning` scene above as a source into any scenes that we wished to display the captions and crop the source to show just the last two lines of the source.
+The captioning team would blast carriage returns at the start of each day to ensure that when the captioning started it would be on the last two lines and the auto-scrolling would keep it there. This means we can add the `_captioning` scene above as a source into any scenes that we wished to display the captions and crop the source to show just the last two lines of the source.
 
 ![Captioning cropped out in session](./captions-in-session.png)
 
@@ -126,9 +126,9 @@ We had captions and live drawing for our Keynotes and main sessions, but not for
 
 ### Keynote and Session Scenes
 
-The Keynote and Session overlay was a scene that started with a graphics source that was had a border with DOD TX colors and graphics (designed by the talente Ahston) with a blank title bar at the bottom and a transparent rectangle (16:9 ratio to match 1080p videos).
+The Keynote and Session overlay was a scene that started with a graphics source that was had a border with DOD TX colors and graphics (designed by the talented Ashton) with a blank title bar at the bottom and a transparent rectangle (16:9 ratio to match 1080p videos).
 
-I added a text source to point viewers to our signup url so they could get access to discord, as well as the captions scene at the top of the window and the live drawing scene on the right.
+I added a text source to point viewers to our sign-up url so they could get access to discord, as well as the captions scene at the top of the window and the live drawing scene on the right.
 
 ![keynote and session overlay](./session-overlay.png)
 
@@ -136,9 +136,9 @@ _Here you can see the blank session overlay Scene._
 
 I then created individual scenes per Keynote and Session that started with the main content source, in most cases a media source that contained the pre-recorded session video. By default I added both the Compression and Noise Suppression filters to the videos (this helped a ton with background noise and substandard microphones) and 2 x Audio Monitor filters (one for OBS ninja, one for headphones) to ensure sound got to where it needed to go. I also skimmed through the video and made sure sound was high green to mid orange at peak and adjusted the gain to suit.
 
-> Note: you can copy transforms and filters from one source to another, this made it very easy to make the videos consistent.
-
 Next I added the Session overlay and adjusted the Video media to fit inside the virtual frame of the overlay. If the video source wasn't perfectly 16:9 I made the video slightly bigger than the transparent part of the overlay and let it  crop off the edges.
+
+> Note: you can copy transforms and filters from one source to another, this made it very easy to make the videos consistently sized.
 
 Finally I added a text overlay that went over the title bar to add the Session title and speaker name.
 
@@ -148,6 +148,88 @@ _The result was a consistent look across all sessions with branding, captions, a
 
 ### Ignite, and Sponsor pitch overlay
 
-....
+This overlay was very similar to the Session overlay, only without the captioning or live drawing (although I did go back and add the captioning source to the ignite scenes later).
 
 ![Ignite and sponsor overlays](./ignite-overlay-in-use.png)
+
+_Here you can see the simpler overlay used for Ignites and Sponsor pitches_
+
+## Transition Scenes
+
+With the majority of the content scenes out of the way, it was time to build out transition scenes. I knew I would need some text focussed transition scenes like "Stay tuned we'll be kicking off at 9:00am" and "break time! next up..." as well as introduction transition scenes to play personalized introduction videos for our sessions.
+
+### Text based Transition Scenes
+
+The text based transitions were fairly straight forward. I had Ashton build me a 1080p image with a big space for text. She created a brilliant image with a cactus (one of the recurring DOD Texas characters she created) and a speech bubble.
+
+![base intermission scene](./intermission-scene.png)
+
+_Here you can see the text base transition scene._
+
+I created a Scene for Starting Soon, Finished, Breaks, and a few other transitions that included the base intermission scene and then added some text in everyone's favorite font.
+
+![starting soon intermission scene](./starting-soon.png)
+
+_Here you can see the starting soon transition scene with the text overlayed over the base scene._
+
+### Speaker Introductions
+
+We also wanted to create personalized speaker introductions, Dan Collins and Laura Santamaria volunteered to record a roughly 1 minute introduction for each speaker, and did an amazing job of it, their experience in creating compelling videos really shone through.
+
+Ashton had created social cards for each speaker to be used on various social media platforms to promote their session, so I collected those and use them as a background for each speaker introduction, and then I layered the introduction video on top of it, that way when the video ended it would show the speaker's avatar and session title while I fumbled to switch to the scene for that session.
+
+![speaker introduction scene](./speaker-intro.png)
+
+_Here you can see Kiran's introduction done by Laura, Laura included the social card in her videos too, so we had a really great transition experience._
+
+## Automating Scene Transitions
+
+By this stage I had two scene collections set up one for Day 1, one for Day 2. Each scene collection had the scenes that consisted of the day's event listed in the order in which they were to be played and prefixed with the times that they should be played.
+
+When I was setting this up originally I had expected that I would be setting alarms and clicking between each scene. However I stumbled across the [Advanced Scene Switcher](https://obsproject.com/forum/resources/advanced-scene-switcher.395/) OBS plugin that allowed you to set various triggers to switch between scenes.
+
+The triggers I used were "Media", "Time", and "Sequence".
+
+Initially I was going to use _Time_ based triggers for the whole event, but I discovered that since most of our content wasn't exactly timed (Session videos were slated for 30 minutes, but most were around 25 minutes, and some were event less) which meant that when a Session video finished it would stay on an empty session scene until the time was up.
+
+To combat this, I switched most of the triggers to be _media_ based and set the action to be "When Media **session - Nigel** state is **Played to end** switch to **11:40 - Lunch Breaks** scene.
+
+![screenshot of media switches](./media-switches.png)
+
+_Here you can see the lengthy list of media based switches that drove most of the automated scene switching._
+
+This was perfect as we had some form of break after every session, so if a session finished early it would immediately transition into the specific Break's transition scene and we'd just get a slightly longer break.
+
+This means that _Time_ based switching was used to trigger the scheduled content such as "at **10:35** switch to **10:35 - Ignite Intro** and the _Media_ based switching was used to trigger the transition scenes.
+
+![screenshot of time switches](./time-switches.png)
+
+_Here you can see the Time based switches that drove the scheduled scenes._
+
+I also had a few text based introduction scenes like the above mentioned **10:35 - Ignite Intro** which I solved with the _Sequence_ based triggers such as "When **10:35 - Ignite Intro** is active switch to **10:35 Ignites - Jeremy** after **10 seconds**".
+
+![screenshot of sequence switches](./sequence-switches.png)
+
+_Finally here's the sequence switches._
+
+With these in place, both days were fully automated, the only thing I had to do was hit "Start Streaming" and "Stop Streaming" at the start and end of each day.
+
+## The actual streams
+
+A few days prior to the events I had the both days fully automated, and was able to test them on unpublished youtube streams. This gave us the opportunity to preview the streams and fix any issues. We found a few, but not all of the issues.
+
+I also used rsync to make sure that the content was synced to the IBM Cloud server and I had exported and imported the scene collections so that I could drive the event from the cloud server and fall back to my personal streaming box in emergency.  I also gave JJ Asghar a quick rundown on what to do in case I lost power or got hit by a falling aircraft engine.
+
+On both days of the event I set the **8:00 Starting Soon** scene as active hit the start streaming button at 8:00am. From here I just had to monitor things and hope I got the automation right, If not, I could always override it.
+
+The event was not without a few glitches. Somewhere I had managed to schedule it to **Start Recording** part way through the first session. The streaming server had just a single slow disk and this action caused the stream to stutter and have issues. On the first day it took a while to figure out what went wrong and fix it. We nearly switched to my backup streaming box when I saw the **Recording** was on.  Turning it off fixed it, but not before I had accidently clicked off the scene and then had to try and scrool through to the right spot in the media playback.
+
+As we played through both days there were a few scenes that weren't quite right, and I was able to switch to **Studio Mode** which lets you edit a scene without switching to it live, which allowed me to fix most of the issues, however a few times I forgot to switch to Studio Mode and accidently switched scenes. This was a sign that unless a scene glitch is really major, better just to leave it glitched than to try and fix it live.
+
+## Conclusion
+
+Overall I would say that while tedious, it was actually fairly easy to build out the OBS setup to stream the event. The few live glitches we had were really stressful, but ultimately small enough that it didn't affect the overall viewing experience.
+
+I definitely gained an appreciation of the hard work and planning that goes into the production side of an event like this, and definitely feel that if you have the budget, partnering with a production company to do this for you is well worth it.
+
+Would I do this again? If you had asked me a few days after the event, I would say no way, but now, with some time passed, I would probably say yes.
