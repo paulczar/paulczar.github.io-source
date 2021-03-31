@@ -7,6 +7,8 @@ draft: false
 
 I recently had the privilege to help organize DevOpsDays Texas 2021 a virtual event that we ran to try and scratch our DevOpsDays itch given that in-person conferences won't be happening any time soon.
 
+To see the final product you can watch the [Day 1](https://www.youtube.com/watch?v=Ji_Dl92D6ps) and [Day 2](https://www.youtube.com/watch?v=AvuWHRPqcCA) streams over on [youtube](https://www.youtube.com/channel/UC4KuCn1Fy1tgt9NRIN3rlFg).
+
 I had the misfortune of being the most experienced at OBS setup for live streaming and therefore was nominated as the person to figure out how to live stream the event to Youtube.
 
 I chose to use [Open Broadcaster Software (OBS)](https://obsproject.com/) to manage the stream and Windows as the OS to run it on (OBS support is generally best on windows).
