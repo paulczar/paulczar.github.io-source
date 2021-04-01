@@ -5,11 +5,11 @@ categories: ["twitch","youtube","streaming","OBS","devops","developer advocate",
 draft: false
 ---
 
-I recently had the privilege to help organize DevOpsDays Texas 2021 a virtual event that we ran to try and scratch our DevOpsDays itch given that in-person conferences won't be happening any time soon.
+I recently had the privilege to help organize DevOpsDays Texas 2021, a virtual event that we ran to try and scratch our DevOpsDays itch given that in-person conferences won't be happening any time soon.
 
-To see the final product you can watch the [Day 1](https://www.youtube.com/watch?v=Ji_Dl92D6ps) and [Day 2](https://www.youtube.com/watch?v=AvuWHRPqcCA) streams over on [youtube](https://www.youtube.com/channel/UC4KuCn1Fy1tgt9NRIN3rlFg).
+> To see the replays of the event you can watch the [Day 1](https://www.youtube.com/watch?v=Ji_Dl92D6ps) and [Day 2](https://www.youtube.com/watch?v=AvuWHRPqcCA) streams over on [youtube](https://www.youtube.com/channel/UC4KuCn1Fy1tgt9NRIN3rlFg).
 
-I had the misfortune of being the most experienced at OBS setup for live streaming and therefore was nominated as the person to figure out how to live stream the event to Youtube.
+I had the dubious honor of being the most experienced at the technical setup for live streaming and therefore was nominated as the person to figure out how to live stream the event to Youtube.
 
 I chose to use [Open Broadcaster Software (OBS)](https://obsproject.com/) to manage the stream and Windows as the OS to run it on (OBS support is generally best on windows).
 
@@ -17,21 +17,29 @@ I chose to use [Open Broadcaster Software (OBS)](https://obsproject.com/) to man
 
 I already have a pretty decent streaming box at home, its a couple year old Dell workstation that I added an SSD and a Nvidia GTX 1050 ti. The most important component of an OBS machine is that it contains something capable of doing h.264 encoding in hardware, otherwise the CPU will be blasted.
 
-The 1050ti is a few years old, but still supports `nvenc` which is the Nvidia library for doing hardware encoding. One important thing to note is that for `nvenc` to work you must have a display hooked up to the card. This means you cannot use the Windows Remote Desktop tool as it swaps out the display for a virtual one.
+The 1050ti is a few years old, but still supports `nvenc` which is the Nvidia library for doing hardware encoding. One important thing to note is that for `nvenc` to work you must have a display hooked up to the card. This means you cannot use the Windows Remote Desktop tool as it swaps out the display for a virtual one, as I later discovered this becomes a major issue when working with GPU enabled cloud instances.
 
-I use NoMachine as a remote desktop tool to connect to my streaming box and I have a [cheap HDMI dummy monitor](https://www.amazon.com/Headless-Display-Emulator-Headless-1920x1080-Generation/dp/B06XT1Z9TF/) which tricks the GPU into thinking it has a monitor plugged in.
+To work around this locally I use NoMachine as a remote desktop tool to connect to my streaming machine and I have a [cheap HDMI dummy monitor](https://www.amazon.com/Headless-Display-Emulator-Headless-1920x1080-Generation/dp/B06XT1Z9TF/) which tricks the GPU into thinking it has a monitor plugged in.
 
 I then installed [OBS Studio 26.1.1](https://obsproject.com/download) and two OBS plugins [Audio Monitor](https://obsproject.com/forum/resources/audio-monitor.1186/) and [Advanced Scene Switcher](https://obsproject.com/forum/resources/advanced-scene-switcher.395/) which I'll detail later.
 
-Knowing that I would need to do some advanced audio work I also downloaded [VB-Cable Virtual Audio Device](https://vb-audio.com/Cable/) to use to ensure I could get audio from Zoom to OBS. For previous streams I've needed more cables and have used their A+B and C+D cable packs as well as [Voicemeeter Banana](https://vb-audio.com/Voicemeeter/banana.htm) for mixing the audio, but for this event I was able to get by with just the one Cable.
+Knowing that I would need to do some advanced audio work I also downloaded [VB-Cable Virtual Audio Cables A+B](https://vb-audio.com/Cable/) (donationware) to use to ensure I could get audio from Zoom to OBS. For previous streams I've needed more cables and have used all five of their virtual cables as well as [Voicemeeter Banana](https://vb-audio.com/Voicemeeter/banana.htm) for mixing the audio, but for this event I was able to get by with just the two Virtual Cables.
+
+![A diagram describing the audio routing](./audio-wiring.drawio.png)
+
+_Here you can see a diagram showing how I wired the audio up between OBS, Zoom, and OBS.Ninja using the Virtual Cables. It may be useful to refer back to this when I describe their setup._
 
 I knew I would want to run a backup streaming server in the cloud so I kept all my files in a sensible path `c:\obs\dod-tx` which meant I could export profiles and scene collections, copy up the whole thing and import them from the same location on the streaming server.
 
-[IBM Cloud](https://ibm.com/cloud) kindly offered to provide us with a dedicated GPU server which we gladly took them up on. Unfortunately they did not have a Dummy HDMI monitor dongle so I was unable to take advantage of the GPU, but the CPU onboard was powerful enough to handle the encoding.
+Speaking of which [IBM Cloud](https://ibm.com/cloud) kindly offered to provide us with a dedicated GPU server which we gladly took them up on. Unfortunately they did not have a Dummy HDMI monitor dongle so I was unable to take advantage of the GPU, but the CPU onboard was powerful enough to handle the encoding. I did however need to install an alternative [virtual monitor driver](https://www.supermicro.com/wdl/driver/VGA/ASPEED/) to get higher than 1024x768 resolution on the remote desktop.
+
+I repeated all of the software install steps on the IBM Cloud backup server.
 
 Knowing that I would need to keep files in sync between the two servers I looked into the state of the art for copying files between windows servers securely over the internet. To my chagrin I found no great answer and ended up doing something that I haven't done in fifteen or more years, installing [Cygwin](https://www.cygwin.com/) and rsync. I'm sure there is something better out there, but at least this gave me the ability to sync `c:\obs\dod-tx` between the two machines over SSH which is secure enough for me.
 
-## OBS Plugins
+## OBS and OBS Plugins
+
+I installed the [latest version](https://cdn-fastly.obsproject.com/downloads/OBS-Studio-26.1.1-Full-Installer-x64.exe) (26.1.1 at time of writing) of OBS. OBS is constantly adding improvements, so its really useful to stay current, plus the Audio Monitor plugin (described later) requires a very recent version of OBS.
 
 ### Audio Monitor
 
@@ -57,7 +65,7 @@ Obviously to build out DOD TX scene collections I needed to first determine the 
 
 Most of the content was pre-recorded and we asked Speakers, Ignites, and Sponsors to provide 1920x1080 resolution videos. Quite a number of the speakers used Zoom or similar to do their recordings and we ended up with a lot of videos that were _not quite_ 1080p. This is relatively easy to fix with OBS, so it wasn't a big deal.
 
-We did however want to do the closing  messages live each day, and the fire-starter chats were live, so we had two all day Zoom meetings that we could capture the audio/video from for those. Much to our annoyance, Zoom does require at least two people in a meeting at all times or it will eventually time the meeting out. This happened to us a few times, however we could just re-open the same meeting so it wasn't a big deal.
+We did however want to do the closing messages live each day, and the fire-starter chats were live, so we had two all day Zoom meetings that we could capture the audio/video from for those. Much to our annoyance, Zoom does require at least two people in a meeting at all times or it will eventually time the meeting out. This happened to us a few times, however we could just re-open the same meeting so it wasn't a big deal.
 
 ## Captions and Live Drawing
 
@@ -67,7 +75,7 @@ We knew that we wanted to ensure the conference was accessible so we opted to hi
 
 I needed a way to get our conference audio/video live to both parties, Streaming services usually add some delay for processing to a stream, so it was important that we were able to provide them with an un-delayed live video/audio feed. I could have used Zoom, but I was already going to use that for live content, therefore I opted to do this with a web based [obs.ninja](obs.ninja) room.
 
-In OBS Ninja I shared the OBS virtual camera and VB Virtual Audio Cable from the Control room. Both the captioning team and Ashton would connect to this and able be able to see and hear the live feed from OBS without any delays, plus broadcast their own video/audio (if needed) to be captured as a Browser source in OBS.
+In OBS Ninja I shared the OBS virtual camera and **VB Virtual Audio Cable A** as a microphone from the Control room. Both the captioning team and Ashton would connect to this and able be able to see and hear the live feed from OBS without any delays, plus broadcast their own video/audio (if needed) to be captured as a Browser source in OBS.
 
 ### Live Drawing
 
@@ -102,11 +110,11 @@ _The captions thus appear in a captions bar across the top of any scenes that we
 
 In order to facilitate live sessions I chose to use Zoom. I could have used OBS.Ninja like above, however that would have required a bunch of extra work vs doing the basic window-grab of Zoom.
 
-I created a Zoom scene in OBS in which I added a Window source for Zoom, a "technical difficulties" source under the Zoom source (so it would show if zoom crashed or whatever) and an Audio Input source for the Virtual Audio Cable.
+I created a Zoom scene in OBS in which I added a Window source for Zoom, a "technical difficulties" source under the Zoom source (so it would show if zoom crashed or whatever) and an Audio Input source for the **Virtual Audio Cable B**.
 
 I used the CTRL-Drag of the bounding box for the Zoom source to cut out the borders and controls of the zoom window to make it look a little less "zoomy".
 
-I also configured Zoom to use the Virtual Audio Cable as the speaker, I wouldn't be sending audio to Zoom so I just left the Mic on the default setting, but I could have used a second Virtual Audio Cable to route audio from OBS to Zoom's Mic.
+I configured Zoom to use the **Virtual Audio Cable B** as the speaker, I wouldn't be sending audio to Zoom but just in case I set the Zoom Mic on the to **Virtual Audio Cable A** and muted it. If I needed to test Audio with the guests I could unmute it in Zoom and they would hear the stream audio.
 
 ![Zoom Scene](./zoom-scene.png)
 
