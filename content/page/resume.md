@@ -5,7 +5,7 @@ title = "Resume for Paul Czarkowski"
 
 # Paul Czarkowski
 
-**Staff Technologist (Developer Advocate) @ VMware**
+**Principal Managed OpenShift Black Belt @ Red Hat**
 
 [username.taken@gmail.com](mailto:username.taken@gmail.com)
 
@@ -20,7 +20,9 @@ Work Permits : USA, Australia, UK/Europe.
 I am an experienced hands-on Architect / DevOps Engineer who accidently fell into a Developer
 Advocate role. I have a long history in Operations and Infrastructure Automation.  I have a broad depth of experience across most IT and Operations related areas with strong experience in using and evangelizing DevOps tools and methodologies.
 
-My current role at VMware has me primarily acting as a Developer Advocate. This is a customer and public facing role in which I work to Advocate for customers and opensource communities into VMware, as well as Advocating for VMware to customers and communities. I also have a key role in improving the Operator experience for a number of VMware's flagship products. I am heavily involved in the Kubernetes community and can be found all over the world advocating for Kubernetes and am an core member of the Helm and Helm Charts community.
+My current team (Managed OpenShift Black Belts) at Red Hat is a post-sales techincal team focussed at removing technical and organizational blockers within customers to help them accellerate their usage of our cloud services. In doing this I have developed expertise in not just OpenShift, but the underlying clouds (Azure, AWS, Google) and any number of integrations with the native cloud services. You can see much of my public facing work at [mobb.ninja](https://mobb.ninja) showing these off.
+
+Previously at at VMware I worked as a Developer Advocate. It was a customer and public facing role in which I worked to Advocate for customers and opensource communities into VMware, as well as Advocating for VMware to customers and communities. I als hado have a key role in improving the Operator experience for a number of VMware's flagship products. I was (and am still) heavily involved in the Kubernetes community and can be found all over the world advocating for Kubernetes and am an core member of the Helm and Helm Charts community.
 
 My previous role at IBM has me focused on helping to rebuild the IBM developer advocacy programs and content creation processes.  Previous to that I led the conversion of our OpenStack Automation platform ([ursula](https://github.com/blueboxgroup/ursula)) from just Ubuntu to also supporting Redhat Enterprise Linux.  I also architected and built the Blue Box Cloud SRE Operations Platform (which was open-sourced as [cuttle](https://github.com/IBM/cuttle)) and built a team to maintain it.
 
@@ -92,7 +94,13 @@ As a Developer Advocate I have travelled to all corners of the globe to speak ab
 
 ## Employment History
 
-### VMWare / Pivotal Software - Nov 2017 to Current
+### Red Hat - April 2021 to Current
+
+*Austin, Texas*
+
+Principal Managed OpenShift Black Belt
+
+### VMWare / Pivotal Software - Nov 2017 to April 2021
 
 *Austin, Texas*
 
