@@ -98,7 +98,7 @@ As a Developer Advocate I have travelled to all corners of the globe to speak ab
 
 *Austin, Texas*
 
-Principal Managed OpenShift Black Belt
+Senior Principal Managed OpenShift Black Belt
 
 ### VMWare / Pivotal Software - Nov 2017 to April 2021
 
@@ -126,7 +126,7 @@ Senior Operations Engineer
 
 *Austin, Texas*
 
-Manager, Systems Engineering *( March 2012 to current )*
+Manager, Systems Engineering *( March 2012 to Nov 2013 )*
 
 Lead Systems Engineer  *( 2010  to March 2012 )*
 
