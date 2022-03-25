@@ -5,7 +5,7 @@ title = "Resume for Paul Czarkowski"
 
 # Paul Czarkowski
 
-**Principal Managed OpenShift Black Belt @ Red Hat**
+**Senior Principal, Cloud Services Black Belts @ Red Hat**
 
 [username.taken@gmail.com](mailto:username.taken@gmail.com)
 
@@ -98,7 +98,7 @@ As a Developer Advocate I have travelled to all corners of the globe to speak ab
 
 *Austin, Texas*
 
-Senior Principal Managed OpenShift Black Belt
+Senior Principal, Cloud Services Black Belts
 
 ### VMWare / Pivotal Software - Nov 2017 to April 2021
 
