@@ -30,7 +30,9 @@ Previous to IBM/Blue Box I was at Rackspace where I worked on a team building a 
 
 ## Speaking Engagements
 
-As a Developer Advocate I have travelled to all corners of the globe to speak about Kubernetes, DevOps, and related topics. Some highlighted events, recordings, and slide decks can be found at my Speaking page: [https://speaking.paulcz.net/](https://speaking.paulcz.net/)
+As a Developer Advocate I have travelled to all corners of the globe to speak about Kubernetes, DevOps, and related topics. Some highlighted events, recordings, and slide decks can be found at my Speaking page: [https://speaking.paulcz.net/](https://speaking.paulcz.net/).
+
+More recently in my role as a Black Belt I present to customers most weeks, I've delivered dozens of workshops, and I do internal enablement on products and features.
 
 ## Open Source and Passion Projects
 
@@ -49,6 +51,12 @@ As a Developer Advocate I have travelled to all corners of the globe to speak ab
 * Over Christmas 2014 I built out [Factorish](https://github.com/factorish/factorish) as a concept to show managing the life-cycle and configuration of applications in Docker using service discovery, and built several example apps such as [Percona with Galera Replication](https://github.com/paulczar/docker-percona_galera) and the [ELK stack](https://github.com/factorish/factorish-elk).  Some of these concepts have found their way into tools such as [Container Pilot](https://github.com/joyent/containerpilot) and [Habitat.sh](https://habitat.sh).  I also used it as a basis for a [blog post](http://tech.paulcz.net/blog/factorish_and_the_12_fakter_app/) and a series of talks I gave on Dockerizing apps that really shouldn’t be Dockerized.
 
 ## Professional Accomplishments
+
+### Red Hat
+
+* I was the first hire of what is now a 40+ person global team, I was instrumental in building out how we work and have interviewed, onboarded, and mentored dozens of people for the role.
+* Seeing gaps in product documentation and real world use cases I created a documentation website [mobb.ninja](https://mobb.ninja) which our customers refer to as their bible. It has since become a formal part of the Red Hat documentation.
+* I produced Streams and Videos about Red Hat (and IBM) products both by myself and with a collegue at IBM including a [new series](https://www.youtube.com/watch?v=v19BFIIbNVQ&list=PLSRSFJxh1W2L3cCzPntXpeHLQx14MZZsO) looking an InstructLab and other OpenSource Generative AI projects.
 
 ### VMware / Pivotal
 
