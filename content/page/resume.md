@@ -17,8 +17,9 @@ Work Permits : USA, Australia, UK/Europe.
 
 ## Overview
 
-I am an experienced hands-on Architect / DevOps Engineer who accidently fell into a Developer
-Advocate role. I have a long history in Operations and Infrastructure Automation.  I have a broad depth of experience across most IT and Operations related areas with strong experience in using and evangelizing DevOps tools and methodologies.
+I am an experienced hands-on Technology Professional with extensive expertise in many technology related job functions. With a long history in Operations and Infrastructure Automation, I possess a comprehensive understanding of IT and Operations, and have a strong background in using and promoting DevOps tools and methodologies.
+
+I have a proven track record of success in leadership, and have a strong ability to communicate and work with all levels of an organization. I am a strong advocate for Open Source Software and have a passion for sharing knowledge and helping others.
 
 My current team (Managed OpenShift Black Belts) at Red Hat is a post-sales techincal team focussed at removing technical and organizational blockers within customers to help them accellerate their usage of our cloud services. In doing this I have developed expertise in not just OpenShift, but the underlying clouds (Azure, AWS, Google) and any number of integrations with the native cloud services. You can see much of my public facing work at [mobb.ninja](https://mobb.ninja) showing these off.
 
@@ -30,7 +31,7 @@ Previous to IBM/Blue Box I was at Rackspace where I worked on a team building a 
 
 ## Speaking Engagements
 
-As a Developer Advocate I have travelled to all corners of the globe to speak about Kubernetes, DevOps, and related topics. Some highlighted events, recordings, and slide decks can be found at my Speaking page: [https://speaking.paulcz.net/](https://speaking.paulcz.net/).
+As a Developer Advocate I travelled to all corners of the globe to speak about Kubernetes, Containers, DevOps, and related topics. Some highlighted events, recordings, and slide decks can be found at my Speaking page: [https://speaking.paulcz.net/](https://speaking.paulcz.net/).
 
 More recently in my role as a Black Belt I present to customers most weeks, I've delivered dozens of workshops, and I do internal enablement on products and features.
 
