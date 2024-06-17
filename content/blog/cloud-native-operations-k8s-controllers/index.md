@@ -16,7 +16,7 @@ Cloud Computing has brought about another shift in software development, going f
 
 With the rise of Kubernetes and similar platforms as well as companies like Hashicorp and stalwarts of Agile Operations such as Google and Pivotal we're starting to see that same shift in Operations as we start to talk about __Platform as Product__ and turning engineering [operations] teams into product teams.
 
-{{< tweet 1088673759291011073 >}}
+{{< twitter user="pczarkowski" id="1088673759291011073" >}}
 
 # Kubernetes Controllers
 

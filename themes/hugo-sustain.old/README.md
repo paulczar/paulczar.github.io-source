@@ -1,11 +1,9 @@
 ![Sustain - Logo][logo]
 
-## Table of Contents
+Table of Contents
+-----------------
 
-- [Table of Contents](#table-of-contents)
 - [Installation](#installation)
-    - [With `git`](#with-git)
-    - [Manual](#manual)
 - [Quick start](#quick-start)
 - [Features](#features)
   - [Syntax highlighting](#syntax-highlighting)
@@ -13,6 +11,7 @@
   - [Google Analytics](#google-analytics)
 - [About](#about)
 - [Contributing](#contributing)
+- [Changelog](#changelog)
 - [License](#license)
 
 ********************
@@ -21,16 +20,16 @@
 
 ********************
 
-<p align="center"><b><a href="https://demo.suyundukov.com/hugo-sustain/">Sustain Live Demo</a></b></p>
+<p align="center"><b><a href="https://demo.sumaxi.me/themes/hugo-sustain/">Sustain Live Demo</a></b></p>
 
-## Installation
+Installation
+------------
 
 #### With `git`
 
-From the root of your Hugo site, clone the theme into `themes/hugo-sustain` by running :
-
-```sh
-git clone https://github.com/nurlansu/hugo-sustain.git themes/hugo-sustain
+From the root of your Hugo site, clone the theme into `themes/hugo-sustain` by running : 
+```
+git clone https://github.com/sumaxime/hugo-sustain.git themes/hugo-sustain
 ```
 
 #### Manual
@@ -41,7 +40,8 @@ git clone https://github.com/nurlansu/hugo-sustain.git themes/hugo-sustain
 
 For more information read the official [setup guide][hugo-guide] of Hugo.
 
-## Quick start
+Quick start
+-----------
 
 After installation, take a look in the `exampleSite` folder at. This directory contains an example config file and the content for the demo. It serves as an example setup for your documentation.
 
@@ -49,33 +49,30 @@ After installation, take a look in the `exampleSite` folder at. This directory c
   exampleSite
   ├── config.toml
   ├── content
-  │   ├── projects.md
-  │   │
+  │   ├── projects
+  │   │   └── index.md
   │   └── blog
   │       ├── creating-a-new-theme.md
   │       ├── go-is-for-lovers.md
   │       ├── hugo-is-for-lovers.md
   │       └── migrate-from-jekyll.md
-  │
-  ├── data
-  │   └── projects.yml
-  │
   └── static
 ```
 
-Copy at least the `config.toml` in the root directory of your website. Overwrite the existing config file if necessary.
+Copy at least the `config.toml` in the root directory of your website. Overwrite the existing config file if necessary. 
 
 Hugo includes a development server, so you can view your changes as you go -
 very handy. Spin it up with the following command:
 
-```sh
+``` sh
 hugo serve
 ```
 
 Now you can go to [localhost:1313][local] and the Sustain
 theme should be visible.
 
-## Features
+Features
+--------
 
 ### Syntax highlighting
 
@@ -83,17 +80,19 @@ Use `highlight = true` in the front matter to include [`highlight.js`][highlight
 
 ### Disqus
 
-To use this feature, uncomment and fill out the `disqusShortname` parameter in `config.toml`.
+To use this feature, uncomment and fill out the `disqusShortname` parameter in config.toml`.
 
 ### Google Analytics
 
 To add Google Analytics, simply sign up to [Google Analytics][g-analytics] to obtain your Google Tracking ID, and add this tracking ID to the `googleAnalytics` parameter in `config.toml`.
 
-## About
+About
+-----
 
 This is a port of the Jekyll theme [Sustain][sustain-jekyll] by [Fábio Madeira][sustain-author]. It supports most of the features of the original theme.
 
-## Contributing
+Contributing
+------------
 
 Pull requests, bug fixes, and new features are welcome!
 
@@ -103,21 +102,24 @@ Pull requests, bug fixes, and new features are welcome!
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request on GitHub
 
-## License
+Changelog
+---------
 
-<p align="center">
-  <a href="./LICENSE.md"><img src="https://suyundukov.com/cdn/logo.svg" width="100%" height="128"></a>
-  <a href="./LICENSE.md"><strong>MIT</strong></a>
-</p>
+> Version 1.0
 
+- Initial release
 
+License
+-------
 
-[logo]: https://suyundukov.com/cdn/sustain.png
-[screenshot]: https://suyundukov.com/cdn/sustain-screen.png
+This theme is released under the [MIT license](LICENSE.md).
+
+[logo]: https://i1.sumaxi.me/i/sustain.png
+[screenshot]: https://i1.sumaxi.me/i/sustain-screen.png
 [bootstrap]: https://getbootstrap.com/
 [hugo]: https://gohugo.io/
 [gh-pages]: https://pages.github.com/
-[zip-archive]: https://github.com/nurlansu/hugo-sustain/archive/master.zip
+[zip-archive]: https://github.com/sumaxime/hugo-sustain/archive/master.zip
 [hugo-guide]: https://gohugo.io/overview/installing/
 [local]: http://localhost:1313/
 [highlight-js]: https://highlightjs.org/

@@ -37,7 +37,7 @@ There's one sticky problem that's left to solve, and this I believe will prove t
 
 Linux containers were not built to be secure isolated sandboxes (like Solaris Zones or FreeBSD Jails). Instead they're built upon a shared kernel model that utilizes kernel features to provide basic process isolation. As [Jessie Frazelle](https://blog.jessfraz.com/post/containers-zones-jails-vms/) would say "Containers aren't a real thing".
 
-{{< tweet 1015407561187655680 >}}
+{{< twitter user="pczarkowski" id="1015407561187655680" >}}
 
 Compounding this is the fact that most Kubernetes components are not Tenant aware. Sure you have [Namespaces](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/) and [Pod Security Policies](https://kubernetes.io/docs/concepts/policy/pod-security-policy/) but the API itself is not. Nor are the internal components like the `kubelet` or `kube-proxy`. This leads to Kubernetes having a "Soft Tenancy" model.
 
@@ -85,7 +85,7 @@ A Kubernetes deployment with two namespaces both with a number of applications r
 
 > Note: there are other cloud tenant workloads running on the same IaaS infrastructure. Since these are VM Containers they have the same level of isolation as a regular Cloud VM. Thus they can run on the same hypervisor with minimal risk.
 
-Initially there is zero infrastructure deployed to the cloud, thus there is zero cost to the Superuser. 
+Initially there is zero infrastructure deployed to the cloud, thus there is zero cost to the Superuser.
 
 The Superuser requests a Kubernetes cluster from the cloud. The Cloud provider creates a single Container VM (or 3 for HA) which is running the main Kubernetes API and System Services. The Superuser could choose to deploy pods in the system namespace, or create new namespaces to delegate access to other users.
 

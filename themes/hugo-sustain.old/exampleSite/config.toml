@@ -1,4 +1,4 @@
-baseURL = "https://example.com/"
+baseurl = "https://example.com/"
 languageCode = "en-US"
 title = "Chris Turner"
 # Enable comments by entering your Disqus shortname
@@ -11,7 +11,7 @@ theme = "hugo-sustain"
   post = "/:year/:month/:day/:slug"
 
 [params]
-  avatar = "img/profile.png"
+  avatar = "profile.png"
   author = "Chris Turner"
   description = "Describe your website"
 
@@ -19,15 +19,12 @@ theme = "hugo-sustain"
   custom_css = []
   custom_js  = []
 
-[params.social]
+[social]
   Github        = "username"
   Email         = "email@example.com"
   Twitter       = "username"
   LinkedIn      = "username"
   Stackoverflow = "username"
-  Medium        = "username"
-  Telegram      = "username"
-  RSS           = "/blog/index.xml"
 
 ## Main Menu
 [[menu.main]]
