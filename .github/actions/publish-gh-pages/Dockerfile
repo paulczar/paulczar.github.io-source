@@ -12,7 +12,7 @@ LABEL "com.github.actions.color"="green"
 RUN apt-get update > /dev/null && apt-get -yqq install curl git > /dev/null
 
 RUN curl -sSL \
-    https://github.com/gohugoio/hugo/releases/download/v0.56.3/hugo_0.56.3_Linux-64bit.tar.gz | \
+    https://github.com/gohugoio/hugo/releases/download/v0.127.0/hugo_extended_0.127.0_Linux-64bit.tar.gz | \
     tar xzf - hugo && \
     chmod +x /hugo && \
     /hugo version
