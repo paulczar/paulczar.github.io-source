@@ -14,3 +14,4 @@ jobs:
       - uses: ./.github/actions/publish-gh-pages
         env:
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+          GH_PAT: ${{ secrets.GH_PAT }}
