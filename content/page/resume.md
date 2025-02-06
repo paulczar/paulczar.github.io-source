@@ -7,7 +7,9 @@ title = "Resume for Paul Czarkowski"
 **Senior Principal, Cloud Services Black Belts @ Red Hat**
 
 📧 [username.taken@gmail.com](mailto:username.taken@gmail.com)
+
 🌍 [tech.paulcz.net](http://tech.paulcz.net/) | 🛠 [github.com/paulczar](https://github.com/paulczar)
+
 🛂 Citizenships: Australia, UK, USA
 
 ---
@@ -100,8 +102,7 @@ Public projects, blogs, and speaking engagements at **[mobb.ninja](https://mobb.
 - **Designed and scaled** infrastructure for **SimCity Online** (AWS) and **Star Wars: The Old Republic** (8,000+ servers, 2M+ subscribers).
 - **Led migration** of game services to cost-effective data centers, increasing efficiency and reducing infrastructure costs.
 
-Further experience / job details on request.
----
+**Further experience / job details on request.**
 
 ## **📌 References**
 Available upon request.
