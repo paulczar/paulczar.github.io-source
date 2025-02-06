@@ -22,8 +22,11 @@ Currently the **Managed OpenShift Black Belt** team at Red Hat, helping **global
 
 ### **Key Highlights:**
 ✅ **Cloud & Kubernetes Expertise** – Deep hands-on experience with OpenShift, Kubernetes, Terraform, Helm, and cloud-native architectures.
+
 ✅ **Thought Leadership & Open Source Advocacy** – Frequent speaker at **KubeCon, DevOpsDays, and industry conferences** - driving DevOps best practices and community growth.  (nonexhaustive list of key talks at [speaking.paulcz.net](https://speaking.paulcz.net/))
+
 ✅ **Infrastructure Automation & DevOps** – Designed and implemented automation frameworks at IBM, Rackspace, and EA, streamlining operations resulting in improved efficiency and cost savings.
+
 ✅ **Team Leadership & Mentorship** – Built and scaled engineering teams at Red Hat, VMware and BlueBox, mentoring engineers and enabling enterprise cloud transformations.
 
 Public projects, blogs, and speaking engagements at **[mobb.ninja](https://mobb.ninja)** and **[speaking.paulcz.net](https://speaking.paulcz.net/)**. Passionate about Open Source, cloud-native tech, and empowering teams to build scalable, high-performance infrastructure.
@@ -58,7 +61,7 @@ Public projects, blogs, and speaking engagements at **[mobb.ninja](https://mobb.
 
 ---
 
-## **🛠 Open Source Contributions**
+## **🛠 Major Open Source Contributions**
 
 - **[Platform Operations on Kubernetes](https://github.com/paulczar/platform-operations-on-kubernetes)** – Created a **"platform in a box"** project to deploy a full SRE/Ops stack, enabling teams to turn Kubernetes into a complete platform with monitoring, logging, and security automation.
 - **[GCP Cloud Compute Operator](https://github.com/paulczar/gcp-cloud-compute-operator)** – Developed the first viable **Google Cloud Operator** for Kubernetes, managing popular GCP services directly from Kubernetes clusters. Contributed to Google's official "Config Connector" to expand its feature set.
