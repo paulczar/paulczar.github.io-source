@@ -20,7 +20,7 @@ git config --global user.email "username.taken@gmail.com"
 git config --global user.name "Hugo Publisher"
 
 echo "--> check out gh-pages"
-git clone https://${PUSH_TOKEN}@github.com/paulczar/paulczar.github.io ../blog
+git clone https://${GH_PAT}@github.com/paulczar/paulczar.github.io ../blog
 
 echo "--> hugo publish"
 cd $GITHUB_WORKSPACE
@@ -28,7 +28,7 @@ cd $GITHUB_WORKSPACE
 
 
 echo "--> push gh-pages"
-if [[ -z "$PUSH_TOKEN" ]]; then
+if [[ -z "$GH_PAT" ]]; then
   echo "No push token provided, skipping publish"
 else
   cd ../blog
