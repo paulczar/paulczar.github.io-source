@@ -20,12 +20,13 @@ title = "Resume for Paul Czarkowski"
 
 Innovative and results-driven **Senior Principal Engineer** with **20+ years** of experience in **cloud platforms (AWS, GCP, Azure), Kubernetes, DevOps, infrastructure automation, and Open Source**. A recognized leader in the **Kubernetes and Helm communities**, I have successfully **built and scaled engineering teams**, driven **enterprise cloud adoption**, and **architected large-scale, resilient infrastructure solutions**.
 
-Currently the **Managed OpenShift Black Belt** team at Red Hat, helping **global enterprises remove technical blockers and accelerate cloud adoption**. Previously, I was a **Developer Advocate at VMware**, shaping Kubernetes tooling and enhancing operator experiences.
+I currently lead the **Managed OpenShift Black Belt** team at Red Hat, helping **global enterprises remove technical blockers and accelerate cloud adoption**. Previously, I was a **Staff Technologist at VMware**, shaping Kubernetes tooling and enhancing operator experiences.
 
 ### **Key Highlights:**
+
 ✅ **Cloud & Kubernetes Expertise** – Deep hands-on experience with OpenShift, Kubernetes, Terraform, Helm, and cloud-native architectures.
 
-✅ **Thought Leadership & Open Source Advocacy** – Frequent speaker at **KubeCon, DevOpsDays, and industry conferences** - driving DevOps best practices and community growth.  (nonexhaustive list of key talks at [speaking.paulcz.net](https://speaking.paulcz.net/))
+✅ **Thought Leadership & Open Source Advocacy** – Frequent speaker and organizer for **DevOpsDays, KubeCon and other industry conferences** - driving DevOps best practices and community growth.  (nonexhaustive list of key talks at [speaking.paulcz.net](https://speaking.paulcz.net/))
 
 ✅ **Infrastructure Automation & DevOps** – Designed and implemented automation frameworks at IBM, Rackspace, and EA, streamlining operations resulting in improved efficiency and cost savings.
 
