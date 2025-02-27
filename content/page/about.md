@@ -1,14 +1,16 @@
 +++
-date = "2016-12-16T09:04:08-06:00"
+date = "2025-02-27"
 title = "About Me"
 +++
 
-Paul is an Infrastructure Engineer who has been doing IT and Operations for longer than he cares to admit and has worked across many industries, retail, game development, managed hosting, and more.  He has worked in both very large and very small organizations.
+Paul Czarkowski is a seasoned DevOps engineer, cloud architect, and open-source advocate with over 20 years of experience designing, automating, and scaling IT infrastructure. Originally from Brisbane, Australia, Paul has spent the past 15 years in the United States working with industry-leading technology companies including Red Hat, VMware, IBM, and Electronic Arts, where he specialized in large-scale cloud infrastructure, Kubernetes, and DevOps automation.
 
-As an avid Technologist he can be found tinkering with emergent technologies (hello running docker in production in 2014) and optimizing and codifying the operations of large legacy applications.
+Paul has been at the forefront of cloud-native technology, running Docker in production as early as 2014 and pioneering Kubernetes automation before it became an industry standard. He is passionate about optimizing and codifying operations for both legacy and modern applications, helping enterprises adopt Infrastructure as Code (IaC), CI/CD pipelines, and cloud-native architectures.
 
-Paul is an active member of the Austin Technology scene and is often found at the [Austin DevOps](https://www.meetup.com/austin-devops/), [Cloud Austin](https://www.meetup.com/CloudAustin/), [Docker Austin](https://www.meetup.com/Docker-Austin/), and [OpenStack Austin](https://www.meetup.com/OpenStack-Austin/) both as a attendee and as a [speaker](/page/speaker).
+A recognized leader in the global DevOps community, Paul is an active speaker, organizer, and mentor. He has spoken at and organized DevOpsDays conferences around the world, including in Austin, Chicago, and Kyiv, and has been a fixture in the Kubernetes, OpenStack, and Cloud Native communities. 
 
-Paul also helps organize local community conferences such as [DevOps Days Austin](https://www.devopsdays.org/events/2016-austin/welcome/) and [Container Days Austin](http://www.containerdaysaustin.com).
+Recently he has been extending his technical expertise to self-hosted, open-source AI, where he explores the intersection of private AI, home automation, and secure, locally-run large language models (LLMs).
 
-Technology isn't his only interest though.  Paul has a love of cooking and can often be found baking sourdough bread and cooking Texas style barbecue in his custom offset pit and competing ( and winning ) in food competitions both locally and interstate.
+Beyond technology, Paul is a competitive cook and barbecue pitmaster. Whether he’s baking sourdough bread, perfecting Texas-style barbecue in his custom-built offset smoker, or winning food competitions across the country, he brings the same passion and precision to cooking as he does to engineering.
+
+For speaking engagements, consulting, or just to talk about the latest in cloud, DevOps, and open-source AI, you can find Paul at tech.paulcz.net or github.com/paulczar.
